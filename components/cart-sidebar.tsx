@@ -1,0 +1,98 @@
+"use client"
+
+import { useCart } from "./cart-provider"
+import { Button } from "@/components/ui/button"
+import { X, Minus, Plus, ShoppingBag } from "lucide-react"
+import Image from "next/image"
+
+export function CartSidebar() {
+  const { state, dispatch } = useCart()
+
+  const total = state.items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+
+  if (!state.isOpen) return null
+
+  return (
+    <div className="fixed inset-0 z-50 overflow-hidden">
+      <div className="absolute inset-0 bg-black bg-opacity-50" onClick={() => dispatch({ type: "TOGGLE_CART" })} />
+
+      <div className="absolute right-0 top-0 h-full w-full max-w-md bg-white shadow-xl">
+        <div className="flex h-full flex-col">
+          <div className="flex items-center justify-between p-4 border-b">
+            <h2 className="text-lg font-semibold">Shopping Cart</h2>
+            <Button variant="ghost" size="sm" onClick={() => dispatch({ type: "TOGGLE_CART" })}>
+              <X className="h-5 w-5" />
+            </Button>
+          </div>
+
+          <div className="flex-1 overflow-y-auto p-4">
+            {state.items.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-full text-center">
+                <ShoppingBag className="h-12 w-12 text-neutral-400 mb-4" />
+                <p className="text-neutral-600">Your cart is empty</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {state.items.map((item) => (
+                  <div key={`${item.id}-${item.size}`} className="flex items-center space-x-4 border-b pb-4">
+                    <Image
+                      src={item.image || "/placeholder.svg"}
+                      alt={item.name}
+                      width={80}
+                      height={80}
+                      className="rounded-lg object-cover"
+                      crossOrigin="anonymous"
+                    />
+                    <div className="flex-1">
+                      <h3 className="font-medium">{item.name}</h3>
+                      <p className="text-sm text-neutral-600">Size: {item.size}</p>
+                      <p className="font-semibold">${item.price}</p>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          dispatch({
+                            type: "UPDATE_QUANTITY",
+                            payload: { id: `${item.id}-${item.size}`, quantity: Math.max(0, item.quantity - 1) },
+                          })
+                        }
+                      >
+                        <Minus className="h-3 w-3" />
+                      </Button>
+                      <span className="w-8 text-center">{item.quantity}</span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          dispatch({
+                            type: "UPDATE_QUANTITY",
+                            payload: { id: `${item.id}-${item.size}`, quantity: item.quantity + 1 },
+                          })
+                        }
+                      >
+                        <Plus className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {state.items.length > 0 && (
+            <div className="border-t p-4">
+              <div className="flex justify-between items-center mb-4">
+                <span className="text-lg font-semibold">Total: ${total}</span>
+              </div>
+              <Button className="w-full" size="lg">
+                Checkout
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
