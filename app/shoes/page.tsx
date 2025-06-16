@@ -3,7 +3,7 @@ import { ShoesGrid } from "@/components/shoes-grid"
 import { ShoesFilters } from "@/components/shoes-filters"
 
 export const metadata: Metadata = {
-  title: "Shoes - Soul Purpose Footwear",
+  title: "Shoes - Sole Purpose Footwear",
   description: "Browse our collection of custom sneaker designs and artistry.",
 }
 

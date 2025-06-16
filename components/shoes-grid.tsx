@@ -4,54 +4,91 @@ import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
+const allSizes = ["6", "6.5", "7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11", "11.5", "12", "12.5", "13"]
+
 const shoes = [
+  // Featured shoes (first 3 from hero section)
+  {
+    id: 1,
+    name: "Red Kuffiyeh AF1",
+    price: 350,
+    image: "/images/kuffiyeh-side-sunset.png",
+    slug: "red-kuffiyeh-af1",
+    sizes: allSizes,
+  },
+  {
+    id: 2,
+    name: "Mexican Eagle AF1",
+    price: 425,
+    image: "/images/mexican-side-view.png",
+    slug: "mexican-eagle-af1",
+    sizes: allSizes,
+  },
+  {
+    id: 3,
+    name: "Black & Red Geometric",
+    price: 375,
+    image: "/images/black-red-geometric-hero.jpg",
+    slug: "black-red-geometric",
+    sizes: allSizes,
+  },
+  // Other shoes
   {
     id: 4,
     name: "Jordanian Flag AF1",
     price: 400,
-    image: "/images/jordanian-af1.png",
+    image: "/images/jordanian-side-view.jpg",
     slug: "jordanian-flag-af1",
-    sizes: ["6", "7", "8", "9"],
+    sizes: allSizes,
   },
   {
     id: 5,
     name: "Geometric Checkered",
     price: 325,
-    image: "/images/geometric-af1.png",
+    image: "/images/geometric-checkered-side.jpg",
     slug: "geometric-checkered",
-    sizes: ["7.5", "8", "8.5", "9", "9.5"],
+    sizes: allSizes,
   },
   {
     id: 6,
     name: "Chinese Flag AF1",
     price: 450,
-    image: "/images/chinese-af1.png",
+    image: "/images/chinese-side-sunset.png",
     slug: "chinese-flag-af1",
-    sizes: ["8", "9", "10", "11", "12"],
+    sizes: allSizes,
   },
   {
     id: 7,
     name: "Checkered Drip AF1",
     price: 395,
-    image: "/images/checkered-drip-af1.png",
+    image: "/images/checkered-drip-sunset.png",
     slug: "checkered-drip-af1",
-    sizes: ["7", "8", "9", "10"],
+    sizes: allSizes,
   },
   {
     id: 8,
-    name: "Abstract Waves",
-    price: 350,
-    image: "/placeholder.svg?height=400&width=400",
-    slug: "abstract-waves",
-    sizes: ["7.5", "8", "8.5", "9"],
+    name: "Map of Palestine AF1",
+    price: 380,
+    image: "/images/palestine-map-side.jpg",
+    slug: "map-of-palestine-af1",
+    sizes: allSizes,
   },
+  // New shoes added at the bottom
   {
     id: 9,
-    name: "Urban Street Art",
-    price: 400,
-    image: "/placeholder.svg?height=400&width=400",
-    slug: "urban-street-art",
-    sizes: ["8", "9", "10", "11"],
+    name: "Lebanese Cedar AF1",
+    price: 410,
+    image: "/images/lebanese-side-view.jpg",
+    slug: "lebanese-cedar-af1",
+    sizes: allSizes,
+  },
+  {
+    id: 10,
+    name: "Filipino Sun AF1",
+    price: 420,
+    image: "/images/filipino-side-view.jpg",
+    slug: "filipino-sun-af1",
+    sizes: allSizes,
   },
 ]
 
@@ -64,11 +101,15 @@ export function ShoesGrid() {
             <div className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden">
               <div className="aspect-[4/3] relative">
                 <Image
-                  src={shoe.image || "/placeholder.svg"}
+                  src={shoe.image || "/placeholder.svg?height=400&width=400&text=Shoe+Image"}
                   alt={shoe.name}
                   fill
                   className="object-cover object-center group-hover:scale-105 transition-transform duration-300"
                   crossOrigin="anonymous"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement
+                    target.src = "/placeholder.svg?height=400&width=400&text=Shoe+Image"
+                  }}
                 />
               </div>
               <div className="p-6">

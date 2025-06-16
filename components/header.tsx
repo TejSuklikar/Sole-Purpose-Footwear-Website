@@ -14,7 +14,7 @@ export function Header() {
     { name: "Home", href: "/" },
     { name: "About", href: "/about" },
     { name: "Shoes", href: "/shoes" },
-    { name: "Order", href: "/order" },
+    { name: "Custom Order", href: "/order" },
   ]
 
   return (
@@ -25,7 +25,7 @@ export function Header() {
             <div className="w-8 h-8 bg-neutral-900 rounded-full flex items-center justify-center">
               <span className="text-white font-bold text-sm">SP</span>
             </div>
-            <span className="font-playfair text-xl font-semibold text-neutral-900">Soul Purpose</span>
+            <span className="font-playfair text-xl font-semibold text-neutral-900">Sole Purpose</span>
           </Link>
 
           <div className="flex items-center space-x-4">

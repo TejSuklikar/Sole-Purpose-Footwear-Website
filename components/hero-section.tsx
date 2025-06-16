@@ -10,7 +10,7 @@ const featuredShoes = [
     id: 1,
     name: "Red Kuffiyeh AF1",
     description: "Traditional Kuffiyeh patterns in bold red on white canvas 🇯🇴",
-    image: "/images/kuffiyeh-af1.png",
+    image: "/images/kuffiyeh-sunset.png",
     price: "$350",
     slug: "red-kuffiyeh-af1",
   },
@@ -18,7 +18,7 @@ const featuredShoes = [
     id: 2,
     name: "Mexican Eagle AF1",
     description: "Hand-painted Mexican flag design with detailed eagle artwork 🇲🇽",
-    image: "/images/mexican-af1.png",
+    image: "/images/mexican-eagle-hero.png",
     price: "$425",
     slug: "mexican-eagle-af1",
   },
@@ -26,7 +26,7 @@ const featuredShoes = [
     id: 3,
     name: "Black & Red Geometric",
     description: "Sleek black forces with striking red geometric patterns ❤️🖤",
-    image: "/images/black-red-af1.png",
+    image: "/images/black-red-geometric-hero.jpg",
     price: "$375",
     slug: "black-red-geometric",
   },
@@ -38,7 +38,7 @@ export function HeroSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16 fade-in-up">
           <h1 className="font-playfair text-4xl md:text-6xl lg:text-7xl font-bold text-gradient mb-4">
-            Soul Purpose Footwear
+            Sole Purpose Footwear
           </h1>
           <p className="text-xl md:text-2xl font-medium text-neutral-700 mb-6 font-sans">
             Personalize your step with a unique hand painted design

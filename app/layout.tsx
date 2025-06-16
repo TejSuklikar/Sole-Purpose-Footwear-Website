@@ -11,10 +11,10 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" })
 
 export const metadata: Metadata = {
-  title: "Soul Purpose Footwear - Custom Sneaker Artistry",
+  title: "Sole Purpose Footwear - Custom Sneaker Artistry",
   description: "Contemporary footwear brand specializing in custom sneaker designs and made-to-order artistry.",
   openGraph: {
-    title: "Soul Purpose Footwear - Custom Sneaker Artistry",
+    title: "Sole Purpose Footwear - Custom Sneaker Artistry",
     description: "Contemporary footwear brand specializing in custom sneaker designs and made-to-order artistry.",
     type: "website",
   },

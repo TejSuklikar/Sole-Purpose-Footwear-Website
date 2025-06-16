@@ -1,14 +1,38 @@
 "use client"
 
+import { useState } from "react"
 import { useCart } from "./cart-provider"
 import { Button } from "@/components/ui/button"
-import { X, Minus, Plus, ShoppingBag } from "lucide-react"
+import { X, Minus, Plus, ShoppingBag, Send } from "lucide-react"
 import Image from "next/image"
 
 export function CartSidebar() {
   const { state, dispatch } = useCart()
+  const [isProcessing, setIsProcessing] = useState(false)
 
   const total = state.items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+
+  const handleCheckout = async () => {
+    setIsProcessing(true)
+
+    // Simulate processing time
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+
+    // Store order in localStorage for the checkout page
+    const orderData = {
+      items: state.items,
+      total,
+      timestamp: new Date().toISOString(),
+      orderId: `SP-${Date.now()}`,
+    }
+
+    localStorage.setItem("pendingOrder", JSON.stringify(orderData))
+
+    // Redirect to checkout page
+    window.location.href = "/checkout/payment"
+
+    setIsProcessing(false)
+  }
 
   if (!state.isOpen) return null
 
@@ -36,7 +60,7 @@ export function CartSidebar() {
                 {state.items.map((item) => (
                   <div key={`${item.id}-${item.size}`} className="flex items-center space-x-4 border-b pb-4">
                     <Image
-                      src={item.image || "/placeholder.svg"}
+                      src={item.image || "/placeholder.svg?height=80&width=80&text=Product"}
                       alt={item.name}
                       width={80}
                       height={80}
@@ -86,8 +110,18 @@ export function CartSidebar() {
               <div className="flex justify-between items-center mb-4">
                 <span className="text-lg font-semibold">Total: ${total}</span>
               </div>
-              <Button className="w-full" size="lg">
-                Checkout
+              <Button className="w-full" size="lg" onClick={handleCheckout} disabled={isProcessing}>
+                {isProcessing ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <Send className="mr-2 h-4 w-4" />
+                    Proceed to Payment
+                  </>
+                )}
               </Button>
             </div>
           )}
