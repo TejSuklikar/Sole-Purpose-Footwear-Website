@@ -59,7 +59,7 @@ export function FeaturedWork() {
             <div className="text-sm text-neutral-600 uppercase tracking-wider">Hand-Painted</div>
           </div>
           <div className="text-center">
-            <div className="text-3xl font-bold text-neutral-900 mb-2">SF</div>
+            <div className="text-3xl font-bold text-neutral-900 mb-2">San Francisco</div>
             <div className="text-sm text-neutral-600 uppercase tracking-wider">Based & Made</div>
           </div>
         </div>

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Copy, Check, Send } from "lucide-react"
+import { Copy, Check, Send, ExternalLink } from "lucide-react"
 import Link from "next/link"
 
 interface CustomOrderData {
@@ -26,11 +26,10 @@ export default function CustomPaymentPage() {
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [copiedField, setCopiedField] = useState<string | null>(null)
 
-  // Payment information - updated with correct email
+  // Payment information
   const paymentMethods = {
-    zelle: "solepurposefootwear813@gmail.com",
-    venmo: "@SolePurposeFootwear",
-    cashapp: "$SolePurposeFootwear",
+    zelle: "+1 (415) 939-8270",
+    venmo: "https://venmo.com/u/Drew-Alaraj",
   }
 
   useEffect(() => {
@@ -176,27 +175,22 @@ export default function CustomPaymentPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <h4 className="font-semibold">Venmo</h4>
-                      <p className="text-sm text-neutral-600">{paymentMethods.venmo}</p>
+                      <p className="text-sm text-neutral-600">Drew Alaraj</p>
                     </div>
-                    <Button variant="outline" size="sm" onClick={() => copyToClipboard(paymentMethods.venmo, "venmo")}>
-                      {copiedField === "venmo" ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="border rounded-lg p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-semibold">Cash App</h4>
-                      <p className="text-sm text-neutral-600">{paymentMethods.cashapp}</p>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => copyToClipboard(paymentMethods.venmo, "venmo")}
+                      >
+                        {copiedField === "venmo" ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                      </Button>
+                      <Button variant="outline" size="sm" asChild>
+                        <a href={paymentMethods.venmo} target="_blank" rel="noopener noreferrer">
+                          <ExternalLink className="h-4 w-4" />
+                        </a>
+                      </Button>
                     </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => copyToClipboard(paymentMethods.cashapp, "cashapp")}
-                    >
-                      {copiedField === "cashapp" ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                    </Button>
                   </div>
                 </div>
               </div>
