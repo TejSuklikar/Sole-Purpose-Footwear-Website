@@ -18,7 +18,7 @@ const featuredShoes = [
     id: 2,
     name: "Mexican Eagle AF1",
     description: "Hand-painted Mexican flag design with detailed eagle artwork 🇲🇽",
-    image: "/images/mexican-af1.png",
+    image: "/images/mexican-eagle-detail.png",
     price: "$425",
     slug: "mexican-eagle-af1",
   },
@@ -65,6 +65,7 @@ export function HeroSection() {
                       alt={shoe.name}
                       fill
                       className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                      style={{ objectPosition: "center center" }}
                       crossOrigin="anonymous"
                     />
                   </div>
