@@ -18,7 +18,6 @@ const shoes = [
       "Hand-painted with premium acrylic paints",
       "Sealed with protective coating for durability",
       "Based on Nike Air Force 1 silhouette",
-      "Ready to ship within 1-2 business days",
     ],
   },
   {
@@ -34,7 +33,6 @@ const shoes = [
       "Hand-painted Mexican coat of arms (eagle and serpent)",
       "Mexican flag colors on swoosh and AIR branding",
       "Premium white leather base with detailed artwork",
-      "Ready to ship within 1-2 business days",
     ],
   },
   {
@@ -46,12 +44,7 @@ const shoes = [
     sizes: allSizes,
     description:
       "Sleek black forces with striking red geometric patterns. Modern design meets traditional craftsmanship in this bold statement piece.",
-    details: [
-      "All-black leather base",
-      "Hand-painted red geometric patterns",
-      "Matte finish for sophisticated look",
-      "Ready to ship within 1-2 business days",
-    ],
+    details: ["All-black leather base", "Hand-painted red geometric patterns", "Matte finish for sophisticated look"],
   },
   // Other shoes
   {
@@ -67,7 +60,6 @@ const shoes = [
       "Hand-painted Jordanian flag design with seven-pointed star",
       "Traditional red, black, white, and green colors",
       "Kuffiyeh pattern details on swoosh and heel",
-      "Ready to ship within 1-2 business days",
     ],
   },
   {
@@ -83,7 +75,6 @@ const shoes = [
       "Hand-painted checkered geometric pattern",
       "Black and white minimalist design",
       "Palestinian flag colors on AIR branding",
-      "Ready to ship within 1-2 business days",
     ],
   },
   {
@@ -99,7 +90,6 @@ const shoes = [
       "Hand-painted Chinese flag design with five-pointed stars",
       "Authentic red and gold colors throughout",
       "Flag elements integrated into swoosh design",
-      "Ready to ship within 1-2 business days",
     ],
   },
   {
@@ -115,7 +105,6 @@ const shoes = [
       "Hand-painted checkered swoosh pattern",
       "Artistic paint drip effect in Palestinian flag colors",
       "Premium white leather base with street art aesthetic",
-      "Ready to ship within 1-2 business days",
     ],
   },
   {
@@ -131,7 +120,6 @@ const shoes = [
       "Hand-painted map of Palestine in red and green",
       "Traditional Kuffiyeh geometric border patterns",
       "Palestinian flag colors throughout design",
-      "Ready to ship within 1-2 business days",
     ],
   },
   // New shoes added at the bottom
@@ -148,7 +136,6 @@ const shoes = [
       "Hand-painted Lebanese cedar tree emblem",
       "Traditional red and white flag stripes",
       "Lebanese flag colors on Nike and AIR branding",
-      "Ready to ship within 1-2 business days",
     ],
   },
   {
@@ -164,7 +151,6 @@ const shoes = [
       "Hand-painted Filipino golden sun symbol",
       "Authentic blue, red, and yellow flag colors",
       "Traditional eight-rayed sun design",
-      "Ready to ship within 1-2 business days",
     ],
   },
 ]

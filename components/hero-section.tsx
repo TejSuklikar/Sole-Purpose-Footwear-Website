@@ -39,7 +39,7 @@ export function HeroSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16 fade-in-up">
           <h1 className="font-playfair text-4xl md:text-6xl lg:text-7xl font-bold text-gradient mb-4">
-            Soul Purpose Footwear
+            Sole Purpose Footwear
           </h1>
           <p className="text-xl md:text-2xl font-medium text-neutral-700 mb-6 font-sans">
             Personalize your step with a unique hand painted design

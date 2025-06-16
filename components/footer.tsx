@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Instagram, Twitter, Facebook, Mail } from "lucide-react"
+import { Instagram, Facebook, Mail } from "lucide-react"
 
 export function Footer() {
   return (
@@ -11,7 +11,7 @@ export function Footer() {
               <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
                 <span className="text-neutral-900 font-bold text-sm">SP</span>
               </div>
-              <span className="font-playfair text-xl font-semibold">Soul Purpose Footwear</span>
+              <span className="font-playfair text-xl font-semibold">Sole Purpose Footwear</span>
             </div>
             <p className="text-neutral-400 max-w-md">
               Contemporary footwear brand specializing in custom sneaker designs and made-to-order artistry. Every pair
@@ -34,7 +34,7 @@ export function Footer() {
               </li>
               <li>
                 <Link href="/order" className="text-neutral-400 hover:text-white transition-colors">
-                  Order
+                  Custom Order
                 </Link>
               </li>
             </ul>
@@ -43,17 +43,19 @@ export function Footer() {
           <div>
             <h3 className="font-semibold mb-4">Connect</h3>
             <div className="flex space-x-4">
-              <a href="#" className="text-neutral-400 hover:text-white transition-colors">
+              <a
+                href="https://www.instagram.com/solepurposefootwear/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-neutral-400 hover:text-white transition-colors"
+              >
                 <Instagram className="w-5 h-5" />
-              </a>
-              <a href="#" className="text-neutral-400 hover:text-white transition-colors">
-                <Twitter className="w-5 h-5" />
               </a>
               <a href="#" className="text-neutral-400 hover:text-white transition-colors">
                 <Facebook className="w-5 h-5" />
               </a>
               <a
-                href="mailto:hello@soulpurposefootwear.com"
+                href="mailto:hello@solepurposefootwear.com"
                 className="text-neutral-400 hover:text-white transition-colors"
               >
                 <Mail className="w-5 h-5" />
@@ -64,7 +66,7 @@ export function Footer() {
 
         <div className="border-t border-neutral-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-neutral-400 text-sm">
-            © {new Date().getFullYear()} Soul Purpose Footwear. All rights reserved.
+            © {new Date().getFullYear()} Sole Purpose Footwear. All rights reserved.
           </p>
           <div className="flex space-x-6 mt-4 md:mt-0">
             <Link href="/privacy" className="text-neutral-400 hover:text-white text-sm transition-colors">

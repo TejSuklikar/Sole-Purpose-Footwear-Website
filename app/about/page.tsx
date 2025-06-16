@@ -3,7 +3,7 @@ import type { Metadata } from "next"
 
 export const metadata: Metadata = {
   title: "About - Sole Purpose Footwear",
-  description: "Learn about our story, values, and craft philosophy behind Soul Purpose Footwear.",
+  description: "Learn about our story, values, and craft philosophy behind Sole Purpose Footwear.",
 }
 
 export default function AboutPage() {
@@ -13,7 +13,7 @@ export default function AboutPage() {
         <div className="text-center mb-16">
           <h1 className="font-playfair text-4xl md:text-5xl font-bold text-neutral-900 mb-6">Our Story</h1>
           <p className="text-xl text-neutral-600 leading-relaxed">
-            Born from a passion for art and a love for sneakers, Soul Purpose Footwear bridges the gap between fashion
+            Born from a passion for art and a love for sneakers, Sole Purpose Footwear bridges the gap between fashion
             and personal expression.
           </p>
         </div>
@@ -23,7 +23,7 @@ export default function AboutPage() {
             <div>
               <h2 className="font-playfair text-3xl font-bold text-neutral-900 mb-4">The Beginning</h2>
               <p className="text-neutral-600 leading-relaxed">
-                Founded in 2020 by a collective of artists and sneaker enthusiasts, Soul Purpose Footwear emerged from a
+                Founded in 2020 by a collective of artists and sneaker enthusiasts, Sole Purpose Footwear emerged from a
                 simple belief: that footwear should be more than just functional—it should be a canvas for creativity
                 and self-expression.
               </p>

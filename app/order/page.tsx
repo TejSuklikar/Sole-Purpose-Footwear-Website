@@ -2,8 +2,8 @@ import type { Metadata } from "next"
 import { OrderForm } from "@/components/order-form"
 
 export const metadata: Metadata = {
-  title: "Order - Soul Purpose Footwear",
-  description: "Create your custom sneaker design with Soul Purpose Footwear.",
+  title: "Custom Order - Sole Purpose Footwear",
+  description: "Create your custom sneaker design with Sole Purpose Footwear.",
 }
 
 export default function OrderPage() {
