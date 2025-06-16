@@ -9,7 +9,7 @@ const shoes = [
     id: 4,
     name: "Jordanian Flag AF1",
     price: 400,
-    image: "/images/jordanian-af1.png",
+    image: "/images/jordanian-side-view.jpg",
     slug: "jordanian-flag-af1",
     sizes: ["6", "7", "8", "9"],
   },
