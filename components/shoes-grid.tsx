@@ -28,7 +28,7 @@ const shoes = [
     id: 3,
     name: "Black & Red Geometric",
     price: 375,
-    image: "/images/black-red-af1.png",
+    image: "/images/black-red-geometric-hero.jpg",
     slug: "black-red-geometric",
     sizes: allSizes,
   },

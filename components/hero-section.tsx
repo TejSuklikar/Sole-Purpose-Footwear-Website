@@ -26,7 +26,7 @@ const featuredShoes = [
     id: 3,
     name: "Black & Red Geometric",
     description: "Sleek black forces with striking red geometric patterns ❤️🖤",
-    image: "/images/black-red-af1.png",
+    image: "/images/black-red-geometric-hero.jpg",
     price: "$375",
     slug: "black-red-geometric",
   },
