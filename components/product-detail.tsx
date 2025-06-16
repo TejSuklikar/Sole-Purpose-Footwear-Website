@@ -56,11 +56,15 @@ export function ProductDetail({ shoe }: { shoe: Shoe }) {
           <div className="space-y-4">
             <div className="aspect-[4/3] relative bg-neutral-50 rounded-lg overflow-hidden group">
               <Image
-                src={shoe.images[currentImageIndex] || "/placeholder.svg"}
+                src={shoe.images[currentImageIndex] || "/placeholder.svg?height=400&width=400&text=Product+Image"}
                 alt={`${shoe.name} view ${currentImageIndex + 1}`}
                 fill
                 className="object-contain object-center p-4"
                 crossOrigin="anonymous"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement
+                  target.src = "/placeholder.svg?height=400&width=400&text=Product+Image"
+                }}
               />
 
               {/* Navigation arrows - only show if more than 1 image */}
@@ -109,11 +113,15 @@ export function ProductDetail({ shoe }: { shoe: Shoe }) {
                     }`}
                   >
                     <Image
-                      src={image || "/placeholder.svg"}
+                      src={image || "/placeholder.svg?height=100&width=100&text=Thumbnail"}
                       alt={`${shoe.name} thumbnail ${index + 1}`}
                       fill
                       className="object-contain object-center p-2"
                       crossOrigin="anonymous"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement
+                        target.src = "/placeholder.svg?height=100&width=100&text=Thumbnail"
+                      }}
                     />
                   </button>
                 ))}

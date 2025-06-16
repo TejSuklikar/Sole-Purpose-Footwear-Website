@@ -168,5 +168,10 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
     notFound()
   }
 
+  if (!shoe?.images || shoe.images.length === 0) {
+    console.error(`No images found for shoe with slug: ${params.slug}`)
+    return notFound()
+  }
+
   return <ProductDetail shoe={shoe} />
 }

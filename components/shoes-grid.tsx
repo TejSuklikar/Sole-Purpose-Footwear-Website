@@ -101,11 +101,15 @@ export function ShoesGrid() {
             <div className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden">
               <div className="aspect-[4/3] relative">
                 <Image
-                  src={shoe.image || "/placeholder.svg"}
+                  src={shoe.image || "/placeholder.svg?height=400&width=400&text=Shoe+Image"}
                   alt={shoe.name}
                   fill
                   className="object-cover object-center group-hover:scale-105 transition-transform duration-300"
                   crossOrigin="anonymous"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement
+                    target.src = "/placeholder.svg?height=400&width=400&text=Shoe+Image"
+                  }}
                 />
               </div>
               <div className="p-6">
