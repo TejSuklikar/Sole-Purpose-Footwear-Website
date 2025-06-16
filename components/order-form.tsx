@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { CreditCard } from "lucide-react"
+import { Send } from "lucide-react"
 
 const shoeModels = [
   "Air Force 1 Style",
@@ -27,6 +27,7 @@ export function OrderForm() {
     firstName: "",
     lastName: "",
     email: "",
+    phone: "",
     shoeModel: "",
     size: "",
     designDescription: "",
@@ -41,39 +42,32 @@ export function OrderForm() {
     e.preventDefault()
     setIsSubmitting(true)
 
-    try {
-      const response = await fetch("/api/create-checkout-session", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          type: "custom_order",
-          orderData: formData,
-        }),
-      })
-
-      const { sessionId } = await response.json()
-
-      // Redirect to Stripe Checkout
-      const stripe = (await import("@stripe/stripe-js")).loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
-      const stripeInstance = await stripe
-
-      if (stripeInstance) {
-        await stripeInstance.redirectToCheckout({ sessionId })
-      }
-    } catch (error) {
-      console.error("Error during checkout:", error)
-      alert("There was an error processing your order. Please try again.")
-    } finally {
-      setIsSubmitting(false)
+    // Create custom order data
+    const customOrderData = {
+      ...formData,
+      price: 350,
+      orderId: `SP-CUSTOM-${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      type: "custom_order",
     }
+
+    // Store in localStorage and redirect to payment page
+    localStorage.setItem("customOrder", JSON.stringify(customOrderData))
+
+    // Simulate processing time
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+
+    // Redirect to custom order payment page
+    window.location.href = "/checkout/custom-payment"
+
+    setIsSubmitting(false)
   }
 
   const isFormValid =
     formData.firstName &&
     formData.lastName &&
     formData.email &&
+    formData.phone &&
     formData.shoeModel &&
     formData.size &&
     formData.designDescription &&
@@ -116,16 +110,29 @@ export function OrderForm() {
             </div>
           </div>
 
-          <div>
-            <Label htmlFor="email">Email Address</Label>
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              value={formData.email}
-              onChange={(e) => handleInputChange("email", e.target.value)}
-              required
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="email">Email Address</Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={(e) => handleInputChange("email", e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="phone">Phone Number</Label>
+              <Input
+                id="phone"
+                name="phone"
+                type="tel"
+                value={formData.phone}
+                onChange={(e) => handleInputChange("phone", e.target.value)}
+                required
+              />
+            </div>
           </div>
 
           <div>
@@ -199,7 +206,7 @@ export function OrderForm() {
           <div className="bg-neutral-50 p-4 rounded-lg">
             <h3 className="font-semibold mb-2">What happens next?</h3>
             <ul className="text-sm text-neutral-600 space-y-1">
-              <li>• Complete payment to secure your custom order</li>
+              <li>• Proceed to payment using Zelle, Venmo, or Cash App</li>
               <li>• We'll review your design request within 24 hours</li>
               <li>• Our team will contact you to discuss details and timeline</li>
               <li>• Creation takes 2-4 weeks depending on complexity</li>
@@ -211,12 +218,12 @@ export function OrderForm() {
             {isSubmitting ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                Processing Payment...
+                Processing...
               </>
             ) : (
               <>
-                <CreditCard className="mr-2 h-4 w-4" />
-                Pay $350 & Place Order
+                <Send className="mr-2 h-4 w-4" />
+                Proceed to Payment
               </>
             )}
           </Button>

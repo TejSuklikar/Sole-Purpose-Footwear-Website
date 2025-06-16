@@ -3,45 +3,35 @@
 import { useState } from "react"
 import { useCart } from "./cart-provider"
 import { Button } from "@/components/ui/button"
-import { X, Minus, Plus, ShoppingBag, CreditCard } from "lucide-react"
+import { X, Minus, Plus, ShoppingBag, Send } from "lucide-react"
 import Image from "next/image"
 
 export function CartSidebar() {
   const { state, dispatch } = useCart()
-  const [isCheckingOut, setIsCheckingOut] = useState(false)
+  const [isProcessing, setIsProcessing] = useState(false)
 
   const total = state.items.reduce((sum, item) => sum + item.price * item.quantity, 0)
 
   const handleCheckout = async () => {
-    setIsCheckingOut(true)
+    setIsProcessing(true)
 
-    try {
-      const response = await fetch("/api/create-checkout-session", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          items: state.items,
-          type: "cart",
-        }),
-      })
+    // Simulate processing time
+    await new Promise((resolve) => setTimeout(resolve, 1000))
 
-      const { sessionId } = await response.json()
-
-      // Redirect to Stripe Checkout
-      const stripe = (await import("@stripe/stripe-js")).loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
-      const stripeInstance = await stripe
-
-      if (stripeInstance) {
-        await stripeInstance.redirectToCheckout({ sessionId })
-      }
-    } catch (error) {
-      console.error("Error during checkout:", error)
-      alert("There was an error processing your checkout. Please try again.")
-    } finally {
-      setIsCheckingOut(false)
+    // Store order in localStorage for the checkout page
+    const orderData = {
+      items: state.items,
+      total,
+      timestamp: new Date().toISOString(),
+      orderId: `SP-${Date.now()}`,
     }
+
+    localStorage.setItem("pendingOrder", JSON.stringify(orderData))
+
+    // Redirect to checkout page
+    window.location.href = "/checkout/payment"
+
+    setIsProcessing(false)
   }
 
   if (!state.isOpen) return null
@@ -120,16 +110,16 @@ export function CartSidebar() {
               <div className="flex justify-between items-center mb-4">
                 <span className="text-lg font-semibold">Total: ${total}</span>
               </div>
-              <Button className="w-full" size="lg" onClick={handleCheckout} disabled={isCheckingOut}>
-                {isCheckingOut ? (
+              <Button className="w-full" size="lg" onClick={handleCheckout} disabled={isProcessing}>
+                {isProcessing ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                     Processing...
                   </>
                 ) : (
                   <>
-                    <CreditCard className="mr-2 h-4 w-4" />
-                    Checkout
+                    <Send className="mr-2 h-4 w-4" />
+                    Proceed to Payment
                   </>
                 )}
               </Button>
