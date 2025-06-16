@@ -26,9 +26,9 @@ export default function CustomPaymentPage() {
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [copiedField, setCopiedField] = useState<string | null>(null)
 
-  // Payment information - your client can update these
+  // Payment information - updated with correct email
   const paymentMethods = {
-    zelle: "solepurposefootwear@gmail.com",
+    zelle: "solepurposefootwear813@gmail.com",
     venmo: "@SolePurposeFootwear",
     cashapp: "$SolePurposeFootwear",
   }
