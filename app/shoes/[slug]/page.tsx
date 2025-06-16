@@ -23,7 +23,7 @@ const shoes = [
   {
     id: 2,
     name: "Mexican Eagle AF1",
-    price: 380,
+    price: 425,
     images: ["/images/mexican-side-view.png", "/images/mexican-box-top.png", "/images/mexican-box-angle.png"],
     slug: "mexican-eagle-af1",
     sizes: allSizes,
@@ -50,7 +50,7 @@ const shoes = [
   {
     id: 4,
     name: "Jordanian Flag AF1",
-    price: 350,
+    price: 400,
     images: ["/images/jordanian-side-view.jpg", "/images/jordanian-heel-view.jpg"],
     slug: "jordanian-flag-af1",
     sizes: allSizes,
@@ -80,7 +80,7 @@ const shoes = [
   {
     id: 6,
     name: "Chinese Flag AF1",
-    price: 350,
+    price: 450,
     images: ["/images/chinese-side-sunset.png", "/images/chinese-heel-view.png"],
     slug: "chinese-flag-af1",
     sizes: allSizes,
@@ -95,7 +95,7 @@ const shoes = [
   {
     id: 7,
     name: "Checkered Drip AF1",
-    price: 315,
+    price: 395,
     images: ["/images/checkered-drip-sunset.png", "/images/checkered-drip-pair.png"],
     slug: "checkered-drip-af1",
     sizes: allSizes,
@@ -110,7 +110,7 @@ const shoes = [
   {
     id: 8,
     name: "Map of Palestine AF1",
-    price: 350,
+    price: 380,
     images: ["/images/palestine-map-side.jpg", "/images/palestine-map-angle.jpg"],
     slug: "map-of-palestine-af1",
     sizes: allSizes,
@@ -126,7 +126,7 @@ const shoes = [
   {
     id: 9,
     name: "Lebanese Cedar AF1",
-    price: 310,
+    price: 410,
     images: ["/images/lebanese-side-view.jpg", "/images/lebanese-heel-view.jpg"],
     slug: "lebanese-cedar-af1",
     sizes: allSizes,
@@ -141,7 +141,7 @@ const shoes = [
   {
     id: 10,
     name: "Filipino Sun AF1",
-    price: 320,
+    price: 420,
     images: ["/images/filipino-side-view.jpg", "/images/filipino-heel-view.jpg"],
     slug: "filipino-sun-af1",
     sizes: allSizes,
