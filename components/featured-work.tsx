@@ -1,31 +1,6 @@
-"use client"
-
 import Image from "next/image"
-import { useState } from "react"
-import { ChevronLeft, ChevronRight } from "lucide-react"
-
-const slideImages = [
-  {
-    src: "/images/kuffiyeh-side-detail.png",
-    alt: "Red Kuffiyeh AF1 - Detailed side view",
-  },
-  {
-    src: "/images/kuffiyeh-heel-view.png",
-    alt: "Red Kuffiyeh AF1 - Heel view",
-  },
-]
 
 export function FeaturedWork() {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0)
-
-  const nextImage = () => {
-    setCurrentImageIndex((prev) => (prev + 1) % slideImages.length)
-  }
-
-  const prevImage = () => {
-    setCurrentImageIndex((prev) => (prev - 1 + slideImages.length) % slideImages.length)
-  }
-
   return (
     <section className="py-20 bg-gradient-to-br from-neutral-50 to-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -55,43 +30,16 @@ export function FeaturedWork() {
             </div>
           </div>
 
-          {/* Image Slideshow */}
+          {/* Single Image */}
           <div className="relative">
-            <div className="aspect-[4/3] relative rounded-2xl overflow-hidden shadow-2xl bg-neutral-100 group">
+            <div className="aspect-[4/3] relative rounded-2xl overflow-hidden shadow-2xl bg-neutral-100">
               <Image
-                src={slideImages[currentImageIndex].src || "/placeholder.svg"}
-                alt={slideImages[currentImageIndex].alt}
+                src="/images/cultural-canvas-studio.png"
+                alt="Custom painted Air Force 1s with Palestinian flag and Kuffiyeh patterns in studio setting"
                 fill
-                className="object-cover transition-opacity duration-500"
+                className="object-cover"
                 crossOrigin="anonymous"
               />
-
-              {/* Navigation arrows */}
-              <button
-                onClick={prevImage}
-                className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-3 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-              >
-                <ChevronLeft className="w-6 h-6 text-neutral-900" />
-              </button>
-              <button
-                onClick={nextImage}
-                className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-3 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-              >
-                <ChevronRight className="w-6 h-6 text-neutral-900" />
-              </button>
-
-              {/* Image indicators */}
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">
-                {slideImages.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setCurrentImageIndex(index)}
-                    className={`w-2 h-2 rounded-full transition-colors ${
-                      index === currentImageIndex ? "bg-white" : "bg-white/50"
-                    }`}
-                  />
-                ))}
-              </div>
             </div>
           </div>
         </div>
