@@ -1,14 +1,48 @@
 "use client"
 
+import { useState } from "react"
 import { useCart } from "./cart-provider"
 import { Button } from "@/components/ui/button"
-import { X, Minus, Plus, ShoppingBag } from "lucide-react"
+import { X, Minus, Plus, ShoppingBag, CreditCard } from "lucide-react"
 import Image from "next/image"
 
 export function CartSidebar() {
   const { state, dispatch } = useCart()
+  const [isCheckingOut, setIsCheckingOut] = useState(false)
 
   const total = state.items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+
+  const handleCheckout = async () => {
+    setIsCheckingOut(true)
+
+    try {
+      const response = await fetch("/api/create-checkout-session", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          items: state.items,
+          type: "cart",
+        }),
+      })
+
+      const { sessionId } = await response.json()
+
+      // Redirect to Stripe Checkout
+      const stripe = (await import("@stripe/stripe-js")).loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
+      const stripeInstance = await stripe
+
+      if (stripeInstance) {
+        await stripeInstance.redirectToCheckout({ sessionId })
+      }
+    } catch (error) {
+      console.error("Error during checkout:", error)
+      alert("There was an error processing your checkout. Please try again.")
+    } finally {
+      setIsCheckingOut(false)
+    }
+  }
 
   if (!state.isOpen) return null
 
@@ -36,7 +70,7 @@ export function CartSidebar() {
                 {state.items.map((item) => (
                   <div key={`${item.id}-${item.size}`} className="flex items-center space-x-4 border-b pb-4">
                     <Image
-                      src={item.image || "/placeholder.svg"}
+                      src={item.image || "/placeholder.svg?height=80&width=80&text=Product"}
                       alt={item.name}
                       width={80}
                       height={80}
@@ -86,8 +120,18 @@ export function CartSidebar() {
               <div className="flex justify-between items-center mb-4">
                 <span className="text-lg font-semibold">Total: ${total}</span>
               </div>
-              <Button className="w-full" size="lg">
-                Checkout
+              <Button className="w-full" size="lg" onClick={handleCheckout} disabled={isCheckingOut}>
+                {isCheckingOut ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <CreditCard className="mr-2 h-4 w-4" />
+                    Checkout
+                  </>
+                )}
               </Button>
             </div>
           )}
