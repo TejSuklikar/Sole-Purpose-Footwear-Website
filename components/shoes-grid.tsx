@@ -49,7 +49,7 @@ const shoes = [
     id: 6,
     name: "Chinese Flag AF1",
     price: 450,
-    image: "/images/chinese-af1.png",
+    image: "/images/chinese-side-sunset.png",
     slug: "chinese-flag-af1",
     sizes: ["8", "9", "10", "11", "12"],
   },
