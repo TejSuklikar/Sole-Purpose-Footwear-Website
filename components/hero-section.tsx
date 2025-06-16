@@ -10,7 +10,7 @@ const featuredShoes = [
     id: 1,
     name: "Red Kuffiyeh AF1",
     description: "Traditional Kuffiyeh patterns in bold red on white canvas 🇯🇴",
-    image: "/images/kuffiyeh-af1.png",
+    image: "/images/kuffiyeh-sunset.png",
     price: "$350",
     slug: "red-kuffiyeh-af1",
   },
