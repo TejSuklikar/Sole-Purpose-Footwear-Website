@@ -21,6 +21,7 @@ const featuredShoes = [
     image: "/images/mexican-eagle-detail.png",
     price: "$425",
     slug: "mexican-eagle-af1",
+    objectPosition: "center 15%", // Add this line to show more of the shoe
   },
   {
     id: 3,
@@ -65,7 +66,7 @@ export function HeroSection() {
                       alt={shoe.name}
                       fill
                       className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
-                      style={{ objectPosition: "center center" }}
+                      style={{ objectPosition: shoe.objectPosition || "center center" }}
                       crossOrigin="anonymous"
                     />
                   </div>
