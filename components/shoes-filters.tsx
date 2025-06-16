@@ -8,7 +8,7 @@ export function ShoesFilters() {
   const [priceRange, setPriceRange] = useState([0, 1000])
   const [selectedSizes, setSelectedSizes] = useState<string[]>([])
 
-  const sizes = ["6", "6.5", "7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11", "11.5", "12"]
+  const sizes = ["6", "6.5", "7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11", "11.5", "12", "12.5", "13"]
   const priceRanges = [
     { label: "Under $300", min: 0, max: 300 },
     { label: "$300 - $400", min: 300, max: 400 },
