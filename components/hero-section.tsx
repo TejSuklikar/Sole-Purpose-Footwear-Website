@@ -18,10 +18,9 @@ const featuredShoes = [
     id: 2,
     name: "Mexican Eagle AF1",
     description: "Hand-painted Mexican flag design with detailed eagle artwork 🇲🇽",
-    image: "/images/mexican-full-shoe.png",
+    image: "/images/mexican-eagle-hero.png",
     price: "$425",
     slug: "mexican-eagle-af1",
-    objectPosition: "center center", // Changed to center to show full shoe
   },
   {
     id: 3,
@@ -65,8 +64,7 @@ export function HeroSection() {
                       src={shoe.image || "/placeholder.svg"}
                       alt={shoe.name}
                       fill
-                      className={`${index === 1 ? "object-contain" : "object-cover"} object-center group-hover:scale-105 transition-transform duration-500`}
-                      style={{ objectPosition: shoe.objectPosition || "center center" }}
+                      className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
                       crossOrigin="anonymous"
                     />
                   </div>
