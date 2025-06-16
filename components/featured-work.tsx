@@ -34,8 +34,8 @@ export function FeaturedWork() {
           <div className="relative">
             <div className="aspect-[4/3] relative rounded-2xl overflow-hidden shadow-2xl bg-neutral-100">
               <Image
-                src="/images/checkered-sunset.png"
-                alt="Checkered pattern sneakers at sunset"
+                src="/images/cultural-canvas-studio.png"
+                alt="Custom painted Air Force 1s with Palestinian flag and Kuffiyeh patterns in studio setting"
                 fill
                 className="object-cover"
                 crossOrigin="anonymous"
