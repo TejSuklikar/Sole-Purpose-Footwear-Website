@@ -6,10 +6,6 @@ import { ChevronLeft, ChevronRight } from "lucide-react"
 
 const slideImages = [
   {
-    src: "/images/kuffiyeh-side-sunset.png",
-    alt: "Red Kuffiyeh AF1 - Side view at sunset",
-  },
-  {
     src: "/images/kuffiyeh-side-detail.png",
     alt: "Red Kuffiyeh AF1 - Detailed side view",
   },
