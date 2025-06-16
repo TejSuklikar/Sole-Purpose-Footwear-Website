@@ -18,10 +18,10 @@ const featuredShoes = [
     id: 2,
     name: "Mexican Eagle AF1",
     description: "Hand-painted Mexican flag design with detailed eagle artwork 🇲🇽",
-    image: "/images/mexican-eagle-detail.png",
+    image: "/images/mexican-full-shoe.png",
     price: "$425",
     slug: "mexican-eagle-af1",
-    objectPosition: "center 15%", // Add this line to show more of the shoe
+    objectPosition: "center center", // Changed to center to show full shoe
   },
   {
     id: 3,
