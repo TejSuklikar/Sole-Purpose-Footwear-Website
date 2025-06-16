@@ -17,7 +17,7 @@ const shoes = [
     id: 2,
     name: "Mexican Eagle AF1",
     price: 425,
-    image: "/images/mexican-full-shoe.png",
+    image: "/images/mexican-side-view.png",
     slug: "mexican-eagle-af1",
     sizes: ["6", "6.5", "7", "7.5", "8", "8.5", "9", "9.5", "10"],
   },
