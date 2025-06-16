@@ -6,7 +6,7 @@ const shoes = [
     id: 1,
     name: "Red Kuffiyeh AF1",
     price: 350,
-    images: ["/images/kuffiyeh-side-sunset.png", "/images/kuffiyeh-side-detail.png", "/images/kuffiyeh-heel-view.png"],
+    images: ["/images/kuffiyeh-af1.png"],
     slug: "red-kuffiyeh-af1",
     sizes: ["7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11"],
     description:

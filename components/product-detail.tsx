@@ -4,7 +4,7 @@ import Image from "next/image"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { useCart } from "./cart-provider"
-import { Check, ChevronLeft, ChevronRight } from "lucide-react"
+import { Check } from "lucide-react"
 
 interface Shoe {
   id: number
@@ -19,7 +19,6 @@ interface Shoe {
 export function ProductDetail({ shoe }: { shoe: Shoe }) {
   const [selectedSize, setSelectedSize] = useState<string>("")
   const [isAdded, setIsAdded] = useState(false)
-  const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const { dispatch } = useCart()
 
   const handleAddToCart = () => {
@@ -40,82 +39,33 @@ export function ProductDetail({ shoe }: { shoe: Shoe }) {
     setTimeout(() => setIsAdded(false), 2000)
   }
 
-  const nextImage = () => {
-    setCurrentImageIndex((prev) => (prev + 1) % shoe.images.length)
-  }
-
-  const prevImage = () => {
-    setCurrentImageIndex((prev) => (prev - 1 + shoe.images.length) % shoe.images.length)
-  }
-
   return (
     <div className="py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Image Section */}
           <div className="space-y-4">
-            <div className="aspect-[4/3] relative bg-neutral-50 rounded-lg overflow-hidden group">
+            <div className="aspect-[4/3] relative bg-neutral-50 rounded-lg overflow-hidden">
               <Image
-                src={shoe.images[currentImageIndex] || "/placeholder.svg"}
-                alt={`${shoe.name} view ${currentImageIndex + 1}`}
+                src={shoe.images[0] || "/placeholder.svg"}
+                alt={shoe.name}
                 fill
                 className="object-contain object-center p-4"
                 crossOrigin="anonymous"
               />
-
-              {/* Navigation arrows - only show if more than 1 image */}
-              {shoe.images.length > 1 && (
-                <>
-                  <button
-                    onClick={prevImage}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    <ChevronLeft className="w-5 h-5" />
-                  </button>
-                  <button
-                    onClick={nextImage}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    <ChevronRight className="w-5 h-5" />
-                  </button>
-                </>
-              )}
-
-              {/* Image indicators */}
-              {shoe.images.length > 1 && (
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">
-                  {shoe.images.map((_, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setCurrentImageIndex(index)}
-                      className={`w-2 h-2 rounded-full transition-colors ${
-                        index === currentImageIndex ? "bg-neutral-900" : "bg-neutral-400"
-                      }`}
-                    />
-                  ))}
-                </div>
-              )}
             </div>
-
-            {/* Thumbnail images */}
             {shoe.images.length > 1 && (
-              <div className="grid grid-cols-4 gap-4">
-                {shoe.images.map((image, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setCurrentImageIndex(index)}
-                    className={`aspect-[4/3] relative bg-neutral-50 rounded-lg overflow-hidden border-2 transition-colors ${
-                      index === currentImageIndex ? "border-neutral-900" : "border-transparent hover:border-neutral-300"
-                    }`}
-                  >
+              <div className="grid grid-cols-2 gap-4">
+                {shoe.images.slice(1).map((image, index) => (
+                  <div key={index} className="aspect-[4/3] relative bg-neutral-50 rounded-lg overflow-hidden">
                     <Image
                       src={image || "/placeholder.svg"}
-                      alt={`${shoe.name} thumbnail ${index + 1}`}
+                      alt={`${shoe.name} view ${index + 2}`}
                       fill
                       className="object-contain object-center p-2"
                       crossOrigin="anonymous"
                     />
-                  </button>
+                  </div>
                 ))}
               </div>
             )}
