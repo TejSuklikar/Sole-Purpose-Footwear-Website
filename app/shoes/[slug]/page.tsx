@@ -4,6 +4,7 @@ import { ProductDetail } from "@/components/product-detail"
 const allSizes = ["6", "6.5", "7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11", "11.5", "12", "12.5", "13"]
 
 const shoes = [
+  // Featured shoes (first 3 from hero section)
   {
     id: 1,
     name: "Red Kuffiyeh AF1",
@@ -52,6 +53,7 @@ const shoes = [
       "Ready to ship within 1-2 business days",
     ],
   },
+  // Other shoes
   {
     id: 4,
     name: "Jordanian Flag AF1",
@@ -113,6 +115,23 @@ const shoes = [
       "Hand-painted checkered swoosh pattern",
       "Artistic paint drip effect in Palestinian flag colors",
       "Premium white leather base with street art aesthetic",
+      "Ready to ship within 1-2 business days",
+    ],
+  },
+  // New shoe added at the bottom
+  {
+    id: 8,
+    name: "Map of Palestine AF1",
+    price: 380,
+    images: ["/images/palestine-map-side.jpg", "/images/palestine-map-angle.jpg"],
+    slug: "map-of-palestine-af1",
+    sizes: allSizes,
+    description:
+      "Hand-painted map of Palestine in traditional flag colors with intricate Kuffiyeh geometric patterns. A powerful statement piece that honors Palestinian heritage and identity through detailed cartographic artistry.",
+    details: [
+      "Hand-painted map of Palestine in red and green",
+      "Traditional Kuffiyeh geometric border patterns",
+      "Palestinian flag colors throughout design",
       "Ready to ship within 1-2 business days",
     ],
   },

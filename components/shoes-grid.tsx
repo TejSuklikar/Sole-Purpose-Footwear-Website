@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 const allSizes = ["6", "6.5", "7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11", "11.5", "12", "12.5", "13"]
 
 const shoes = [
+  // Featured shoes (first 3 from hero section)
   {
     id: 1,
     name: "Red Kuffiyeh AF1",
@@ -31,6 +32,7 @@ const shoes = [
     slug: "black-red-geometric",
     sizes: allSizes,
   },
+  // Other shoes
   {
     id: 4,
     name: "Jordanian Flag AF1",
@@ -61,6 +63,15 @@ const shoes = [
     price: 395,
     image: "/images/checkered-drip-sunset.png",
     slug: "checkered-drip-af1",
+    sizes: allSizes,
+  },
+  // New shoe added at the bottom
+  {
+    id: 8,
+    name: "Map of Palestine AF1",
+    price: 380,
+    image: "/images/palestine-map-side.jpg",
+    slug: "map-of-palestine-af1",
     sizes: allSizes,
   },
 ]
