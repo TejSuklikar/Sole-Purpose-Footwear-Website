@@ -65,7 +65,7 @@ export function HeroSection() {
                       src={shoe.image || "/placeholder.svg"}
                       alt={shoe.name}
                       fill
-                      className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                      className={`${index === 1 ? "object-contain" : "object-cover"} object-center group-hover:scale-105 transition-transform duration-500`}
                       style={{ objectPosition: shoe.objectPosition || "center center" }}
                       crossOrigin="anonymous"
                     />
