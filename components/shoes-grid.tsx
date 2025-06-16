@@ -65,13 +65,29 @@ const shoes = [
     slug: "checkered-drip-af1",
     sizes: allSizes,
   },
-  // New shoe added at the bottom
   {
     id: 8,
     name: "Map of Palestine AF1",
     price: 380,
     image: "/images/palestine-map-side.jpg",
     slug: "map-of-palestine-af1",
+    sizes: allSizes,
+  },
+  // New shoes added at the bottom
+  {
+    id: 9,
+    name: "Lebanese Cedar AF1",
+    price: 410,
+    image: "/images/lebanese-side-view.jpg",
+    slug: "lebanese-cedar-af1",
+    sizes: allSizes,
+  },
+  {
+    id: 10,
+    name: "Filipino Sun AF1",
+    price: 420,
+    image: "/images/filipino-side-view.jpg",
+    slug: "filipino-sun-af1",
     sizes: allSizes,
   },
 ]

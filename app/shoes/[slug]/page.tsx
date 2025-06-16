@@ -118,7 +118,6 @@ const shoes = [
       "Ready to ship within 1-2 business days",
     ],
   },
-  // New shoe added at the bottom
   {
     id: 8,
     name: "Map of Palestine AF1",
@@ -132,6 +131,39 @@ const shoes = [
       "Hand-painted map of Palestine in red and green",
       "Traditional Kuffiyeh geometric border patterns",
       "Palestinian flag colors throughout design",
+      "Ready to ship within 1-2 business days",
+    ],
+  },
+  // New shoes added at the bottom
+  {
+    id: 9,
+    name: "Lebanese Cedar AF1",
+    price: 410,
+    images: ["/images/lebanese-side-view.jpg", "/images/lebanese-heel-view.jpg"],
+    slug: "lebanese-cedar-af1",
+    sizes: allSizes,
+    description:
+      "Lebanese flag design featuring the iconic cedar tree symbol with traditional red and white horizontal stripes. Celebrates Lebanese heritage with hand-painted national emblems and flag-colored Nike branding.",
+    details: [
+      "Hand-painted Lebanese cedar tree emblem",
+      "Traditional red and white flag stripes",
+      "Lebanese flag colors on Nike and AIR branding",
+      "Ready to ship within 1-2 business days",
+    ],
+  },
+  {
+    id: 10,
+    name: "Filipino Sun AF1",
+    price: 420,
+    images: ["/images/filipino-side-view.jpg", "/images/filipino-heel-view.jpg"],
+    slug: "filipino-sun-af1",
+    sizes: allSizes,
+    description:
+      "Filipino flag design featuring the golden sun symbol with blue triangle and red stripe elements. Celebrates Filipino heritage with authentic flag colors and the iconic eight-rayed sun integrated into the swoosh design.",
+    details: [
+      "Hand-painted Filipino golden sun symbol",
+      "Authentic blue, red, and yellow flag colors",
+      "Traditional eight-rayed sun design",
       "Ready to ship within 1-2 business days",
     ],
   },
