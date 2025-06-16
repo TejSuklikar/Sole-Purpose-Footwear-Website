@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation"
 import { ProductDetail } from "@/components/product-detail"
 
+const allSizes = ["6", "6.5", "7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11", "11.5", "12", "12.5", "13"]
+
 const shoes = [
   {
     id: 1,
@@ -8,7 +10,7 @@ const shoes = [
     price: 350,
     images: ["/images/kuffiyeh-side-sunset.png", "/images/kuffiyeh-heel-sunset.png"],
     slug: "red-kuffiyeh-af1",
-    sizes: ["7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11"],
+    sizes: allSizes,
     description:
       "Traditional Kuffiyeh patterns hand-painted in bold red on premium white canvas. Each pair celebrates Palestinian heritage with intricate geometric designs that honor cultural identity.",
     details: [
@@ -24,7 +26,7 @@ const shoes = [
     price: 425,
     images: ["/images/mexican-side-view.png", "/images/mexican-box-top.png", "/images/mexican-box-angle.png"],
     slug: "mexican-eagle-af1",
-    sizes: ["6", "6.5", "7", "7.5", "8", "8.5", "9", "9.5", "10"],
+    sizes: allSizes,
     description:
       "Detailed Mexican flag design featuring the iconic eagle and serpent coat of arms. Hand-painted artwork celebrates Mexican heritage with vibrant colors, intricate national emblem details, and flag-colored swoosh elements.",
     details: [
@@ -40,7 +42,7 @@ const shoes = [
     price: 375,
     images: ["/images/black-red-af1.png"],
     slug: "black-red-geometric",
-    sizes: ["7", "8", "8.5", "9", "9.5", "10", "11"],
+    sizes: allSizes,
     description:
       "Sleek black forces with striking red geometric patterns. Modern design meets traditional craftsmanship in this bold statement piece.",
     details: [
@@ -56,7 +58,7 @@ const shoes = [
     price: 400,
     images: ["/images/jordanian-side-view.jpg", "/images/jordanian-heel-view.jpg"],
     slug: "jordanian-flag-af1",
-    sizes: ["6", "7", "8", "9", "10"],
+    sizes: allSizes,
     description:
       "Jordanian flag design with traditional colors and patterns. Celebrates Jordanian heritage with hand-painted flag elements and cultural motifs including the iconic seven-pointed star and Kuffiyeh patterns.",
     details: [
@@ -72,7 +74,7 @@ const shoes = [
     price: 325,
     images: ["/images/geometric-checkered-side.jpg"],
     slug: "geometric-checkered",
-    sizes: ["7.5", "8", "8.5", "9", "9.5"],
+    sizes: allSizes,
     description:
       "Clean geometric checkered pattern in black and white. Minimalist design with maximum impact, perfect for those who appreciate subtle artistry and Palestinian heritage elements.",
     details: [
@@ -88,7 +90,7 @@ const shoes = [
     price: 450,
     images: ["/images/chinese-side-sunset.png", "/images/chinese-heel-view.png"],
     slug: "chinese-flag-af1",
-    sizes: ["8", "9", "10", "11", "12"],
+    sizes: allSizes,
     description:
       "Chinese flag design featuring the iconic red and gold color scheme with hand-painted five-pointed stars. Celebrates Chinese heritage with authentic flag elements integrated into the swoosh and Nike branding.",
     details: [
@@ -102,15 +104,15 @@ const shoes = [
     id: 7,
     name: "Checkered Drip AF1",
     price: 395,
-    images: ["/images/checkered-drip-af1.png", "/images/checkered-drip-heel.png"],
+    images: ["/images/checkered-drip-sunset.png", "/images/checkered-drip-pair.png"],
     slug: "checkered-drip-af1",
-    sizes: ["7", "7.5", "8", "8.5", "9", "9.5", "10"],
+    sizes: allSizes,
     description:
-      "Bold checkered pattern with artistic red drip design. Street art meets high fashion in this eye-catching custom piece that makes a statement.",
+      "Bold checkered pattern with artistic paint drip design in Palestinian flag colors. Street art meets cultural heritage in this eye-catching custom piece that celebrates identity through contemporary art.",
     details: [
-      "Hand-painted checkered swoosh design",
-      "Artistic red drip paint effect",
-      "Premium white leather base",
+      "Hand-painted checkered swoosh pattern",
+      "Artistic paint drip effect in Palestinian flag colors",
+      "Premium white leather base with street art aesthetic",
       "Ready to ship within 1-2 business days",
     ],
   },

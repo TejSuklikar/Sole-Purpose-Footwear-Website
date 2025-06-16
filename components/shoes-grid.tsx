@@ -4,6 +4,8 @@ import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
+const allSizes = ["6", "6.5", "7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11", "11.5", "12", "12.5", "13"]
+
 const shoes = [
   {
     id: 1,
@@ -11,7 +13,7 @@ const shoes = [
     price: 350,
     image: "/images/kuffiyeh-side-sunset.png",
     slug: "red-kuffiyeh-af1",
-    sizes: ["7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11"],
+    sizes: allSizes,
   },
   {
     id: 2,
@@ -19,7 +21,7 @@ const shoes = [
     price: 425,
     image: "/images/mexican-side-view.png",
     slug: "mexican-eagle-af1",
-    sizes: ["6", "6.5", "7", "7.5", "8", "8.5", "9", "9.5", "10"],
+    sizes: allSizes,
   },
   {
     id: 3,
@@ -27,7 +29,7 @@ const shoes = [
     price: 375,
     image: "/images/black-red-af1.png",
     slug: "black-red-geometric",
-    sizes: ["7", "8", "8.5", "9", "9.5", "10", "11"],
+    sizes: allSizes,
   },
   {
     id: 4,
@@ -35,7 +37,7 @@ const shoes = [
     price: 400,
     image: "/images/jordanian-side-view.jpg",
     slug: "jordanian-flag-af1",
-    sizes: ["6", "7", "8", "9", "10"],
+    sizes: allSizes,
   },
   {
     id: 5,
@@ -43,7 +45,7 @@ const shoes = [
     price: 325,
     image: "/images/geometric-checkered-side.jpg",
     slug: "geometric-checkered",
-    sizes: ["7.5", "8", "8.5", "9", "9.5"],
+    sizes: allSizes,
   },
   {
     id: 6,
@@ -51,15 +53,15 @@ const shoes = [
     price: 450,
     image: "/images/chinese-side-sunset.png",
     slug: "chinese-flag-af1",
-    sizes: ["8", "9", "10", "11", "12"],
+    sizes: allSizes,
   },
   {
     id: 7,
     name: "Checkered Drip AF1",
     price: 395,
-    image: "/images/checkered-drip-af1.png",
+    image: "/images/checkered-drip-sunset.png",
     slug: "checkered-drip-af1",
-    sizes: ["7", "7.5", "8", "8.5", "9", "9.5", "10"],
+    sizes: allSizes,
   },
 ]
 
