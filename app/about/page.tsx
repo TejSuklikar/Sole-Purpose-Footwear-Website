@@ -2,7 +2,7 @@ import Image from "next/image"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "About - Soul Purpose Footwear",
+  title: "About - Sole Purpose Footwear",
   description: "Learn about our story, values, and craft philosophy behind Soul Purpose Footwear.",
 }
 
