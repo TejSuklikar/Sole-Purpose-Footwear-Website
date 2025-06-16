@@ -55,7 +55,7 @@ export function Footer() {
                 <Facebook className="w-5 h-5" />
               </a>
               <a
-                href="mailto:solepurposefootwear813@gmail.com"
+                href="mailto:solepurposefootwear813@gmail.com?subject=Inquiry%20from%20Website"
                 className="text-neutral-400 hover:text-white transition-colors"
               >
                 <Mail className="w-5 h-5" />
