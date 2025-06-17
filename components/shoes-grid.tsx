@@ -119,7 +119,10 @@ export function ShoesGrid() {
                   <p className="text-sm text-neutral-600 mb-2">Available Sizes:</p>
                   <div className="flex flex-wrap gap-1">
                     {shoe.sizes.map((size) => (
-                      <span key={size} className="px-2 py-1 bg-neutral-800 text-white text-xs rounded">
+                      <span
+                        key={size}
+                        className="px-3 py-2 bg-neutral-800 text-white text-sm rounded-lg border border-neutral-600"
+                      >
                         {size}
                       </span>
                     ))}

@@ -76,7 +76,7 @@ export function OrderForm() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="font-playfair text-2xl">Custom Order Details</CardTitle>
+        <CardTitle className="font-playfair text-2xl text-white">Custom Order Details</CardTitle>
         <div className="bg-neutral-50 p-4 rounded-lg">
           <div className="flex justify-between items-center">
             <span className="text-lg font-semibold">Custom Design Price:</span>
@@ -89,30 +89,38 @@ export function OrderForm() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="firstName">First Name</Label>
+              <Label htmlFor="firstName" className="text-white">
+                First Name
+              </Label>
               <Input
                 id="firstName"
                 name="firstName"
                 value={formData.firstName}
                 onChange={(e) => handleInputChange("firstName", e.target.value)}
                 required
+                className="placeholder:text-neutral-500"
               />
             </div>
             <div>
-              <Label htmlFor="lastName">Last Name</Label>
+              <Label htmlFor="lastName" className="text-white">
+                Last Name
+              </Label>
               <Input
                 id="lastName"
                 name="lastName"
                 value={formData.lastName}
                 onChange={(e) => handleInputChange("lastName", e.target.value)}
                 required
+                className="placeholder:text-neutral-500"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="email">Email Address</Label>
+              <Label htmlFor="email" className="text-white">
+                Email Address
+              </Label>
               <Input
                 id="email"
                 name="email"
@@ -120,10 +128,13 @@ export function OrderForm() {
                 value={formData.email}
                 onChange={(e) => handleInputChange("email", e.target.value)}
                 required
+                className="placeholder:text-neutral-500"
               />
             </div>
             <div>
-              <Label htmlFor="phone">Phone Number</Label>
+              <Label htmlFor="phone" className="text-white">
+                Phone Number
+              </Label>
               <Input
                 id="phone"
                 name="phone"
@@ -131,12 +142,15 @@ export function OrderForm() {
                 value={formData.phone}
                 onChange={(e) => handleInputChange("phone", e.target.value)}
                 required
+                className="placeholder:text-neutral-500"
               />
             </div>
           </div>
 
           <div>
-            <Label htmlFor="shoeModel">Shoe Model</Label>
+            <Label htmlFor="shoeModel" className="text-white">
+              Shoe Model
+            </Label>
             <Select
               name="shoeModel"
               value={formData.shoeModel}
@@ -157,7 +171,9 @@ export function OrderForm() {
           </div>
 
           <div>
-            <Label htmlFor="size">Shoe Size</Label>
+            <Label htmlFor="size" className="text-white">
+              Shoe Size
+            </Label>
             <Select
               name="size"
               value={formData.size}
@@ -178,7 +194,9 @@ export function OrderForm() {
           </div>
 
           <div>
-            <Label htmlFor="designDescription">Design Description</Label>
+            <Label htmlFor="designDescription" className="text-white">
+              Design Description
+            </Label>
             <Textarea
               id="designDescription"
               name="designDescription"
@@ -187,11 +205,14 @@ export function OrderForm() {
               value={formData.designDescription}
               onChange={(e) => handleInputChange("designDescription", e.target.value)}
               required
+              className="placeholder:text-neutral-500"
             />
           </div>
 
           <div>
-            <Label htmlFor="address">Shipping Address</Label>
+            <Label htmlFor="address" className="text-white">
+              Shipping Address
+            </Label>
             <Textarea
               id="address"
               name="address"
@@ -200,6 +221,7 @@ export function OrderForm() {
               value={formData.address}
               onChange={(e) => handleInputChange("address", e.target.value)}
               required
+              className="placeholder:text-neutral-500"
             />
           </div>
 
