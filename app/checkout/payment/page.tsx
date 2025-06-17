@@ -58,10 +58,28 @@ export default function PaymentPage() {
     }
   }, [])
 
-  const copyToClipboard = (text: string, field: string) => {
-    navigator.clipboard.writeText(text)
-    setCopiedField(field)
-    setTimeout(() => setCopiedField(null), 2000)
+  const copyToClipboard = async (text: string, field: string) => {
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopiedField(field)
+      setTimeout(() => setCopiedField(null), 2000)
+    } catch (err) {
+      console.error("Failed to copy text: ", err)
+      // Fallback for older browsers
+      const textArea = document.createElement("textarea")
+      textArea.value = text
+      document.body.appendChild(textArea)
+      textArea.focus()
+      textArea.select()
+      try {
+        document.execCommand("copy")
+        setCopiedField(field)
+        setTimeout(() => setCopiedField(null), 2000)
+      } catch (fallbackErr) {
+        console.error("Fallback copy failed: ", fallbackErr)
+      }
+      document.body.removeChild(textArea)
+    }
   }
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -326,9 +344,16 @@ Custom sneaker artistry that tells your story
                       <p className="text-sm text-neutral-600">{paymentMethods.zelle}</p>
                       <p className="text-xs text-neutral-500 mt-1">Include Order ID in memo</p>
                     </div>
-                    <Button variant="outline" size="sm" onClick={() => copyToClipboard(paymentMethods.zelle, "zelle")}>
-                      {copiedField === "zelle" ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                    </Button>
+                    <button
+                      onClick={() => copyToClipboard(paymentMethods.zelle, "zelle")}
+                      className="w-10 h-10 bg-neutral-800 hover:bg-neutral-700 rounded-lg flex items-center justify-center transition-colors"
+                    >
+                      {copiedField === "zelle" ? (
+                        <Check className="h-4 w-4 text-white" />
+                      ) : (
+                        <Copy className="h-4 w-4 text-white" />
+                      )}
+                    </button>
                   </div>
                 </div>
 
@@ -340,13 +365,16 @@ Custom sneaker artistry that tells your story
                       <p className="text-xs text-neutral-500 mt-1">Include Order ID in note</p>
                     </div>
                     <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
+                      <button
                         onClick={() => copyToClipboard(paymentMethods.venmo, "venmo")}
+                        className="w-10 h-10 bg-neutral-800 hover:bg-neutral-700 rounded-lg flex items-center justify-center transition-colors"
                       >
-                        {copiedField === "venmo" ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                      </Button>
+                        {copiedField === "venmo" ? (
+                          <Check className="h-4 w-4 text-white" />
+                        ) : (
+                          <Copy className="h-4 w-4 text-white" />
+                        )}
+                      </button>
                       <Button variant="outline" size="sm" asChild>
                         <a href={paymentMethods.venmo} target="_blank" rel="noopener noreferrer">
                           <ExternalLink className="h-4 w-4" />
