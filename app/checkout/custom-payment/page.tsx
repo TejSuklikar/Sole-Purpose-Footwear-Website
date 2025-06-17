@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Copy, Check, Send, ExternalLink, Upload, AlertCircle } from "lucide-react"
+import { Copy, Check, Send, ExternalLink, Upload, AlertCircle, ShoppingCart } from "lucide-react"
 import Link from "next/link"
 
 interface CustomOrderData {
@@ -24,6 +24,8 @@ interface CustomOrderData {
   orderId: string
   timestamp: string
   type: string
+  hasExistingCartItems?: boolean
+  existingCartItems?: any[]
 }
 
 export default function CustomPaymentPage() {
@@ -106,6 +108,16 @@ export default function CustomPaymentPage() {
     formData.append("Total_Price", `$${orderData!.price}`)
     formData.append("Order_Date", new Date(orderData!.timestamp).toLocaleString())
 
+    // Cart items info if they exist
+    if (orderData!.hasExistingCartItems && orderData!.existingCartItems) {
+      const cartItemsText = orderData!.existingCartItems
+        .map((item) => `${item.name} (Size ${item.size}) x${item.quantity} - $${item.price * item.quantity}`)
+        .join("\n")
+      formData.append("Existing_Cart_Items", cartItemsText)
+      const cartTotal = orderData!.existingCartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
+      formData.append("Cart_Total", `$${cartTotal}`)
+    }
+
     // Payment Proof Information
     formData.append("Payment_Method", paymentProof.method.toUpperCase())
     formData.append("Transaction_ID", paymentProof.transactionId)
@@ -141,6 +153,20 @@ ${orderData!.designDescription}
 
 📦 SHIPPING ADDRESS:
 ${orderData!.address}
+
+${
+  orderData!.hasExistingCartItems
+    ? `
+🛒 CUSTOMER ALSO HAS CART ITEMS:
+${orderData!.existingCartItems
+  ?.map((item) => `• ${item.name} (Size ${item.size}) x${item.quantity} - $${item.price * item.quantity}`)
+  .join("\n")}
+Cart Total: $${orderData!.existingCartItems?.reduce((sum, item) => sum + item.price * item.quantity, 0)}
+
+⚠️ NOTE: Cart items need separate checkout!
+`
+    : ""
+}
 
 💳 PAYMENT VERIFICATION:
 • Method: ${paymentProof.method.toUpperCase()}
@@ -191,6 +217,20 @@ Thank you for your custom order with Sole Purpose Footwear! 🎨
 • Model: ${orderData!.shoeModel}
 • Size: ${orderData!.size}
 • Design: ${orderData!.designDescription}
+
+${
+  orderData!.hasExistingCartItems
+    ? `
+🛒 CART ITEMS REMINDER:
+You also have items in your cart that need separate checkout:
+${orderData!.existingCartItems
+  ?.map((item) => `• ${item.name} (Size ${item.size}) x${item.quantity} - $${item.price * item.quantity}`)
+  .join("\n")}
+
+Please return to the website to complete your cart checkout.
+`
+    : ""
+}
 
 💳 PAYMENT STATUS:
 • Method: ${paymentProof.method.toUpperCase()}
@@ -250,6 +290,7 @@ Custom sneaker artistry that tells your story
 
       setIsSubmitted(true)
       localStorage.removeItem("customOrder")
+      // Note: We don't clear the cart here - it stays for separate checkout
     } catch (error) {
       console.error("Error submitting order:", error)
       alert("There was an error submitting your order. Please try again or contact us directly.")
@@ -291,14 +332,27 @@ Custom sneaker artistry that tells your story
                 Thank you! We've received your custom order and payment verification. We'll confirm your payment within
                 2-4 hours and begin working on your design.
               </p>
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                <p className="text-sm text-blue-800">
-                  <strong>Confirmation emails sent:</strong> Check your email for order confirmation and next steps.
-                  We'll also verify your payment and contact you within 24 hours.
-                </p>
-              </div>
+              {orderData.hasExistingCartItems && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                  <div className="flex items-center justify-center space-x-2 mb-2">
+                    <ShoppingCart className="w-5 h-5 text-blue-600" />
+                    <p className="font-semibold text-blue-800">Don't Forget Your Cart!</p>
+                  </div>
+                  <p className="text-sm text-blue-700">
+                    You still have items in your cart that need separate checkout. Click below to complete that order.
+                  </p>
+                </div>
+              )}
               <div className="space-y-4">
-                <Button asChild>
+                {orderData.hasExistingCartItems && (
+                  <Button asChild className="bg-blue-600 hover:bg-blue-700">
+                    <Link href="/shoes">
+                      <ShoppingCart className="mr-2 h-4 w-4" />
+                      Complete Cart Checkout
+                    </Link>
+                  </Button>
+                )}
+                <Button variant="outline" asChild>
                   <Link href="/shoes">View Our Work</Link>
                 </Button>
                 <Button variant="outline" asChild>
@@ -315,7 +369,24 @@ Custom sneaker artistry that tells your story
   return (
     <div className="py-20">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Progress Steps - MATCHING COLORS */}
+        {/* Cart Items Reminder */}
+        {orderData.hasExistingCartItems && (
+          <Card className="mb-6 border-blue-200 bg-blue-50">
+            <CardContent className="p-4">
+              <div className="flex items-start space-x-3">
+                <ShoppingCart className="w-5 h-5 text-blue-600 mt-0.5" />
+                <div>
+                  <h3 className="font-semibold text-blue-900 mb-2">Cart Items Saved</h3>
+                  <p className="text-sm text-blue-800">
+                    Your cart items are saved and will need separate checkout after this custom order.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Progress Steps */}
         <div className="mb-8">
           <div className="flex items-center justify-center space-x-4">
             <div className={`flex items-center ${currentStep >= 1 ? "text-neutral-600" : "text-neutral-400"}`}>
