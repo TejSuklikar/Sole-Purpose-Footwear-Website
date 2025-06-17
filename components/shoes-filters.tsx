@@ -1,22 +1,15 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Button } from "@/components/ui/button"
 
-interface FilterState {
-  selectedSizes: string[]
-  priceRanges: { min: number; max: number }[]
+interface FiltersProps {
+  onFiltersChange: (filters: { sizes: string[]; priceRanges: { min: number; max: number }[] }) => void
 }
 
-interface ShoesFiltersProps {
-  filters: FilterState
-  onFiltersChange: (filters: FilterState) => void
-  onClearFilters: () => void
-}
-
-export function ShoesFilters({ filters, onFiltersChange, onClearFilters }: ShoesFiltersProps) {
-  const [localFilters, setLocalFilters] = useState(filters)
+export function ShoesFilters({ onFiltersChange }: FiltersProps) {
+  const [selectedSizes, setSelectedSizes] = useState<string[]>([])
+  const [selectedPriceRanges, setSelectedPriceRanges] = useState<string[]>([])
 
   const sizes = ["6", "6.5", "7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11", "11.5", "12", "12.5", "13"]
   const priceRanges = [
@@ -26,35 +19,36 @@ export function ShoesFilters({ filters, onFiltersChange, onClearFilters }: Shoes
     { label: "Over $500", min: 500, max: 1000 },
   ]
 
-  useEffect(() => {
-    setLocalFilters(filters)
-  }, [filters])
+  const handleSizeChange = (size: string) => {
+    const newSizes = selectedSizes.includes(size) ? selectedSizes.filter((s) => s !== size) : [...selectedSizes, size]
 
-  const handleSizeToggle = (size: string) => {
-    const newSelectedSizes = localFilters.selectedSizes.includes(size)
-      ? localFilters.selectedSizes.filter((s) => s !== size)
-      : [...localFilters.selectedSizes, size]
+    setSelectedSizes(newSizes)
 
-    const newFilters = { ...localFilters, selectedSizes: newSelectedSizes }
-    setLocalFilters(newFilters)
-    onFiltersChange(newFilters)
+    const activePriceRanges = priceRanges.filter((range) => selectedPriceRanges.includes(range.label))
+
+    onFiltersChange({ sizes: newSizes, priceRanges: activePriceRanges })
   }
 
-  const handlePriceRangeToggle = (range: { min: number; max: number }) => {
-    const isSelected = localFilters.priceRanges.some((r) => r.min === range.min && r.max === range.max)
-    const newPriceRanges = isSelected
-      ? localFilters.priceRanges.filter((r) => !(r.min === range.min && r.max === range.max))
-      : [...localFilters.priceRanges, range]
+  const handlePriceRangeChange = (rangeLabel: string) => {
+    const newPriceRanges = selectedPriceRanges.includes(rangeLabel)
+      ? selectedPriceRanges.filter((r) => r !== rangeLabel)
+      : [...selectedPriceRanges, rangeLabel]
 
-    const newFilters = { ...localFilters, priceRanges: newPriceRanges }
-    setLocalFilters(newFilters)
-    onFiltersChange(newFilters)
+    setSelectedPriceRanges(newPriceRanges)
+
+    const activePriceRanges = priceRanges.filter((range) => newPriceRanges.includes(range.label))
+
+    onFiltersChange({ sizes: selectedSizes, priceRanges: activePriceRanges })
   }
 
-  const hasActiveFilters = localFilters.selectedSizes.length > 0 || localFilters.priceRanges.length > 0
+  const clearFilters = () => {
+    setSelectedSizes([])
+    setSelectedPriceRanges([])
+    onFiltersChange({ sizes: [], priceRanges: [] })
+  }
 
   return (
-    <div className="space-y-6 bg-neutral-900/50 p-4 sm:p-6 rounded-lg border border-neutral-800">
+    <div className="space-y-6">
       <div>
         <h3 className="font-semibold text-lg mb-4 text-white">Size</h3>
         <div className="grid grid-cols-3 gap-2">
@@ -62,14 +56,14 @@ export function ShoesFilters({ filters, onFiltersChange, onClearFilters }: Shoes
             <button
               key={size}
               className={`
-                px-3 py-2 sm:px-4 sm:py-3 rounded-lg text-center font-medium transition-colors text-sm sm:text-base
+                px-4 py-3 rounded-lg text-center font-medium transition-colors
                 ${
-                  localFilters.selectedSizes.includes(size)
-                    ? "bg-white text-black border-2 border-white"
-                    : "bg-neutral-800 text-white border border-neutral-600 hover:bg-neutral-700"
+                  selectedSizes.includes(size)
+                    ? "bg-black text-white border border-neutral-600"
+                    : "bg-white text-black border border-neutral-300"
                 }
               `}
-              onClick={() => handleSizeToggle(size)}
+              onClick={() => handleSizeChange(size)}
             >
               {size}
             </button>
@@ -79,48 +73,28 @@ export function ShoesFilters({ filters, onFiltersChange, onClearFilters }: Shoes
 
       <div>
         <h3 className="font-semibold text-lg mb-4 text-white">Price Range</h3>
-        <div className="space-y-3">
-          {priceRanges.map((range) => {
-            const isSelected = localFilters.priceRanges.some((r) => r.min === range.min && r.max === range.max)
-            return (
-              <div key={range.label} className="flex items-center space-x-3">
-                <Checkbox
-                  id={range.label}
-                  checked={isSelected}
-                  onCheckedChange={() => handlePriceRangeToggle(range)}
-                  className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
-                />
-                <label htmlFor={range.label} className="text-sm sm:text-base text-neutral-300 cursor-pointer">
-                  {range.label}
-                </label>
-              </div>
-            )
-          })}
+        <div className="space-y-2">
+          {priceRanges.map((range) => (
+            <div key={range.label} className="flex items-center space-x-2">
+              <Checkbox
+                id={range.label}
+                checked={selectedPriceRanges.includes(range.label)}
+                onCheckedChange={() => handlePriceRangeChange(range.label)}
+              />
+              <label htmlFor={range.label} className="text-sm text-neutral-300">
+                {range.label}
+              </label>
+            </div>
+          ))}
         </div>
       </div>
 
-      <Button
-        onClick={onClearFilters}
-        disabled={!hasActiveFilters}
-        className="w-full bg-neutral-800 hover:bg-neutral-700 text-white border border-neutral-600 disabled:opacity-50 disabled:cursor-not-allowed"
+      <button
+        className="w-full px-4 py-2 border border-neutral-600 text-white rounded-lg hover:bg-neutral-800 transition-colors"
+        onClick={clearFilters}
       >
         Clear Filters
-        {hasActiveFilters && (
-          <span className="ml-2 bg-white text-black rounded-full px-2 py-0.5 text-xs">
-            {localFilters.selectedSizes.length + localFilters.priceRanges.length}
-          </span>
-        )}
-      </Button>
-
-      {hasActiveFilters && (
-        <div className="text-xs text-neutral-400">
-          <p>Active filters:</p>
-          {localFilters.selectedSizes.length > 0 && <p>Sizes: {localFilters.selectedSizes.join(", ")}</p>}
-          {localFilters.priceRanges.length > 0 && (
-            <p>Price: {localFilters.priceRanges.map((r) => `$${r.min}-${r.max}`).join(", ")}</p>
-          )}
-        </div>
-      )}
+      </button>
     </div>
   )
 }
