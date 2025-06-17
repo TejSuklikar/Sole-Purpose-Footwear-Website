@@ -96,15 +96,15 @@ export function ShoesGrid() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       {shoes.map((shoe) => (
-        <div key={shoe.id} className="group">
+        <div key={shoe.id}>
           <Link href={`/shoes/${shoe.slug}`}>
-            <div className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden">
+            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
               <div className="aspect-[4/3] relative">
                 <Image
                   src={shoe.image || "/placeholder.svg?height=400&width=400&text=Shoe+Image"}
                   alt={shoe.name}
                   fill
-                  className="object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                  className="object-cover object-center"
                   crossOrigin="anonymous"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement
