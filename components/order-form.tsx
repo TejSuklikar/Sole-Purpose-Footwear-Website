@@ -89,7 +89,7 @@ export function OrderForm() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="firstName" className="text-neutral">
+              <Label htmlFor="firstName" className="text-white">
                 First Name
               </Label>
               <Input
@@ -157,7 +157,7 @@ export function OrderForm() {
               onValueChange={(value) => handleInputChange("shoeModel", value)}
               required
             >
-              <SelectTrigger>
+              <SelectTrigger className="text-black">
                 <SelectValue placeholder="Select a base model" />
               </SelectTrigger>
               <SelectContent>
@@ -180,7 +180,7 @@ export function OrderForm() {
               onValueChange={(value) => handleInputChange("size", value)}
               required
             >
-              <SelectTrigger>
+              <SelectTrigger className="text-black">
                 <SelectValue placeholder="Select your size" />
               </SelectTrigger>
               <SelectContent>
