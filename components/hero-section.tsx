@@ -40,7 +40,7 @@ export function HeroSection() {
           <p className="text-xl md:text-2xl font-medium text-neutral-300 mb-6 font-sans">
             Personalize your step with a unique hand painted design
           </p>
-          <p className="text-lg md:text-xl text-neutral-400 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-lg md:text-xl text-neutral-200 max-w-3xl mx-auto leading-relaxed">
             Where contemporary design meets traditional craftsmanship. Each pair celebrates culture, identity, and
             personal expression through meticulous hand-painted artistry.
           </p>
