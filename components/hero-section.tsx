@@ -65,7 +65,7 @@ export function HeroSection() {
                   </div>
                   <div className="p-6 flex-1 flex flex-col justify-between">
                     <div>
-                      <h3 className="font-playfair text-xl font-semibold mb-2">{shoe.name}</h3>
+                      <h3 className="font-playfair text-xl font-semibold mb-2 text-black">{shoe.name}</h3>
                       <p className="text-neutral-800 mb-4 line-clamp-2">{shoe.description}</p>
                     </div>
                     <div className="flex justify-between items-center">
