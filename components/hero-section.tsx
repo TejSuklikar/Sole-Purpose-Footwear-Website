@@ -8,7 +8,7 @@ const featuredShoes = [
   {
     id: 1,
     name: "Red Kuffiyeh AF1",
-    color: black
+    color: "black"
     description: "Traditional Kuffiyeh patterns in bold red on white canvas 🇯🇴",
     image: "/images/kuffiyeh-sunset.png",
     price: "$350",
