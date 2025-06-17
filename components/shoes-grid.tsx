@@ -92,47 +92,88 @@ const shoes = [
   },
 ]
 
-export function ShoesGrid() {
+interface ShoesGridProps {
+  filters: {
+    sizes: string[]
+    priceRanges: { min: number; max: number }[]
+  }
+}
+
+export function ShoesGrid({ filters }: ShoesGridProps) {
+  const filteredShoes = shoes.filter((shoe) => {
+    // Size filter
+    if (filters.sizes.length > 0) {
+      const hasMatchingSize = filters.sizes.some((size) => shoe.sizes.includes(size))
+      if (!hasMatchingSize) return false
+    }
+
+    // Price range filter
+    if (filters.priceRanges.length > 0) {
+      const matchesPriceRange = filters.priceRanges.some((range) => shoe.price >= range.min && shoe.price <= range.max)
+      if (!matchesPriceRange) return false
+    }
+
+    return true
+  })
+
+  if (filteredShoes.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-white text-lg mb-4">No shoes match your current filters.</p>
+        <p className="text-neutral-400">Try adjusting your size or price range selections.</p>
+      </div>
+    )
+  }
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {shoes.map((shoe) => (
-        <div key={shoe.id} className="group">
-          <Link href={`/shoes/${shoe.slug}`}>
-            <div className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden">
-              <div className="aspect-[4/3] relative">
-                <Image
-                  src={shoe.image || "/placeholder.svg?height=400&width=400&text=Shoe+Image"}
-                  alt={shoe.name}
-                  fill
-                  className="object-cover object-center group-hover:scale-105 transition-transform duration-300"
-                  crossOrigin="anonymous"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement
-                    target.src = "/placeholder.svg?height=400&width=400&text=Shoe+Image"
-                  }}
-                />
-              </div>
-              <div className="p-6">
-                <h3 className="font-semibold text-lg mb-2">{shoe.name}</h3>
-                <p className="text-2xl font-bold text-neutral-900 mb-4">${shoe.price}</p>
-                <div className="flex flex-wrap gap-1 mb-4">
-                  {shoe.sizes.slice(0, 4).map((size) => (
-                    <span key={size} className="px-2 py-1 bg-neutral-100 text-xs rounded">
-                      {size}
-                    </span>
-                  ))}
-                  {shoe.sizes.length > 4 && (
-                    <span className="px-2 py-1 bg-neutral-100 text-xs rounded">+{shoe.sizes.length - 4}</span>
-                  )}
+    <div>
+      <div className="mb-6">
+        <p className="text-neutral-400 text-sm">
+          Showing {filteredShoes.length} of {shoes.length} shoes
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {filteredShoes.map((shoe) => (
+          <div key={shoe.id}>
+            <Link href={`/shoes/${shoe.slug}`}>
+              <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+                <div className="aspect-[4/3] relative">
+                  <Image
+                    src={shoe.image || "/placeholder.svg?height=400&width=400&text=Shoe+Image"}
+                    alt={shoe.name}
+                    fill
+                    className="object-cover object-center"
+                    crossOrigin="anonymous"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement
+                      target.src = "/placeholder.svg?height=400&width=400&text=Shoe+Image"
+                    }}
+                  />
                 </div>
-                <Button className="w-full" variant="outline">
-                  View Details
-                </Button>
+                <div className="p-6">
+                  <h3 className="font-semibold text-lg mb-2 text-neutral-900">{shoe.name}</h3>
+                  <p className="text-2xl font-bold text-neutral-900 mb-4">${shoe.price}</p>
+                  <div className="mb-4">
+                    <p className="text-sm text-neutral-600 mb-2">Available Sizes:</p>
+                    <div className="flex flex-wrap gap-1">
+                      {shoe.sizes.map((size) => (
+                        <span
+                          key={size}
+                          className="px-3 py-2 bg-neutral-800 text-white text-sm rounded-lg border border-neutral-600"
+                        >
+                          {size}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <Button className="w-full bg-neutral-700 text-white">View Details</Button>
+                </div>
               </div>
-            </div>
-          </Link>
-        </div>
-      ))}
+            </Link>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }

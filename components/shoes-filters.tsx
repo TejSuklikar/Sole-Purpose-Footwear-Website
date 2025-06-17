@@ -1,12 +1,15 @@
 "use client"
 
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 
-export function ShoesFilters() {
-  const [priceRange, setPriceRange] = useState([0, 1000])
+interface FiltersProps {
+  onFiltersChange: (filters: { sizes: string[]; priceRanges: { min: number; max: number }[] }) => void
+}
+
+export function ShoesFilters({ onFiltersChange }: FiltersProps) {
   const [selectedSizes, setSelectedSizes] = useState<string[]>([])
+  const [selectedPriceRanges, setSelectedPriceRanges] = useState<string[]>([])
 
   const sizes = ["6", "6.5", "7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11", "11.5", "12", "12.5", "13"]
   const priceRanges = [
@@ -16,33 +19,69 @@ export function ShoesFilters() {
     { label: "Over $500", min: 500, max: 1000 },
   ]
 
+  const handleSizeChange = (size: string) => {
+    const newSizes = selectedSizes.includes(size) ? selectedSizes.filter((s) => s !== size) : [...selectedSizes, size]
+
+    setSelectedSizes(newSizes)
+
+    const activePriceRanges = priceRanges.filter((range) => selectedPriceRanges.includes(range.label))
+
+    onFiltersChange({ sizes: newSizes, priceRanges: activePriceRanges })
+  }
+
+  const handlePriceRangeChange = (rangeLabel: string) => {
+    const newPriceRanges = selectedPriceRanges.includes(rangeLabel)
+      ? selectedPriceRanges.filter((r) => r !== rangeLabel)
+      : [...selectedPriceRanges, rangeLabel]
+
+    setSelectedPriceRanges(newPriceRanges)
+
+    const activePriceRanges = priceRanges.filter((range) => newPriceRanges.includes(range.label))
+
+    onFiltersChange({ sizes: selectedSizes, priceRanges: activePriceRanges })
+  }
+
+  const clearFilters = () => {
+    setSelectedSizes([])
+    setSelectedPriceRanges([])
+    onFiltersChange({ sizes: [], priceRanges: [] })
+  }
+
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="font-semibold text-lg mb-4">Size</h3>
+        <h3 className="font-semibold text-lg mb-4 text-white">Size</h3>
         <div className="grid grid-cols-3 gap-2">
           {sizes.map((size) => (
-            <Button
+            <button
               key={size}
-              variant={selectedSizes.includes(size) ? "default" : "outline"}
-              size="sm"
-              onClick={() => {
-                setSelectedSizes((prev) => (prev.includes(size) ? prev.filter((s) => s !== size) : [...prev, size]))
-              }}
+              className={`
+                px-4 py-3 rounded-lg text-center font-medium transition-colors
+                ${
+                  selectedSizes.includes(size)
+                    ? "bg-black text-white border border-neutral-600"
+                    : "bg-white text-black border border-neutral-300"
+                }
+              `}
+              onClick={() => handleSizeChange(size)}
             >
               {size}
-            </Button>
+            </button>
           ))}
         </div>
       </div>
 
       <div>
-        <h3 className="font-semibold text-lg mb-4">Price Range</h3>
+        <h3 className="font-semibold text-lg mb-4 text-white">Price Range</h3>
         <div className="space-y-2">
           {priceRanges.map((range) => (
             <div key={range.label} className="flex items-center space-x-2">
-              <Checkbox id={range.label} />
-              <label htmlFor={range.label} className="text-sm">
+              <Checkbox
+                id={range.label}
+                checked={selectedPriceRanges.includes(range.label)}
+                onCheckedChange={() => handlePriceRangeChange(range.label)}
+              />
+              <label htmlFor={range.label} className="text-sm text-neutral-300">
                 {range.label}
               </label>
             </div>
@@ -50,9 +89,12 @@ export function ShoesFilters() {
         </div>
       </div>
 
-      <Button variant="outline" className="w-full">
+      <button
+        className="w-full px-4 py-2 border border-neutral-600 text-white rounded-lg hover:bg-neutral-800 transition-colors"
+        onClick={clearFilters}
+      >
         Clear Filters
-      </Button>
+      </button>
     </div>
   )
 }

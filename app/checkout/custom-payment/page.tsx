@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Copy, Check, Send, ExternalLink, Upload, AlertCircle } from "lucide-react"
+import { Copy, Check, Send, ExternalLink, Upload, AlertCircle, ShoppingCart } from "lucide-react"
 import Link from "next/link"
 
 interface CustomOrderData {
@@ -24,6 +24,8 @@ interface CustomOrderData {
   orderId: string
   timestamp: string
   type: string
+  hasExistingCartItems?: boolean
+  existingCartItems?: any[]
 }
 
 export default function CustomPaymentPage() {
@@ -35,6 +37,7 @@ export default function CustomPaymentPage() {
     notes: "",
   })
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [copiedField, setCopiedField] = useState<string | null>(null)
   const [currentStep, setCurrentStep] = useState(1)
 
@@ -51,10 +54,28 @@ export default function CustomPaymentPage() {
     }
   }, [])
 
-  const copyToClipboard = (text: string, field: string) => {
-    navigator.clipboard.writeText(text)
-    setCopiedField(field)
-    setTimeout(() => setCopiedField(null), 2000)
+  const copyToClipboard = async (text: string, field: string) => {
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopiedField(field)
+      setTimeout(() => setCopiedField(null), 2000)
+    } catch (err) {
+      console.error("Failed to copy text: ", err)
+      // Fallback for older browsers
+      const textArea = document.createElement("textarea")
+      textArea.value = text
+      document.body.appendChild(textArea)
+      textArea.focus()
+      textArea.select()
+      try {
+        document.execCommand("copy")
+        setCopiedField(field)
+        setTimeout(() => setCopiedField(null), 2000)
+      } catch (fallbackErr) {
+        console.error("Fallback copy failed: ", fallbackErr)
+      }
+      document.body.removeChild(textArea)
+    }
   }
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,9 +85,218 @@ export default function CustomPaymentPage() {
     }
   }
 
+  const sendBusinessNotification = async () => {
+    const formData = new FormData()
+
+    // Business notification email
+    formData.append(
+      "_subject",
+      `🎨 New Custom Order #${orderData!.orderId} - ${orderData!.firstName} ${orderData!.lastName}`,
+    )
+    formData.append("_template", "box")
+    formData.append("_captcha", "false")
+
+    // Order Information
+    formData.append("Order_ID", orderData!.orderId)
+    formData.append("Customer_Name", `${orderData!.firstName} ${orderData!.lastName}`)
+    formData.append("Customer_Email", orderData!.email)
+    formData.append("Customer_Phone", orderData!.phone)
+    formData.append("Shoe_Model", orderData!.shoeModel)
+    formData.append("Shoe_Size", orderData!.size)
+    formData.append("Design_Description", orderData!.designDescription)
+    formData.append("Shipping_Address", orderData!.address)
+    formData.append("Total_Price", `$${orderData!.price}`)
+    formData.append("Order_Date", new Date(orderData!.timestamp).toLocaleString())
+
+    // Cart items info if they exist
+    if (orderData!.hasExistingCartItems && orderData!.existingCartItems) {
+      const cartItemsText = orderData!.existingCartItems
+        .map((item) => `${item.name} (Size ${item.size}) x${item.quantity} - $${item.price * item.quantity}`)
+        .join("\n")
+      formData.append("Existing_Cart_Items", cartItemsText)
+      const cartTotal = orderData!.existingCartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
+      formData.append("Cart_Total", `$${cartTotal}`)
+    }
+
+    // Payment Proof Information
+    formData.append("Payment_Method", paymentProof.method.toUpperCase())
+    formData.append("Transaction_ID", paymentProof.transactionId)
+    if (paymentProof.notes) {
+      formData.append("Payment_Notes", paymentProof.notes)
+    }
+
+    // Add screenshot if provided
+    if (paymentProof.screenshot) {
+      formData.append("Payment_Screenshot", paymentProof.screenshot)
+    }
+
+    // Add formatted summary for better readability
+    const orderSummary = `
+🎨 NEW CUSTOM ORDER RECEIVED
+
+📋 ORDER DETAILS:
+• Order ID: ${orderData!.orderId}
+• Date: ${new Date(orderData!.timestamp).toLocaleString()}
+• Total: $${orderData!.price}
+
+👤 CUSTOMER INFO:
+• Name: ${orderData!.firstName} ${orderData!.lastName}
+• Email: ${orderData!.email}
+• Phone: ${orderData!.phone}
+
+👟 SHOE DETAILS:
+• Model: ${orderData!.shoeModel}
+• Size: ${orderData!.size}
+
+🎨 DESIGN DESCRIPTION:
+${orderData!.designDescription}
+
+📦 SHIPPING ADDRESS:
+${orderData!.address}
+
+${
+  orderData!.hasExistingCartItems
+    ? `
+🛒 CUSTOMER ALSO HAS CART ITEMS:
+${orderData!.existingCartItems
+  ?.map((item) => `• ${item.name} (Size ${item.size}) x${item.quantity} - $${item.price * item.quantity}`)
+  .join("\n")}
+Cart Total: $${orderData!.existingCartItems?.reduce((sum, item) => sum + item.price * item.quantity, 0)}
+
+⚠️ NOTE: Cart items need separate checkout!
+`
+    : ""
+}
+
+💳 PAYMENT VERIFICATION:
+• Method: ${paymentProof.method.toUpperCase()}
+• Transaction ID: ${paymentProof.transactionId}
+${paymentProof.notes ? `• Notes: ${paymentProof.notes}` : ""}
+• Screenshot: ${paymentProof.screenshot ? "Attached" : "Not provided"}
+
+⏰ NEXT STEPS:
+1. Verify payment within 2-4 hours
+2. Contact customer to confirm design details
+3. Begin creation process (2-4 weeks)
+4. Send progress photos during creation
+
+---
+Sole Purpose Footwear
+Custom sneaker artistry that tells your story
+    `
+
+    formData.append("Order_Summary", orderSummary)
+
+    // Send to business email
+    return fetch("https://formsubmit.co/solepurposefootwear813@gmail.com", {
+      method: "POST",
+      body: formData,
+    })
+  }
+
+  const sendCustomerConfirmation = async () => {
+    const formData = new FormData()
+
+    // Customer confirmation email
+    formData.append("_subject", `✅ Order Confirmation #${orderData!.orderId} - Sole Purpose Footwear`)
+    formData.append("_template", "box")
+    formData.append("_captcha", "false")
+    formData.append("_next", "https://solepurposefootwear.com/thank-you") // Optional redirect
+
+    const customerMessage = `
+Hi ${orderData!.firstName},
+
+Thank you for your custom order with Sole Purpose Footwear! 🎨
+
+📋 ORDER CONFIRMATION:
+• Order ID: ${orderData!.orderId}
+• Date: ${new Date(orderData!.timestamp).toLocaleString()}
+• Total: $${orderData!.price}
+
+👟 YOUR CUSTOM DESIGN:
+• Model: ${orderData!.shoeModel}
+• Size: ${orderData!.size}
+• Design: ${orderData!.designDescription}
+
+${
+  orderData!.hasExistingCartItems
+    ? `
+🛒 CART ITEMS REMINDER:
+You also have items in your cart that need separate checkout:
+${orderData!.existingCartItems
+  ?.map((item) => `• ${item.name} (Size ${item.size}) x${item.quantity} - $${item.price * item.quantity}`)
+  .join("\n")}
+
+Please return to the website to complete your cart checkout.
+`
+    : ""
+}
+
+💳 PAYMENT STATUS:
+• Method: ${paymentProof.method.toUpperCase()}
+• Transaction ID: ${paymentProof.transactionId}
+• Status: Pending Verification
+
+⏰ WHAT HAPPENS NEXT:
+1. We'll verify your payment within 2-4 hours
+2. Our team will email you to discuss design details
+3. Creation begins (typically 2-4 weeks)
+4. We'll send progress photos during creation
+5. Your custom shoes will be shipped to:
+   ${orderData!.address}
+
+📞 QUESTIONS?
+Email: solepurposefootwear813@gmail.com
+Phone: (415) 939-8270
+
+Thank you for choosing Sole Purpose Footwear to bring your vision to life!
+
+---
+The Sole Purpose Team
+Custom sneaker artistry that tells your story
+    `
+
+    formData.append("Customer_Message", customerMessage)
+    formData.append("Order_ID", orderData!.orderId)
+    formData.append("Customer_Name", `${orderData!.firstName} ${orderData!.lastName}`)
+    formData.append("Total_Amount", `$${orderData!.price}`)
+
+    // Send to customer email
+    return fetch(`https://formsubmit.co/${orderData!.email}`, {
+      method: "POST",
+      body: formData,
+    })
+  }
+
   const handleSubmitOrder = async () => {
-    setIsSubmitted(true)
-    localStorage.removeItem("customOrder")
+    if (!orderData) return
+
+    setIsSubmitting(true)
+
+    try {
+      // Send both emails simultaneously
+      const [businessResponse, customerResponse] = await Promise.all([
+        sendBusinessNotification(),
+        sendCustomerConfirmation(),
+      ])
+
+      if (!businessResponse.ok) {
+        throw new Error("Failed to send business notification")
+      }
+
+      if (!customerResponse.ok) {
+        console.warn("Customer confirmation email may have failed, but order was processed")
+      }
+
+      setIsSubmitted(true)
+      localStorage.removeItem("customOrder")
+      // Note: We don't clear the cart here - it stays for separate checkout
+    } catch (error) {
+      console.error("Error submitting order:", error)
+      alert("There was an error submitting your order. Please try again or contact us directly.")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const isPaymentProofComplete = paymentProof.method && paymentProof.transactionId && paymentProof.screenshot
@@ -102,14 +332,27 @@ export default function CustomPaymentPage() {
                 Thank you! We've received your custom order and payment verification. We'll confirm your payment within
                 2-4 hours and begin working on your design.
               </p>
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                <p className="text-sm text-blue-800">
-                  <strong>Next Steps:</strong> We'll verify your payment, email you confirmation, and start discussing
-                  your custom design within 24 hours.
-                </p>
-              </div>
+              {orderData.hasExistingCartItems && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                  <div className="flex items-center justify-center space-x-2 mb-2">
+                    <ShoppingCart className="w-5 h-5 text-blue-600" />
+                    <p className="font-semibold text-blue-800">Don't Forget Your Cart!</p>
+                  </div>
+                  <p className="text-sm text-blue-700">
+                    You still have items in your cart that need separate checkout. Click below to complete that order.
+                  </p>
+                </div>
+              )}
               <div className="space-y-4">
-                <Button asChild>
+                {orderData.hasExistingCartItems && (
+                  <Button asChild className="bg-blue-600 hover:bg-blue-700">
+                    <Link href="/shoes">
+                      <ShoppingCart className="mr-2 h-4 w-4" />
+                      Complete Cart Checkout
+                    </Link>
+                  </Button>
+                )}
+                <Button variant="outline" asChild>
                   <Link href="/shoes">View Our Work</Link>
                 </Button>
                 <Button variant="outline" asChild>
@@ -126,21 +369,38 @@ export default function CustomPaymentPage() {
   return (
     <div className="py-20">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Cart Items Reminder */}
+        {orderData.hasExistingCartItems && (
+          <Card className="mb-6 border-blue-200 bg-blue-50">
+            <CardContent className="p-4">
+              <div className="flex items-start space-x-3">
+                <ShoppingCart className="w-5 h-5 text-blue-600 mt-0.5" />
+                <div>
+                  <h3 className="font-semibold text-blue-900 mb-2">Cart Items Saved</h3>
+                  <p className="text-sm text-blue-800">
+                    Your cart items are saved and will need separate checkout after this custom order.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Progress Steps */}
         <div className="mb-8">
           <div className="flex items-center justify-center space-x-4">
-            <div className={`flex items-center ${currentStep >= 1 ? "text-neutral-900" : "text-neutral-400"}`}>
+            <div className={`flex items-center ${currentStep >= 1 ? "text-neutral-600" : "text-neutral-400"}`}>
               <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep >= 1 ? "bg-neutral-900 text-white" : "bg-neutral-200"}`}
+                className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep >= 1 ? "bg-white text-black" : "bg-neutral-600 text-neutral-400"}`}
               >
                 1
               </div>
               <span className="ml-2 font-medium">Send Payment</span>
             </div>
-            <div className="w-16 h-0.5 bg-neutral-200"></div>
-            <div className={`flex items-center ${currentStep >= 2 ? "text-neutral-900" : "text-neutral-400"}`}>
+            <div className="w-16 h-0.5 bg-neutral-600"></div>
+            <div className={`flex items-center ${currentStep >= 2 ? "text-neutral-600" : "text-neutral-400"}`}>
               <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep >= 2 ? "bg-neutral-900 text-white" : "bg-neutral-200"}`}
+                className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep >= 2 ? "bg-white text-black" : "bg-neutral-600 text-neutral-400"}`}
               >
                 2
               </div>
@@ -207,13 +467,16 @@ export default function CustomPaymentPage() {
                         <h4 className="font-semibold">Zelle</h4>
                         <p className="text-sm text-neutral-600">{paymentMethods.zelle}</p>
                       </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
+                      <button
                         onClick={() => copyToClipboard(paymentMethods.zelle, "zelle")}
+                        className="w-10 h-10 bg-neutral-800 hover:bg-neutral-700 rounded-lg flex items-center justify-center transition-colors"
                       >
-                        {copiedField === "zelle" ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                      </Button>
+                        {copiedField === "zelle" ? (
+                          <Check className="h-4 w-4 text-white" />
+                        ) : (
+                          <Copy className="h-4 w-4 text-white" />
+                        )}
+                      </button>
                     </div>
                   </div>
 
@@ -224,13 +487,16 @@ export default function CustomPaymentPage() {
                         <p className="text-sm text-neutral-600">Drew Alaraj</p>
                       </div>
                       <div className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
+                        <button
                           onClick={() => copyToClipboard(paymentMethods.venmo, "venmo")}
+                          className="w-10 h-10 bg-neutral-800 hover:bg-neutral-700 rounded-lg flex items-center justify-center transition-colors"
                         >
-                          {copiedField === "venmo" ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                        </Button>
+                          {copiedField === "venmo" ? (
+                            <Check className="h-4 w-4 text-white" />
+                          ) : (
+                            <Copy className="h-4 w-4 text-white" />
+                          )}
+                        </button>
                         <Button variant="outline" size="sm" asChild>
                           <a href={paymentMethods.venmo} target="_blank" rel="noopener noreferrer">
                             <ExternalLink className="h-4 w-4" />
@@ -321,9 +587,23 @@ export default function CustomPaymentPage() {
                     </div>
                   </div>
 
-                  <Button className="w-full" size="lg" onClick={handleSubmitOrder} disabled={!isPaymentProofComplete}>
-                    <Send className="mr-2 h-4 w-4" />
-                    Submit Custom Order & Payment Proof
+                  <Button
+                    className="w-full"
+                    size="lg"
+                    onClick={handleSubmitOrder}
+                    disabled={!isPaymentProofComplete || isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Sending Order...
+                      </>
+                    ) : (
+                      <>
+                        <Send className="mr-2 h-4 w-4" />
+                        Submit Custom Order & Payment Proof
+                      </>
+                    )}
                   </Button>
                 </>
               )}

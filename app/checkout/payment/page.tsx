@@ -43,6 +43,7 @@ export default function PaymentPage() {
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [copiedField, setCopiedField] = useState<string | null>(null)
   const [currentStep, setCurrentStep] = useState(1)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Payment information
   const paymentMethods = {
@@ -57,10 +58,28 @@ export default function PaymentPage() {
     }
   }, [])
 
-  const copyToClipboard = (text: string, field: string) => {
-    navigator.clipboard.writeText(text)
-    setCopiedField(field)
-    setTimeout(() => setCopiedField(null), 2000)
+  const copyToClipboard = async (text: string, field: string) => {
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopiedField(field)
+      setTimeout(() => setCopiedField(null), 2000)
+    } catch (err) {
+      console.error("Failed to copy text: ", err)
+      // Fallback for older browsers
+      const textArea = document.createElement("textarea")
+      textArea.value = text
+      document.body.appendChild(textArea)
+      textArea.focus()
+      textArea.select()
+      try {
+        document.execCommand("copy")
+        setCopiedField(field)
+        setTimeout(() => setCopiedField(null), 2000)
+      } catch (fallbackErr) {
+        console.error("Fallback copy failed: ", fallbackErr)
+      }
+      document.body.removeChild(textArea)
+    }
   }
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -70,10 +89,116 @@ export default function PaymentPage() {
     }
   }
 
+  const sendCustomerConfirmation = async () => {
+    if (!orderData || !customerInfo.email) return
+
+    const formData = new FormData()
+
+    formData.append("_subject", `✅ Order Confirmation #${orderData.orderId} - Sole Purpose Footwear`)
+    formData.append("_template", "box")
+    formData.append("_captcha", "false")
+
+    const customerMessage = `
+Hi ${customerInfo.name},
+
+Thank you for your order with Sole Purpose Footwear! 🎨
+
+📋 ORDER CONFIRMATION:
+• Order ID: ${orderData.orderId}
+• Date: ${new Date(orderData.timestamp).toLocaleString()}
+• Total: $${orderData.total}
+
+👟 YOUR ORDER:
+${orderData.items.map((item) => `• ${item.name} (Size ${item.size}) x${item.quantity} - $${item.price * item.quantity}`).join("\n")}
+
+💳 PAYMENT STATUS:
+• Method: ${paymentProof.method.toUpperCase()}
+• Transaction ID: ${paymentProof.transactionId}
+• Status: Pending Verification
+
+⏰ WHAT HAPPENS NEXT:
+1. We'll verify your payment within 2-4 hours
+2. Your order will be prepared and shipped to:
+   ${customerInfo.address}
+3. You'll receive tracking information once shipped
+
+📞 QUESTIONS?
+Email: solepurposefootwear813@gmail.com
+Phone: (415) 939-8270
+
+Thank you for choosing Sole Purpose Footwear!
+
+---
+The Sole Purpose Team
+Custom sneaker artistry that tells your story
+  `
+
+    formData.append("Customer_Message", customerMessage)
+    formData.append("Order_ID", orderData.orderId)
+    formData.append("Customer_Name", customerInfo.name)
+    formData.append("Total_Amount", `$${orderData.total}`)
+
+    return fetch(`https://formsubmit.co/${customerInfo.email}`, {
+      method: "POST",
+      body: formData,
+    })
+  }
+
   const handleSubmitOrder = async () => {
-    // Here you would typically send the order and payment proof to your backend
-    setIsSubmitted(true)
-    localStorage.removeItem("pendingOrder")
+    if (!orderData) return
+
+    setIsSubmitting(true)
+
+    try {
+      // Send both business and customer emails simultaneously
+      const [businessResponse, customerResponse] = await Promise.all([
+        sendBusinessNotification(),
+        sendCustomerConfirmation(),
+      ])
+
+      if (!businessResponse.ok) {
+        throw new Error("Failed to send business notification")
+      }
+
+      if (!customerResponse.ok) {
+        console.warn("Customer confirmation email may have failed, but order was processed")
+      }
+
+      setIsSubmitted(true)
+      localStorage.removeItem("pendingOrder")
+    } catch (error) {
+      console.error("Error submitting order:", error)
+      alert("There was an error submitting your order. Please try again or contact us directly.")
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const sendBusinessNotification = async () => {
+    if (!orderData) return
+
+    const formData = new FormData()
+
+    formData.append("_subject", `🛒 New Order #${orderData.orderId} - Payment Verification`)
+    formData.append("_template", "box")
+    formData.append("_captcha", "false")
+
+    // Order details
+    formData.append("Order_ID", orderData.orderId)
+    formData.append("Order_Items", JSON.stringify(orderData.items, null, 2))
+    formData.append("Total_Amount", `$${orderData.total}`)
+    formData.append("Customer_Info", JSON.stringify(customerInfo, null, 2))
+    formData.append("Payment_Method", paymentProof.method.toUpperCase())
+    formData.append("Transaction_ID", paymentProof.transactionId)
+
+    if (paymentProof.screenshot) {
+      formData.append("Payment_Screenshot", paymentProof.screenshot)
+    }
+
+    return fetch("https://formsubmit.co/solepurposefootwear813@gmail.com", {
+      method: "POST",
+      body: formData,
+    })
   }
 
   const isPaymentProofComplete =
@@ -143,7 +268,7 @@ export default function PaymentPage() {
         {/* Progress Steps */}
         <div className="mb-8">
           <div className="flex items-center justify-center space-x-4">
-            <div className={`flex items-center ${currentStep >= 1 ? "text-neutral-900" : "text-neutral-400"}`}>
+            <div className={`flex items-center ${currentStep >= 1 ? "text-neutral-600" : "text-neutral-400"}`}>
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep >= 1 ? "bg-neutral-900 text-white" : "bg-neutral-200"}`}
               >
@@ -152,7 +277,7 @@ export default function PaymentPage() {
               <span className="ml-2 font-medium">Send Payment</span>
             </div>
             <div className="w-16 h-0.5 bg-neutral-200"></div>
-            <div className={`flex items-center ${currentStep >= 2 ? "text-neutral-900" : "text-neutral-400"}`}>
+            <div className={`flex items-center ${currentStep >= 2 ? "text-neutral-600" : "text-neutral-400"}`}>
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep >= 2 ? "bg-neutral-900 text-white" : "bg-neutral-200"}`}
               >
@@ -219,9 +344,16 @@ export default function PaymentPage() {
                       <p className="text-sm text-neutral-600">{paymentMethods.zelle}</p>
                       <p className="text-xs text-neutral-500 mt-1">Include Order ID in memo</p>
                     </div>
-                    <Button variant="outline" size="sm" onClick={() => copyToClipboard(paymentMethods.zelle, "zelle")}>
-                      {copiedField === "zelle" ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                    </Button>
+                    <button
+                      onClick={() => copyToClipboard(paymentMethods.zelle, "zelle")}
+                      className="w-10 h-10 bg-neutral-800 hover:bg-neutral-700 rounded-lg flex items-center justify-center transition-colors"
+                    >
+                      {copiedField === "zelle" ? (
+                        <Check className="h-4 w-4 text-white" />
+                      ) : (
+                        <Copy className="h-4 w-4 text-white" />
+                      )}
+                    </button>
                   </div>
                 </div>
 
@@ -233,13 +365,16 @@ export default function PaymentPage() {
                       <p className="text-xs text-neutral-500 mt-1">Include Order ID in note</p>
                     </div>
                     <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
+                      <button
                         onClick={() => copyToClipboard(paymentMethods.venmo, "venmo")}
+                        className="w-10 h-10 bg-neutral-800 hover:bg-neutral-700 rounded-lg flex items-center justify-center transition-colors"
                       >
-                        {copiedField === "venmo" ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                      </Button>
+                        {copiedField === "venmo" ? (
+                          <Check className="h-4 w-4 text-white" />
+                        ) : (
+                          <Copy className="h-4 w-4 text-white" />
+                        )}
+                      </button>
                       <Button variant="outline" size="sm" asChild>
                         <a href={paymentMethods.venmo} target="_blank" rel="noopener noreferrer">
                           <ExternalLink className="h-4 w-4" />
@@ -374,9 +509,14 @@ export default function PaymentPage() {
                     </div>
                   </div>
 
-                  <Button className="w-full" size="lg" onClick={handleSubmitOrder} disabled={!isPaymentProofComplete}>
+                  <Button
+                    className="w-full"
+                    size="lg"
+                    onClick={handleSubmitOrder}
+                    disabled={!isPaymentProofComplete || isSubmitting}
+                  >
                     <Send className="mr-2 h-4 w-4" />
-                    Submit Order & Payment Proof
+                    {isSubmitting ? "Submitting..." : "Submit Order & Payment Proof"}
                   </Button>
                 </>
               )}
