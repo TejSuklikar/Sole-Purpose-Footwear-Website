@@ -34,7 +34,7 @@ const config: Config = {
           foreground: "#000000",
         },
         secondary: {
-          DEFAULT: "#262626",
+          DEFAULT: "#404040",
           foreground: "#ffffff",
         },
         destructive: {
@@ -42,11 +42,11 @@ const config: Config = {
           foreground: "hsl(var(--destructive-foreground))",
         },
         muted: {
-          DEFAULT: "#262626",
-          foreground: "#a3a3a3",
+          DEFAULT: "#404040",
+          foreground: "#d4d4d4",
         },
         accent: {
-          DEFAULT: "#262626",
+          DEFAULT: "#404040",
           foreground: "#ffffff",
         },
         popover: {
@@ -54,7 +54,7 @@ const config: Config = {
           foreground: "hsl(var(--popover-foreground))",
         },
         card: {
-          DEFAULT: "#171717",
+          DEFAULT: "#262626",
           foreground: "#ffffff",
         },
       },
@@ -70,7 +70,7 @@ const config: Config = {
         },
         "accordion-up": {
           from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
         },
       },
       animation: {
