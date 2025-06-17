@@ -297,21 +297,21 @@ Custom sneaker artistry that tells your story
   return (
     <div className="py-20">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Progress Steps */}
+        {/* Progress Steps - KEEPING WHITE TEXT */}
         <div className="mb-8">
           <div className="flex items-center justify-center space-x-4">
-            <div className={`flex items-center ${currentStep >= 1 ? "text-neutral-900" : "text-neutral-400"}`}>
+            <div className={`flex items-center ${currentStep >= 1 ? "text-white" : "text-neutral-400"}`}>
               <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep >= 1 ? "bg-neutral-900 text-white" : "bg-neutral-200"}`}
+                className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep >= 1 ? "bg-white text-black" : "bg-neutral-600 text-neutral-400"}`}
               >
                 1
               </div>
               <span className="ml-2 font-medium">Send Payment</span>
             </div>
-            <div className="w-16 h-0.5 bg-neutral-200"></div>
-            <div className={`flex items-center ${currentStep >= 2 ? "text-neutral-900" : "text-neutral-400"}`}>
+            <div className="w-16 h-0.5 bg-neutral-600"></div>
+            <div className={`flex items-center ${currentStep >= 2 ? "text-white" : "text-neutral-400"}`}>
               <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep >= 2 ? "bg-neutral-900 text-white" : "bg-neutral-200"}`}
+                className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep >= 2 ? "bg-white text-black" : "bg-neutral-600 text-neutral-400"}`}
               >
                 2
               </div>
