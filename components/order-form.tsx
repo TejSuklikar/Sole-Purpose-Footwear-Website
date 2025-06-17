@@ -79,7 +79,7 @@ export function OrderForm() {
         <CardTitle className="font-playfair text-2xl text-white">Custom Order Details</CardTitle>
         <div className="bg-neutral-50 p-4 rounded-lg">
           <div className="flex justify-between items-center">
-            <span className="text-lg font-semibold text-neutral -900">Custom Design Price:</span>
+            <span className="text-lg font-semibold text-neutral-600">Custom Design Price:</span>
             <span className="text-2xl font-bold text-neutral-900">$350</span>
           </div>
           <p className="text-sm text-neutral-600 mt-2">All custom designs are hand-painted and made to order</p>
