@@ -35,6 +35,7 @@ export default function CustomPaymentPage() {
     notes: "",
   })
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [copiedField, setCopiedField] = useState<string | null>(null)
   const [currentStep, setCurrentStep] = useState(1)
 
@@ -65,8 +66,35 @@ export default function CustomPaymentPage() {
   }
 
   const handleSubmitOrder = async () => {
-    setIsSubmitted(true)
-    localStorage.removeItem("customOrder")
+    if (!orderData) return
+
+    setIsSubmitting(true)
+
+    try {
+      // Send email notification
+      const emailResponse = await fetch("/api/send-order-email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...orderData,
+          paymentProof: paymentProof,
+        }),
+      })
+
+      if (!emailResponse.ok) {
+        throw new Error("Failed to send email notification")
+      }
+
+      setIsSubmitted(true)
+      localStorage.removeItem("customOrder")
+    } catch (error) {
+      console.error("Error submitting order:", error)
+      alert("There was an error submitting your order. Please try again or contact us directly.")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const isPaymentProofComplete = paymentProof.method && paymentProof.transactionId && paymentProof.screenshot
@@ -321,9 +349,23 @@ export default function CustomPaymentPage() {
                     </div>
                   </div>
 
-                  <Button className="w-full" size="lg" onClick={handleSubmitOrder} disabled={!isPaymentProofComplete}>
-                    <Send className="mr-2 h-4 w-4" />
-                    Submit Custom Order & Payment Proof
+                  <Button
+                    className="w-full"
+                    size="lg"
+                    onClick={handleSubmitOrder}
+                    disabled={!isPaymentProofComplete || isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Sending Order...
+                      </>
+                    ) : (
+                      <>
+                        <Send className="mr-2 h-4 w-4" />
+                        Submit Custom Order & Payment Proof
+                      </>
+                    )}
                   </Button>
                 </>
               )}
