@@ -43,6 +43,7 @@ export default function PaymentPage() {
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [copiedField, setCopiedField] = useState<string | null>(null)
   const [currentStep, setCurrentStep] = useState(1)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Payment information
   const paymentMethods = {
@@ -71,9 +72,47 @@ export default function PaymentPage() {
   }
 
   const handleSubmitOrder = async () => {
-    // Here you would typically send the order and payment proof to your backend
-    setIsSubmitted(true)
-    localStorage.removeItem("pendingOrder")
+    if (!orderData) return
+
+    setIsSubmitting(true)
+
+    try {
+      // Send business notification using FormSubmit
+      const formData = new FormData()
+
+      formData.append("_subject", `🛒 New Order #${orderData.orderId} - Payment Verification`)
+      formData.append("_template", "box")
+      formData.append("_captcha", "false")
+
+      // Order details
+      formData.append("Order_ID", orderData.orderId)
+      formData.append("Order_Items", JSON.stringify(orderData.items, null, 2))
+      formData.append("Total_Amount", `$${orderData.total}`)
+      formData.append("Customer_Info", JSON.stringify(customerInfo, null, 2))
+      formData.append("Payment_Method", paymentProof.method.toUpperCase())
+      formData.append("Transaction_ID", paymentProof.transactionId)
+
+      if (paymentProof.screenshot) {
+        formData.append("Payment_Screenshot", paymentProof.screenshot)
+      }
+
+      const response = await fetch("https://formsubmit.co/solepurposefootwear813@gmail.com", {
+        method: "POST",
+        body: formData,
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to send order notification")
+      }
+
+      setIsSubmitted(true)
+      localStorage.removeItem("pendingOrder")
+    } catch (error) {
+      console.error("Error submitting order:", error)
+      alert("There was an error submitting your order. Please try again or contact us directly.")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const isPaymentProofComplete =
@@ -374,9 +413,14 @@ export default function PaymentPage() {
                     </div>
                   </div>
 
-                  <Button className="w-full" size="lg" onClick={handleSubmitOrder} disabled={!isPaymentProofComplete}>
+                  <Button
+                    className="w-full"
+                    size="lg"
+                    onClick={handleSubmitOrder}
+                    disabled={!isPaymentProofComplete || isSubmitting}
+                  >
                     <Send className="mr-2 h-4 w-4" />
-                    Submit Order & Payment Proof
+                    {isSubmitting ? "Submitting..." : "Submit Order & Payment Proof"}
                   </Button>
                 </>
               )}
