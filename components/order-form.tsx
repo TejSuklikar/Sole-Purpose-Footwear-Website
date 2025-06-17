@@ -80,22 +80,22 @@ export function OrderForm() {
   const cartTotal = state.items.reduce((sum, item) => sum + item.price * item.quantity, 0)
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Cart Items Warning */}
       {state.items.length > 0 && (
         <Card className="border-blue-200 bg-blue-50">
-          <CardContent className="p-4">
-            <div className="flex items-start space-x-3">
-              <ShoppingCart className="w-5 h-5 text-blue-600 mt-0.5" />
-              <div>
-                <h3 className="font-semibold text-blue-900 mb-2">Items in Your Cart</h3>
-                <p className="text-sm text-blue-800 mb-3">
+          <CardContent className="p-3 sm:p-4">
+            <div className="flex items-start space-x-2 sm:space-x-3">
+              <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+              <div className="min-w-0 flex-1">
+                <h3 className="font-semibold text-blue-900 mb-2 text-sm sm:text-base">Items in Your Cart</h3>
+                <p className="text-xs sm:text-sm text-blue-800 mb-3">
                   You have {state.items.length} item(s) in your cart (${cartTotal}). These will be processed separately
                   from your custom order.
                 </p>
                 <div className="space-y-1">
                   {state.items.map((item) => (
-                    <div key={`${item.id}-${item.size}`} className="text-sm text-blue-700">
+                    <div key={`${item.id}-${item.size}`} className="text-xs sm:text-sm text-blue-700">
                       • {item.name} (Size {item.size}) x{item.quantity} - ${item.price * item.quantity}
                     </div>
                   ))}
@@ -110,21 +110,23 @@ export function OrderForm() {
       )}
 
       <Card>
-        <CardHeader>
-          <CardTitle className="font-playfair text-2xl text-white">Custom Order Details</CardTitle>
-          <div className="bg-neutral-50 p-4 rounded-lg">
-            <div className="flex justify-between items-center">
-              <span className="text-lg font-semibold text-neutral-600">Custom Design Price:</span>
-              <span className="text-2xl font-bold text-neutral-900">$350</span>
+        <CardHeader className="p-4 sm:p-6">
+          <CardTitle className="font-playfair text-xl sm:text-2xl text-white">Custom Order Details</CardTitle>
+          <div className="bg-neutral-50 p-3 sm:p-4 rounded-lg">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+              <span className="text-base sm:text-lg font-semibold text-neutral-600">Custom Design Price:</span>
+              <span className="text-xl sm:text-2xl font-bold text-neutral-900">$350</span>
             </div>
-            <p className="text-sm text-neutral-600 mt-2">All custom designs are hand-painted and made to order</p>
+            <p className="text-xs sm:text-sm text-neutral-600 mt-2">
+              All custom designs are hand-painted and made to order
+            </p>
           </div>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CardContent className="p-4 sm:p-6">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
-                <Label htmlFor="firstName" className="text-white">
+                <Label htmlFor="firstName" className="text-white text-sm sm:text-base">
                   First Name
                 </Label>
                 <Input
@@ -133,11 +135,11 @@ export function OrderForm() {
                   value={formData.firstName}
                   onChange={(e) => handleInputChange("firstName", e.target.value)}
                   required
-                  className="placeholder:text-neutral-500"
+                  className="mt-1 text-sm sm:text-base"
                 />
               </div>
               <div>
-                <Label htmlFor="lastName" className="text-white">
+                <Label htmlFor="lastName" className="text-white text-sm sm:text-base">
                   Last Name
                 </Label>
                 <Input
@@ -146,14 +148,14 @@ export function OrderForm() {
                   value={formData.lastName}
                   onChange={(e) => handleInputChange("lastName", e.target.value)}
                   required
-                  className="placeholder:text-neutral-500"
+                  className="mt-1 text-sm sm:text-base"
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
-                <Label htmlFor="email" className="text-white">
+                <Label htmlFor="email" className="text-white text-sm sm:text-base">
                   Email Address
                 </Label>
                 <Input
@@ -163,11 +165,11 @@ export function OrderForm() {
                   value={formData.email}
                   onChange={(e) => handleInputChange("email", e.target.value)}
                   required
-                  className="placeholder:text-neutral-500"
+                  className="mt-1 text-sm sm:text-base"
                 />
               </div>
               <div>
-                <Label htmlFor="phone" className="text-white">
+                <Label htmlFor="phone" className="text-white text-sm sm:text-base">
                   Phone Number
                 </Label>
                 <Input
@@ -177,13 +179,13 @@ export function OrderForm() {
                   value={formData.phone}
                   onChange={(e) => handleInputChange("phone", e.target.value)}
                   required
-                  className="placeholder:text-neutral-500"
+                  className="mt-1 text-sm sm:text-base"
                 />
               </div>
             </div>
 
             <div>
-              <Label htmlFor="shoeModel" className="text-white">
+              <Label htmlFor="shoeModel" className="text-white text-sm sm:text-base">
                 Shoe Model
               </Label>
               <Select
@@ -192,12 +194,12 @@ export function OrderForm() {
                 onValueChange={(value) => handleInputChange("shoeModel", value)}
                 required
               >
-                <SelectTrigger className="text-black">
+                <SelectTrigger className="mt-1 text-sm sm:text-base">
                   <SelectValue placeholder="Select a base model" />
                 </SelectTrigger>
                 <SelectContent>
                   {shoeModels.map((model) => (
-                    <SelectItem key={model} value={model}>
+                    <SelectItem key={model} value={model} className="text-sm sm:text-base">
                       {model}
                     </SelectItem>
                   ))}
@@ -206,7 +208,7 @@ export function OrderForm() {
             </div>
 
             <div>
-              <Label htmlFor="size" className="text-white">
+              <Label htmlFor="size" className="text-white text-sm sm:text-base">
                 Shoe Size
               </Label>
               <Select
@@ -215,12 +217,12 @@ export function OrderForm() {
                 onValueChange={(value) => handleInputChange("size", value)}
                 required
               >
-                <SelectTrigger className="text-black">
+                <SelectTrigger className="mt-1 text-sm sm:text-base">
                   <SelectValue placeholder="Select your size" />
                 </SelectTrigger>
                 <SelectContent>
                   {allSizes.map((size) => (
-                    <SelectItem key={size} value={size}>
+                    <SelectItem key={size} value={size} className="text-sm sm:text-base">
                       {size}
                     </SelectItem>
                   ))}
@@ -229,23 +231,23 @@ export function OrderForm() {
             </div>
 
             <div>
-              <Label htmlFor="designDescription" className="text-white">
+              <Label htmlFor="designDescription" className="text-white text-sm sm:text-base">
                 Design Description
               </Label>
               <Textarea
                 id="designDescription"
                 name="designDescription"
                 placeholder="Describe your vision in detail. Include colors, themes, inspiration, or any specific elements you'd like incorporated..."
-                rows={6}
+                rows={4}
                 value={formData.designDescription}
                 onChange={(e) => handleInputChange("designDescription", e.target.value)}
                 required
-                className="placeholder:text-neutral-500"
+                className="mt-1 text-sm sm:text-base resize-none"
               />
             </div>
 
             <div>
-              <Label htmlFor="address" className="text-white">
+              <Label htmlFor="address" className="text-white text-sm sm:text-base">
                 Shipping Address
               </Label>
               <Textarea
@@ -256,13 +258,13 @@ export function OrderForm() {
                 value={formData.address}
                 onChange={(e) => handleInputChange("address", e.target.value)}
                 required
-                className="placeholder:text-neutral-500"
+                className="mt-1 text-sm sm:text-base resize-none"
               />
             </div>
 
-            <div className="bg-neutral-50 p-4 rounded-lg">
-              <h3 className="font-semibold text-neutral-900 mb-2">What happens next?</h3>
-              <ul className="text-sm text-neutral-600 space-y-1">
+            <div className="bg-neutral-50 p-3 sm:p-4 rounded-lg">
+              <h3 className="font-semibold text-neutral-900 mb-2 text-sm sm:text-base">What happens next?</h3>
+              <ul className="text-xs sm:text-sm text-neutral-600 space-y-1">
                 <li>• Proceed to payment using Zelle or Venmo</li>
                 <li>• We'll review your design request within 24 hours</li>
                 <li>• Our team will contact you to discuss details and timeline</li>
@@ -276,19 +278,26 @@ export function OrderForm() {
               </ul>
             </div>
 
-            <Button type="submit" className="w-full" size="lg" disabled={isSubmitting || !isFormValid}>
-              {isSubmitting ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Processing...
-                </>
-              ) : (
-                <>
-                  <Send className="mr-2 h-4 w-4" />
-                  Proceed to Custom Order Payment
-                </>
-              )}
-            </Button>
+            <div className="pt-2">
+              <Button
+                type="submit"
+                className="w-full bg-neutral-900 hover:bg-neutral-800 text-white border border-neutral-700"
+                size="lg"
+                disabled={isSubmitting || !isFormValid}
+              >
+                {isSubmitting ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <Send className="mr-2 h-4 w-4" />
+                    Proceed to Custom Order Payment
+                  </>
+                )}
+              </Button>
+            </div>
           </form>
         </CardContent>
       </Card>
