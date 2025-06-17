@@ -80,14 +80,17 @@ export function HeroSection() {
 
         <div className="text-center mt-16">
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button asChild size="lg" className="bg-white text-black hover:bg-neutral-200 px-8 py-3 text-lg">
+            <Button
+              asChild
+              size="lg"
+              className="bg-white text-black border-2 border-black px-8 py-3 text-lg font-medium"
+            >
               <Link href="/shoes">View All Designs</Link>
             </Button>
             <Button
               asChild
               size="lg"
-              variant="outline"
-              className="border-white text-white hover:bg-white hover:text-black px-8 py-3 text-lg"
+              className="bg-white text-black border-2 border-black px-8 py-3 text-lg font-medium"
             >
               <Link href="/order">Start a Custom Order</Link>
             </Button>
