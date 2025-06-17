@@ -65,70 +65,64 @@ export default function CustomPaymentPage() {
     }
   }
 
-  const handleSubmitOrder = async () => {
-    if (!orderData) return
+  const sendBusinessNotification = async () => {
+    const formData = new FormData()
 
-    setIsSubmitting(true)
+    // Business notification email
+    formData.append(
+      "_subject",
+      `🎨 New Custom Order #${orderData!.orderId} - ${orderData!.firstName} ${orderData!.lastName}`,
+    )
+    formData.append("_template", "box")
+    formData.append("_captcha", "false")
 
-    try {
-      // Create form data for Formsubmit
-      const formData = new FormData()
+    // Order Information
+    formData.append("Order_ID", orderData!.orderId)
+    formData.append("Customer_Name", `${orderData!.firstName} ${orderData!.lastName}`)
+    formData.append("Customer_Email", orderData!.email)
+    formData.append("Customer_Phone", orderData!.phone)
+    formData.append("Shoe_Model", orderData!.shoeModel)
+    formData.append("Shoe_Size", orderData!.size)
+    formData.append("Design_Description", orderData!.designDescription)
+    formData.append("Shipping_Address", orderData!.address)
+    formData.append("Total_Price", `$${orderData!.price}`)
+    formData.append("Order_Date", new Date(orderData!.timestamp).toLocaleString())
 
-      // Add all order details
-      formData.append(
-        "_subject",
-        `🎨 New Custom Order #${orderData.orderId} - ${orderData.firstName} ${orderData.lastName}`,
-      )
-      formData.append("_template", "box") // Use a nice template
-      formData.append("_captcha", "false") // Disable captcha since this is automated
+    // Payment Proof Information
+    formData.append("Payment_Method", paymentProof.method.toUpperCase())
+    formData.append("Transaction_ID", paymentProof.transactionId)
+    if (paymentProof.notes) {
+      formData.append("Payment_Notes", paymentProof.notes)
+    }
 
-      // Order Information
-      formData.append("Order_ID", orderData.orderId)
-      formData.append("Customer_Name", `${orderData.firstName} ${orderData.lastName}`)
-      formData.append("Customer_Email", orderData.email)
-      formData.append("Customer_Phone", orderData.phone)
-      formData.append("Shoe_Model", orderData.shoeModel)
-      formData.append("Shoe_Size", orderData.size)
-      formData.append("Design_Description", orderData.designDescription)
-      formData.append("Shipping_Address", orderData.address)
-      formData.append("Total_Price", `$${orderData.price}`)
-      formData.append("Order_Date", new Date(orderData.timestamp).toLocaleString())
+    // Add screenshot if provided
+    if (paymentProof.screenshot) {
+      formData.append("Payment_Screenshot", paymentProof.screenshot)
+    }
 
-      // Payment Proof Information
-      formData.append("Payment_Method", paymentProof.method.toUpperCase())
-      formData.append("Transaction_ID", paymentProof.transactionId)
-      if (paymentProof.notes) {
-        formData.append("Payment_Notes", paymentProof.notes)
-      }
-
-      // Add screenshot if provided
-      if (paymentProof.screenshot) {
-        formData.append("Payment_Screenshot", paymentProof.screenshot)
-      }
-
-      // Add formatted summary for better readability
-      const orderSummary = `
+    // Add formatted summary for better readability
+    const orderSummary = `
 🎨 NEW CUSTOM ORDER RECEIVED
 
 📋 ORDER DETAILS:
-• Order ID: ${orderData.orderId}
-• Date: ${new Date(orderData.timestamp).toLocaleString()}
-• Total: $${orderData.price}
+• Order ID: ${orderData!.orderId}
+• Date: ${new Date(orderData!.timestamp).toLocaleString()}
+• Total: $${orderData!.price}
 
 👤 CUSTOMER INFO:
-• Name: ${orderData.firstName} ${orderData.lastName}
-• Email: ${orderData.email}
-• Phone: ${orderData.phone}
+• Name: ${orderData!.firstName} ${orderData!.lastName}
+• Email: ${orderData!.email}
+• Phone: ${orderData!.phone}
 
 👟 SHOE DETAILS:
-• Model: ${orderData.shoeModel}
-• Size: ${orderData.size}
+• Model: ${orderData!.shoeModel}
+• Size: ${orderData!.size}
 
 🎨 DESIGN DESCRIPTION:
-${orderData.designDescription}
+${orderData!.designDescription}
 
 📦 SHIPPING ADDRESS:
-${orderData.address}
+${orderData!.address}
 
 💳 PAYMENT VERIFICATION:
 • Method: ${paymentProof.method.toUpperCase()}
@@ -145,18 +139,95 @@ ${paymentProof.notes ? `• Notes: ${paymentProof.notes}` : ""}
 ---
 Sole Purpose Footwear
 Custom sneaker artistry that tells your story
-      `
+    `
 
-      formData.append("Order_Summary", orderSummary)
+    formData.append("Order_Summary", orderSummary)
 
-      // Send to Formsubmit (replace with your email)
-      const response = await fetch("https://formsubmit.co/drew.alaraj@gmail.com", {
-        method: "POST",
-        body: formData,
-      })
+    // Send to business email
+    return fetch("https://formsubmit.co/solepurposefootwear813@gmail.com", {
+      method: "POST",
+      body: formData,
+    })
+  }
 
-      if (!response.ok) {
-        throw new Error("Failed to send order notification")
+  const sendCustomerConfirmation = async () => {
+    const formData = new FormData()
+
+    // Customer confirmation email
+    formData.append("_subject", `✅ Order Confirmation #${orderData!.orderId} - Sole Purpose Footwear`)
+    formData.append("_template", "box")
+    formData.append("_captcha", "false")
+    formData.append("_next", "https://solepurposefootwear.com/thank-you") // Optional redirect
+
+    const customerMessage = `
+Hi ${orderData!.firstName},
+
+Thank you for your custom order with Sole Purpose Footwear! 🎨
+
+📋 ORDER CONFIRMATION:
+• Order ID: ${orderData!.orderId}
+• Date: ${new Date(orderData!.timestamp).toLocaleString()}
+• Total: $${orderData!.price}
+
+👟 YOUR CUSTOM DESIGN:
+• Model: ${orderData!.shoeModel}
+• Size: ${orderData!.size}
+• Design: ${orderData!.designDescription}
+
+💳 PAYMENT STATUS:
+• Method: ${paymentProof.method.toUpperCase()}
+• Transaction ID: ${paymentProof.transactionId}
+• Status: Pending Verification
+
+⏰ WHAT HAPPENS NEXT:
+1. We'll verify your payment within 2-4 hours
+2. Our team will email you to discuss design details
+3. Creation begins (typically 2-4 weeks)
+4. We'll send progress photos during creation
+5. Your custom shoes will be shipped to:
+   ${orderData!.address}
+
+📞 QUESTIONS?
+Email: solepurposefootwear813@gmail.com
+Phone: (415) 939-8270
+
+Thank you for choosing Sole Purpose Footwear to bring your vision to life!
+
+---
+The Sole Purpose Team
+Custom sneaker artistry that tells your story
+    `
+
+    formData.append("Customer_Message", customerMessage)
+    formData.append("Order_ID", orderData!.orderId)
+    formData.append("Customer_Name", `${orderData!.firstName} ${orderData!.lastName}`)
+    formData.append("Total_Amount", `$${orderData!.price}`)
+
+    // Send to customer email
+    return fetch(`https://formsubmit.co/${orderData!.email}`, {
+      method: "POST",
+      body: formData,
+    })
+  }
+
+  const handleSubmitOrder = async () => {
+    if (!orderData) return
+
+    setIsSubmitting(true)
+
+    try {
+      // Send both emails simultaneously
+      const [businessResponse, customerResponse] = await Promise.all([
+        sendBusinessNotification(),
+        sendCustomerConfirmation(),
+      ])
+
+      if (!businessResponse.ok) {
+        throw new Error("Failed to send business notification")
+      }
+
+      if (!customerResponse.ok) {
+        console.warn("Customer confirmation email may have failed, but order was processed")
       }
 
       setIsSubmitted(true)
@@ -204,8 +275,8 @@ Custom sneaker artistry that tells your story
               </p>
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
                 <p className="text-sm text-blue-800">
-                  <strong>Next Steps:</strong> We'll verify your payment, email you confirmation, and start discussing
-                  your custom design within 24 hours.
+                  <strong>Confirmation emails sent:</strong> Check your email for order confirmation and next steps.
+                  We'll also verify your payment and contact you within 24 hours.
                 </p>
               </div>
               <div className="space-y-4">
