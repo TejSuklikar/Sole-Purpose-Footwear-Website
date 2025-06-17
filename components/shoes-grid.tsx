@@ -115,17 +115,15 @@ export function ShoesGrid() {
               <div className="p-6">
                 <h3 className="font-semibold text-lg mb-2 text-neutral-900">{shoe.name}</h3>
                 <p className="text-2xl font-bold text-neutral-900 mb-4">${shoe.price}</p>
-                <div className="flex flex-wrap gap-1 mb-4">
-                  {shoe.sizes.slice(0, 4).map((size) => (
-                    <span key={size} className="px-2 py-1 bg-neutral-800 text-white text-xs rounded">
-                      {size}
-                    </span>
-                  ))}
-                  {shoe.sizes.length > 4 && (
-                    <span className="px-2 py-1 bg-neutral-800 text-white text-xs rounded">
-                      +{shoe.sizes.length - 4}
-                    </span>
-                  )}
+                <div className="mb-4">
+                  <p className="text-sm text-neutral-600 mb-2">Available Sizes:</p>
+                  <div className="flex flex-wrap gap-1">
+                    {shoe.sizes.map((size) => (
+                      <span key={size} className="px-2 py-1 bg-neutral-800 text-white text-xs rounded">
+                        {size}
+                      </span>
+                    ))}
+                  </div>
                 </div>
                 <Button className="w-full" variant="outline">
                   View Details
