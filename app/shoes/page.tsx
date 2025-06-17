@@ -1,13 +1,30 @@
-import type { Metadata } from "next"
+"use client"
+import { useState } from "react"
 import { ShoesGrid } from "@/components/shoes-grid"
 import { ShoesFilters } from "@/components/shoes-filters"
 
-export const metadata: Metadata = {
-  title: "Shoes - Sole Purpose Footwear",
-  description: "Browse our collection of custom sneaker designs and artistry.",
+interface FilterState {
+  selectedSizes: string[]
+  priceRanges: { min: number; max: number }[]
 }
 
 export default function ShoesPage() {
+  const [filters, setFilters] = useState<FilterState>({
+    selectedSizes: [],
+    priceRanges: [],
+  })
+
+  const handleFiltersChange = (newFilters: FilterState) => {
+    setFilters(newFilters)
+  }
+
+  const clearFilters = () => {
+    setFilters({
+      selectedSizes: [],
+      priceRanges: [],
+    })
+  }
+
   return (
     <div className="py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -20,10 +37,10 @@ export default function ShoesPage() {
 
         <div className="flex flex-col lg:flex-row gap-8">
           <aside className="lg:w-64 flex-shrink-0">
-            <ShoesFilters />
+            <ShoesFilters filters={filters} onFiltersChange={handleFiltersChange} onClearFilters={clearFilters} />
           </aside>
           <main className="flex-1">
-            <ShoesGrid />
+            <ShoesGrid filters={filters} />
           </main>
         </div>
       </div>

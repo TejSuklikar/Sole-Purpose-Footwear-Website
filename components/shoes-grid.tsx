@@ -1,5 +1,6 @@
 "use client"
 
+import { useMemo } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -92,48 +93,103 @@ const shoes = [
   },
 ]
 
-export function ShoesGrid() {
+interface FilterState {
+  selectedSizes: string[]
+  priceRanges: { min: number; max: number }[]
+}
+
+interface ShoesGridProps {
+  filters: FilterState
+}
+
+export function ShoesGrid({ filters }: ShoesGridProps) {
+  const filteredShoes = useMemo(() => {
+    let filtered = shoes
+
+    // Filter by size
+    if (filters.selectedSizes.length > 0) {
+      filtered = filtered.filter((shoe) => filters.selectedSizes.some((size) => shoe.sizes.includes(size)))
+    }
+
+    // Filter by price range
+    if (filters.priceRanges.length > 0) {
+      filtered = filtered.filter((shoe) =>
+        filters.priceRanges.some((range) => shoe.price >= range.min && shoe.price <= range.max),
+      )
+    }
+
+    return filtered
+  }, [filters])
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {shoes.map((shoe) => (
-        <div key={shoe.id}>
-          <Link href={`/shoes/${shoe.slug}`}>
-            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-              <div className="aspect-[4/3] relative">
-                <Image
-                  src={shoe.image || "/placeholder.svg?height=400&width=400&text=Shoe+Image"}
-                  alt={shoe.name}
-                  fill
-                  className="object-cover object-center"
-                  crossOrigin="anonymous"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement
-                    target.src = "/placeholder.svg?height=400&width=400&text=Shoe+Image"
-                  }}
-                />
-              </div>
-              <div className="p-6">
-                <h3 className="font-semibold text-lg mb-2 text-neutral-900">{shoe.name}</h3>
-                <p className="text-2xl font-bold text-neutral-900 mb-4">${shoe.price}</p>
-                <div className="mb-4">
-                  <p className="text-sm text-neutral-600 mb-2">Available Sizes:</p>
-                  <div className="flex flex-wrap gap-1">
-                    {shoe.sizes.map((size) => (
-                      <span
-                        key={size}
-                        className="px-3 py-2 bg-neutral-800 text-white text-sm rounded-lg border border-neutral-600"
-                      >
-                        {size}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-                <Button className="w-full bg-neutral-700 text-white">View Details</Button>
-              </div>
-            </div>
-          </Link>
+    <div>
+      {/* Results count */}
+      <div className="mb-6 flex justify-between items-center">
+        <p className="text-neutral-300 text-sm sm:text-base">
+          Showing {filteredShoes.length} of {shoes.length} shoes
+        </p>
+        {(filters.selectedSizes.length > 0 || filters.priceRanges.length > 0) && (
+          <p className="text-neutral-400 text-xs sm:text-sm">Filters applied</p>
+        )}
+      </div>
+
+      {/* No results message */}
+      {filteredShoes.length === 0 && (
+        <div className="text-center py-12">
+          <p className="text-neutral-400 text-lg mb-4">No shoes match your current filters</p>
+          <p className="text-neutral-500 text-sm">Try adjusting your size or price range selections</p>
         </div>
-      ))}
+      )}
+
+      {/* Shoes grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+        {filteredShoes.map((shoe) => (
+          <div key={shoe.id}>
+            <Link href={`/shoes/${shoe.slug}`}>
+              <div className="bg-white rounded-lg shadow-sm overflow-hidden transition-transform hover:scale-105">
+                <div className="aspect-[4/3] relative">
+                  <Image
+                    src={shoe.image || "/placeholder.svg?height=400&width=400&text=Shoe+Image"}
+                    alt={shoe.name}
+                    fill
+                    className="object-cover object-center"
+                    crossOrigin="anonymous"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement
+                      target.src = "/placeholder.svg?height=400&width=400&text=Shoe+Image"
+                    }}
+                  />
+                </div>
+                <div className="p-4 sm:p-6">
+                  <h3 className="font-semibold text-base sm:text-lg mb-2 text-neutral-900">{shoe.name}</h3>
+                  <p className="text-xl sm:text-2xl font-bold text-neutral-900 mb-4">${shoe.price}</p>
+                  <div className="mb-4">
+                    <p className="text-xs sm:text-sm text-neutral-600 mb-2">Available Sizes:</p>
+                    <div className="flex flex-wrap gap-1">
+                      {shoe.sizes.slice(0, 6).map((size) => (
+                        <span
+                          key={size}
+                          className={`px-2 py-1 text-xs rounded border ${
+                            filters.selectedSizes.includes(size)
+                              ? "bg-neutral-900 text-white border-neutral-900"
+                              : "bg-neutral-100 text-neutral-700 border-neutral-300"
+                          }`}
+                        >
+                          {size}
+                        </span>
+                      ))}
+                      {shoe.sizes.length > 6 && (
+                        <span className="px-2 py-1 text-xs text-neutral-500">+{shoe.sizes.length - 6} more</span>
+                      )}
+                    </div>
+                  </div>
+                  <Button className="w-full bg-neutral-700 hover:bg-neutral-800 text-white">View Details</Button>
+                </div>
+              </div>
+            </Link>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
