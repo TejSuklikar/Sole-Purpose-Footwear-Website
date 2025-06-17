@@ -71,38 +71,79 @@ export default function PaymentPage() {
     }
   }
 
+  const sendCustomerConfirmation = async () => {
+    if (!orderData || !customerInfo.email) return
+
+    const formData = new FormData()
+
+    formData.append("_subject", `✅ Order Confirmation #${orderData.orderId} - Sole Purpose Footwear`)
+    formData.append("_template", "box")
+    formData.append("_captcha", "false")
+
+    const customerMessage = `
+Hi ${customerInfo.name},
+
+Thank you for your order with Sole Purpose Footwear! 🎨
+
+📋 ORDER CONFIRMATION:
+• Order ID: ${orderData.orderId}
+• Date: ${new Date(orderData.timestamp).toLocaleString()}
+• Total: $${orderData.total}
+
+👟 YOUR ORDER:
+${orderData.items.map((item) => `• ${item.name} (Size ${item.size}) x${item.quantity} - $${item.price * item.quantity}`).join("\n")}
+
+💳 PAYMENT STATUS:
+• Method: ${paymentProof.method.toUpperCase()}
+• Transaction ID: ${paymentProof.transactionId}
+• Status: Pending Verification
+
+⏰ WHAT HAPPENS NEXT:
+1. We'll verify your payment within 2-4 hours
+2. Your order will be prepared and shipped to:
+   ${customerInfo.address}
+3. You'll receive tracking information once shipped
+
+📞 QUESTIONS?
+Email: solepurposefootwear813@gmail.com
+Phone: (415) 939-8270
+
+Thank you for choosing Sole Purpose Footwear!
+
+---
+The Sole Purpose Team
+Custom sneaker artistry that tells your story
+  `
+
+    formData.append("Customer_Message", customerMessage)
+    formData.append("Order_ID", orderData.orderId)
+    formData.append("Customer_Name", customerInfo.name)
+    formData.append("Total_Amount", `$${orderData.total}`)
+
+    return fetch(`https://formsubmit.co/${customerInfo.email}`, {
+      method: "POST",
+      body: formData,
+    })
+  }
+
   const handleSubmitOrder = async () => {
     if (!orderData) return
 
     setIsSubmitting(true)
 
     try {
-      // Send business notification using FormSubmit
-      const formData = new FormData()
+      // Send both business and customer emails simultaneously
+      const [businessResponse, customerResponse] = await Promise.all([
+        sendBusinessNotification(),
+        sendCustomerConfirmation(),
+      ])
 
-      formData.append("_subject", `🛒 New Order #${orderData.orderId} - Payment Verification`)
-      formData.append("_template", "box")
-      formData.append("_captcha", "false")
-
-      // Order details
-      formData.append("Order_ID", orderData.orderId)
-      formData.append("Order_Items", JSON.stringify(orderData.items, null, 2))
-      formData.append("Total_Amount", `$${orderData.total}`)
-      formData.append("Customer_Info", JSON.stringify(customerInfo, null, 2))
-      formData.append("Payment_Method", paymentProof.method.toUpperCase())
-      formData.append("Transaction_ID", paymentProof.transactionId)
-
-      if (paymentProof.screenshot) {
-        formData.append("Payment_Screenshot", paymentProof.screenshot)
+      if (!businessResponse.ok) {
+        throw new Error("Failed to send business notification")
       }
 
-      const response = await fetch("https://formsubmit.co/solepurposefootwear813@gmail.com", {
-        method: "POST",
-        body: formData,
-      })
-
-      if (!response.ok) {
-        throw new Error("Failed to send order notification")
+      if (!customerResponse.ok) {
+        console.warn("Customer confirmation email may have failed, but order was processed")
       }
 
       setIsSubmitted(true)
@@ -113,6 +154,33 @@ export default function PaymentPage() {
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+  const sendBusinessNotification = async () => {
+    if (!orderData) return
+
+    const formData = new FormData()
+
+    formData.append("_subject", `🛒 New Order #${orderData.orderId} - Payment Verification`)
+    formData.append("_template", "box")
+    formData.append("_captcha", "false")
+
+    // Order details
+    formData.append("Order_ID", orderData.orderId)
+    formData.append("Order_Items", JSON.stringify(orderData.items, null, 2))
+    formData.append("Total_Amount", `$${orderData.total}`)
+    formData.append("Customer_Info", JSON.stringify(customerInfo, null, 2))
+    formData.append("Payment_Method", paymentProof.method.toUpperCase())
+    formData.append("Transaction_ID", paymentProof.transactionId)
+
+    if (paymentProof.screenshot) {
+      formData.append("Payment_Screenshot", paymentProof.screenshot)
+    }
+
+    return fetch("https://formsubmit.co/solepurposefootwear813@gmail.com", {
+      method: "POST",
+      body: formData,
+    })
   }
 
   const isPaymentProofComplete =
@@ -182,7 +250,7 @@ export default function PaymentPage() {
         {/* Progress Steps */}
         <div className="mb-8">
           <div className="flex items-center justify-center space-x-4">
-            <div className={`flex items-center ${currentStep >= 1 ? "text-neutral-900" : "text-neutral-400"}`}>
+            <div className={`flex items-center ${currentStep >= 1 ? "text-neutral-600" : "text-neutral-400"}`}>
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep >= 1 ? "bg-neutral-900 text-white" : "bg-neutral-200"}`}
               >
@@ -191,7 +259,7 @@ export default function PaymentPage() {
               <span className="ml-2 font-medium">Send Payment</span>
             </div>
             <div className="w-16 h-0.5 bg-neutral-200"></div>
-            <div className={`flex items-center ${currentStep >= 2 ? "text-neutral-900" : "text-neutral-400"}`}>
+            <div className={`flex items-center ${currentStep >= 2 ? "text-neutral-600" : "text-neutral-400"}`}>
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep >= 2 ? "bg-neutral-900 text-white" : "bg-neutral-200"}`}
               >
