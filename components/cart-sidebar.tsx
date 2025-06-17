@@ -68,9 +68,9 @@ export function CartSidebar() {
                       crossOrigin="anonymous"
                     />
                     <div className="flex-1">
-                      <h3 className="font-medium">{item.name}</h3>
-                      <p className="text-sm text-neutral-600">Size: {item.size}</p>
-                      <p className="font-semibold">${item.price}</p>
+                      <h3 className="font-medium text-black">{item.name}</h3>
+                      <p className="text-sm text-black">Size: {item.size}</p>
+                      <p className="font-semibold text-black">${item.price}</p>
                     </div>
                     <div className="flex items-center space-x-2">
                       <Button
@@ -108,7 +108,7 @@ export function CartSidebar() {
           {state.items.length > 0 && (
             <div className="border-t p-4">
               <div className="flex justify-between items-center mb-4">
-                <span className="text-lg font-semibold">Total: ${total}</span>
+                <span className="text-lg font-semibold text-black">Total: ${total}</span>
               </div>
               <Button className="w-full" size="lg" onClick={handleCheckout} disabled={isProcessing}>
                 {isProcessing ? (
