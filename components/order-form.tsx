@@ -226,7 +226,7 @@ export function OrderForm() {
           </div>
 
           <div className="bg-neutral-50 p-4 rounded-lg">
-            <h3 className="font-semibold mb-2">What happens next?</h3>
+            <h3 className="font-semibold neutral-900">What happens next?</h3>
             <ul className="text-sm text-neutral-600 space-y-1">
               <li>• Proceed to payment using Zelle or Venmo</li>
               <li>• We'll review your design request within 24 hours</li>
