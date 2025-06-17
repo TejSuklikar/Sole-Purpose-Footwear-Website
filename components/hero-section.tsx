@@ -3,7 +3,6 @@
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { ArrowRight } from "lucide-react"
 
 const featuredShoes = [
   {
@@ -69,10 +68,10 @@ export function HeroSection() {
                   <div className="p-6 flex-1 flex flex-col justify-between">
                     <div>
                       <h3 className="font-playfair text-xl font-semibold mb-2">{shoe.name}</h3>
-                      <p className="text-neutral-600 mb-4 line-clamp-2">{shoe.description}</p>
+                      <p className="text-neutral-800 mb-4 line-clamp-2">{shoe.description}</p>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-2xl font-bold text-neutral-900">{shoe.price}</span>
+                      <span className="text-2xl font-bold text-black">{shoe.price}</span>
                     </div>
                   </div>
                 </div>
@@ -82,12 +81,19 @@ export function HeroSection() {
         </div>
 
         <div className="text-center mt-16">
-          <Button asChild size="lg" className="bg-white text-black hover:bg-neutral-200 px-8 py-3 text-lg">
-            <Link href="/shoes">
-              View All Designs
-              <ArrowRight className="ml-2 w-5 h-5" />
-            </Link>
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Button asChild size="lg" className="bg-white text-black hover:bg-neutral-200 px-8 py-3 text-lg">
+              <Link href="/shoes">View All Designs</Link>
+            </Button>
+            <Button
+              asChild
+              size="lg"
+              variant="outline"
+              className="border-white text-white hover:bg-white hover:text-black px-8 py-3 text-lg"
+            >
+              <Link href="/order">Start a Custom Order</Link>
+            </Button>
+          </div>
         </div>
       </div>
     </section>
