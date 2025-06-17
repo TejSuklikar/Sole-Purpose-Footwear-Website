@@ -30,32 +30,32 @@ const config: Config = {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#171717",
-          foreground: "#ffffff",
+          DEFAULT: "#ffffff",
+          foreground: "#000000",
         },
         secondary: {
-          DEFAULT: "#f5f5f5",
-          foreground: "#171717",
+          DEFAULT: "#262626",
+          foreground: "#ffffff",
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
         },
         muted: {
-          DEFAULT: "#f5f5f5",
-          foreground: "#737373",
+          DEFAULT: "#262626",
+          foreground: "#a3a3a3",
         },
         accent: {
-          DEFAULT: "#f5f5f5",
-          foreground: "#171717",
+          DEFAULT: "#262626",
+          foreground: "#ffffff",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",
         },
         card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
+          DEFAULT: "#171717",
+          foreground: "#ffffff",
         },
       },
       borderRadius: {
@@ -70,7 +70,7 @@ const config: Config = {
         },
         "accordion-up": {
           from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
       },
       animation: {
