@@ -4,7 +4,8 @@ import Image from "next/image"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { useCart } from "./cart-provider"
-import { Check, ChevronLeft, ChevronRight } from "lucide-react"
+import { Check, ChevronLeft, ChevronRight, ArrowLeft } from "lucide-react"
+import Link from "next/link"
 
 interface Shoe {
   id: number
@@ -51,6 +52,14 @@ export function ProductDetail({ shoe }: { shoe: Shoe }) {
   return (
     <div className="py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Back Arrow */}
+        <div className="mb-8">
+          <Link href="/shoes" className="inline-flex items-center text-white hover:text-neutral-300 transition-colors">
+            <ArrowLeft className="w-5 h-5 mr-2" />
+            Back to Gallery
+          </Link>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Image Section */}
           <div className="space-y-4">
@@ -132,15 +141,15 @@ export function ProductDetail({ shoe }: { shoe: Shoe }) {
           {/* Product Info */}
           <div className="space-y-6">
             <div>
-              <h1 className="font-playfair text-3xl md:text-4xl font-bold text-neutral-900 mb-2">{shoe.name}</h1>
-              <p className="text-3xl font-bold text-neutral-900">${shoe.price}</p>
+              <h1 className="font-playfair text-3xl md:text-4xl font-bold text-white mb-2">{shoe.name}</h1>
+              <p className="text-3xl font-bold text-white">${shoe.price}</p>
             </div>
 
-            <p className="text-lg text-neutral-600 leading-relaxed">{shoe.description}</p>
+            <p className="text-lg text-neutral-300 leading-relaxed">{shoe.description}</p>
 
             {/* Size Selection */}
             <div>
-              <h3 className="text-lg font-semibold mb-3">Select Size</h3>
+              <h3 className="text-lg font-semibold mb-3 text-white">Select Size</h3>
               <div className="grid grid-cols-4 gap-2">
                 {shoe.sizes.map((size) => (
                   <button
@@ -148,8 +157,8 @@ export function ProductDetail({ shoe }: { shoe: Shoe }) {
                     onClick={() => setSelectedSize(size)}
                     className={`p-3 border rounded-lg text-center transition-colors ${
                       selectedSize === size
-                        ? "border-neutral-900 bg-neutral-900 text-white"
-                        : "border-neutral-300 hover:border-neutral-400"
+                        ? "border-white bg-white text-neutral-900"
+                        : "border-neutral-600 text-white hover:border-neutral-400"
                     }`}
                   >
                     {size}
@@ -172,10 +181,10 @@ export function ProductDetail({ shoe }: { shoe: Shoe }) {
 
             {/* Product Details */}
             <div>
-              <h3 className="text-lg font-semibold mb-3">Product Details</h3>
+              <h3 className="text-lg font-semibold mb-3 text-white">Product Details</h3>
               <ul className="space-y-2">
                 {shoe.details.map((detail, index) => (
-                  <li key={index} className="text-neutral-600 flex items-start">
+                  <li key={index} className="text-neutral-300 flex items-start">
                     <span className="w-2 h-2 bg-neutral-400 rounded-full mt-2 mr-3 flex-shrink-0" />
                     {detail}
                   </li>
