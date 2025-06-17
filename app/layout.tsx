@@ -6,6 +6,7 @@ import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { CartProvider } from "@/components/cart-provider"
 import { CartSidebar } from "@/components/cart-sidebar"
+import { ScrollToTop } from "@/components/scroll-to-top"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" })
@@ -18,7 +19,7 @@ export const metadata: Metadata = {
     description: "Contemporary footwear brand specializing in custom sneaker designs and made-to-order artistry.",
     type: "website",
   },
-    generator: 'v0.dev'
+  generator: "v0.dev",
 }
 
 export default function RootLayout({
@@ -30,6 +31,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.variable} ${playfair.variable} font-sans antialiased`}>
         <CartProvider>
+          <ScrollToTop />
           <Header />
           <main className="min-h-screen">{children}</main>
           <Footer />
