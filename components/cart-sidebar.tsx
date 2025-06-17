@@ -43,7 +43,7 @@ export function CartSidebar() {
       <div className="absolute right-0 top-0 h-full w-full max-w-md bg-white shadow-xl">
         <div className="flex h-full flex-col">
           <div className="flex items-center justify-between p-4 border-b">
-            <h2 className="text-lg font-semibold">Shopping Cart</h2>
+            <h2 className="text-lg font-semibold text-black">Shopping Cart</h2>
             <Button variant="ghost" size="sm" onClick={() => dispatch({ type: "TOGGLE_CART" })}>
               <X className="h-5 w-5" />
             </Button>
@@ -76,6 +76,7 @@ export function CartSidebar() {
                       <Button
                         variant="outline"
                         size="sm"
+                        className="border-neutral-800 text-black hover:bg-neutral-100"
                         onClick={() =>
                           dispatch({
                             type: "UPDATE_QUANTITY",
@@ -85,10 +86,11 @@ export function CartSidebar() {
                       >
                         <Minus className="h-3 w-3" />
                       </Button>
-                      <span className="w-8 text-center">{item.quantity}</span>
+                      <span className="w-8 text-center text-black font-medium">{item.quantity}</span>
                       <Button
                         variant="outline"
                         size="sm"
+                        className="border-neutral-800 text-black hover:bg-neutral-100"
                         onClick={() =>
                           dispatch({
                             type: "UPDATE_QUANTITY",
