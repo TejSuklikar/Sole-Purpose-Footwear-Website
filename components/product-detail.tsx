@@ -81,13 +81,13 @@ export function ProductDetail({ shoe }: { shoe: Shoe }) {
                 <>
                   <button
                     onClick={prevImage}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-2 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
                   >
                     <ChevronLeft className="w-5 h-5" />
                   </button>
                   <button
                     onClick={nextImage}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-2 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
                   >
                     <ChevronRight className="w-5 h-5" />
                   </button>
@@ -156,9 +156,7 @@ export function ProductDetail({ shoe }: { shoe: Shoe }) {
                     key={size}
                     onClick={() => setSelectedSize(size)}
                     className={`p-3 border rounded-lg text-center transition-colors ${
-                      selectedSize === size
-                        ? "border-white bg-white text-neutral-900"
-                        : "border-neutral-600 text-white hover:border-neutral-400"
+                      selectedSize === size ? "border-white bg-white text-neutral-900" : "border-neutral-600 text-white"
                     }`}
                   >
                     {size}

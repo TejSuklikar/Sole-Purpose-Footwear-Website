@@ -128,9 +128,7 @@ export function ShoesGrid() {
                     ))}
                   </div>
                 </div>
-                <Button className="w-full" variant="outline">
-                  View Details
-                </Button>
+                <Button className="w-full bg-neutral-700 text-white">View Details</Button>
               </div>
             </div>
           </Link>

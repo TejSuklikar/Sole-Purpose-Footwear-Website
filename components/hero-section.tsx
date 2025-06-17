@@ -50,9 +50,7 @@ export function HeroSection() {
           {featuredShoes.map((shoe, index) => (
             <div
               key={shoe.id}
-              className={`group hover-lift ${
-                index === 0 ? "fade-in-up" : index === 1 ? "fade-in-up-delay-1" : "fade-in-up-delay-2"
-              }`}
+              className={`${index === 0 ? "fade-in-up" : index === 1 ? "fade-in-up-delay-1" : "fade-in-up-delay-2"}`}
             >
               <Link href={`/shoes/${shoe.slug}`}>
                 <div className="bg-white rounded-2xl shadow-lg overflow-hidden h-full flex flex-col">
@@ -61,7 +59,7 @@ export function HeroSection() {
                       src={shoe.image || "/placeholder.svg"}
                       alt={shoe.name}
                       fill
-                      className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                      className="object-cover object-center"
                       crossOrigin="anonymous"
                     />
                   </div>

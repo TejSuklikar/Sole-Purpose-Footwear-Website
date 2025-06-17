@@ -26,9 +26,9 @@
     @apply bg-gradient-to-r from-white to-neutral-200 bg-clip-text text-transparent;
   }
 
-  .hover-lift {
-    @apply transition-transform duration-300 ease-out hover:-translate-y-2;
-  }
+  /* .hover-lift {
+  @apply transition-transform duration-300 ease-out hover:-translate-y-2;
+} */
 
   .card-dark {
     @apply bg-neutral-900/50 backdrop-blur-sm border border-neutral-800;
