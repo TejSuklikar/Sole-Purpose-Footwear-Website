@@ -71,20 +71,92 @@ export default function CustomPaymentPage() {
     setIsSubmitting(true)
 
     try {
-      // Send email notification
-      const emailResponse = await fetch("/api/send-order-email", {
+      // Create form data for Formsubmit
+      const formData = new FormData()
+
+      // Add all order details
+      formData.append(
+        "_subject",
+        `🎨 New Custom Order #${orderData.orderId} - ${orderData.firstName} ${orderData.lastName}`,
+      )
+      formData.append("_template", "box") // Use a nice template
+      formData.append("_captcha", "false") // Disable captcha since this is automated
+
+      // Order Information
+      formData.append("Order_ID", orderData.orderId)
+      formData.append("Customer_Name", `${orderData.firstName} ${orderData.lastName}`)
+      formData.append("Customer_Email", orderData.email)
+      formData.append("Customer_Phone", orderData.phone)
+      formData.append("Shoe_Model", orderData.shoeModel)
+      formData.append("Shoe_Size", orderData.size)
+      formData.append("Design_Description", orderData.designDescription)
+      formData.append("Shipping_Address", orderData.address)
+      formData.append("Total_Price", `$${orderData.price}`)
+      formData.append("Order_Date", new Date(orderData.timestamp).toLocaleString())
+
+      // Payment Proof Information
+      formData.append("Payment_Method", paymentProof.method.toUpperCase())
+      formData.append("Transaction_ID", paymentProof.transactionId)
+      if (paymentProof.notes) {
+        formData.append("Payment_Notes", paymentProof.notes)
+      }
+
+      // Add screenshot if provided
+      if (paymentProof.screenshot) {
+        formData.append("Payment_Screenshot", paymentProof.screenshot)
+      }
+
+      // Add formatted summary for better readability
+      const orderSummary = `
+🎨 NEW CUSTOM ORDER RECEIVED
+
+📋 ORDER DETAILS:
+• Order ID: ${orderData.orderId}
+• Date: ${new Date(orderData.timestamp).toLocaleString()}
+• Total: $${orderData.price}
+
+👤 CUSTOMER INFO:
+• Name: ${orderData.firstName} ${orderData.lastName}
+• Email: ${orderData.email}
+• Phone: ${orderData.phone}
+
+👟 SHOE DETAILS:
+• Model: ${orderData.shoeModel}
+• Size: ${orderData.size}
+
+🎨 DESIGN DESCRIPTION:
+${orderData.designDescription}
+
+📦 SHIPPING ADDRESS:
+${orderData.address}
+
+💳 PAYMENT VERIFICATION:
+• Method: ${paymentProof.method.toUpperCase()}
+• Transaction ID: ${paymentProof.transactionId}
+${paymentProof.notes ? `• Notes: ${paymentProof.notes}` : ""}
+• Screenshot: ${paymentProof.screenshot ? "Attached" : "Not provided"}
+
+⏰ NEXT STEPS:
+1. Verify payment within 2-4 hours
+2. Contact customer to confirm design details
+3. Begin creation process (2-4 weeks)
+4. Send progress photos during creation
+
+---
+Sole Purpose Footwear
+Custom sneaker artistry that tells your story
+      `
+
+      formData.append("Order_Summary", orderSummary)
+
+      // Send to Formsubmit (replace with your email)
+      const response = await fetch("https://formsubmit.co/drew.alaraj@gmail.com", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...orderData,
-          paymentProof: paymentProof,
-        }),
+        body: formData,
       })
 
-      if (!emailResponse.ok) {
-        throw new Error("Failed to send email notification")
+      if (!response.ok) {
+        throw new Error("Failed to send order notification")
       }
 
       setIsSubmitted(true)
