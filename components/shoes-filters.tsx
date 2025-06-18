@@ -12,9 +12,7 @@ export function ShoesFilters({ onFiltersChange }: FiltersProps) {
   const [selectedPriceRanges, setSelectedPriceRanges] = useState<string[]>([])
 
   const sizes = [
-    // Men's sizes
-    "6",
-    "6.5",
+    // Men's sizes (starting from 7, as youth 7 = men's 7)
     "7",
     "7.5",
     "8",
@@ -47,33 +45,22 @@ export function ShoesFilters({ onFiltersChange }: FiltersProps) {
     "11W",
     "11.5W",
     "12W",
-    // Toddler sizes (1C-7C)
+    // Toddler sizes (0-13)
+    "0C",
     "1C",
-    "1.5C",
     "2C",
-    "2.5C",
     "3C",
-    "3.5C",
     "4C",
-    "4.5C",
     "5C",
-    "5.5C",
     "6C",
-    "6.5C",
     "7C",
-    // Youth sizes (8C and up)
     "8C",
-    "8.5C",
     "9C",
-    "9.5C",
     "10C",
-    "10.5C",
     "11C",
-    "11.5C",
     "12C",
-    "12.5C",
     "13C",
-    "13.5C",
+    // Youth sizes (1-7, where 7Y = 7 Men's)
     "1Y",
     "1.5Y",
     "2Y",

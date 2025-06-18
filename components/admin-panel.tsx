@@ -21,11 +21,9 @@ interface Shoe {
   isFeatured?: boolean
 }
 
-// All available sizes including men's, women's, and children's
+// All available sizes following proper shoe industry standards
 const allSizes = [
-  // Men's sizes
-  "6",
-  "6.5",
+  // Men's sizes (starting from 7, as youth 7 = men's 7)
   "7",
   "7.5",
   "8",
@@ -58,33 +56,22 @@ const allSizes = [
   "11W",
   "11.5W",
   "12W",
-  // Toddler sizes (1C-7C)
+  // Toddler sizes (0-13)
+  "0C",
   "1C",
-  "1.5C",
   "2C",
-  "2.5C",
   "3C",
-  "3.5C",
   "4C",
-  "4.5C",
   "5C",
-  "5.5C",
   "6C",
-  "6.5C",
   "7C",
-  // Youth sizes (8C and up)
   "8C",
-  "8.5C",
   "9C",
-  "9.5C",
   "10C",
-  "10.5C",
   "11C",
-  "11.5C",
   "12C",
-  "12.5C",
   "13C",
-  "13.5C",
+  // Youth sizes (1-7, where 7Y = 7 Men's)
   "1Y",
   "1.5Y",
   "2Y",
@@ -352,11 +339,9 @@ export function AdminPanel() {
     } else if (category === "women") {
       categorySizes = allSizes.filter((size) => size.includes("W"))
     } else if (category === "toddler") {
-      categorySizes = allSizes.filter((size) => size.includes("C") && Number.parseFloat(size) <= 7)
+      categorySizes = allSizes.filter((size) => size.includes("C"))
     } else if (category === "youth") {
-      categorySizes = allSizes.filter(
-        (size) => (size.includes("C") && Number.parseFloat(size) >= 8) || size.includes("Y"),
-      )
+      categorySizes = allSizes.filter((size) => size.includes("Y"))
     }
 
     // Add to existing selection (don't replace)
@@ -369,10 +354,8 @@ export function AdminPanel() {
   // Group sizes for better display
   const mensSizes = allSizes.filter((size) => !size.includes("W") && !size.includes("C") && !size.includes("Y"))
   const womensSizes = allSizes.filter((size) => size.includes("W"))
-  const toddlerSizes = allSizes.filter((size) => size.includes("C") && Number.parseFloat(size) <= 7)
-  const youthSizes = allSizes.filter(
-    (size) => (size.includes("C") && Number.parseFloat(size) >= 8) || size.includes("Y"),
-  )
+  const toddlerSizes = allSizes.filter((size) => size.includes("C"))
+  const youthSizes = allSizes.filter((size) => size.includes("Y"))
 
   return (
     <div className="space-y-8">
@@ -549,7 +532,7 @@ export function AdminPanel() {
 
               {/* Men's Sizes */}
               <div className="mb-4">
-                <h4 className="text-white text-sm font-medium mb-2">Men's Sizes</h4>
+                <h4 className="text-white text-sm font-medium mb-2">Men's Sizes (7-15)</h4>
                 <div className="grid grid-cols-6 gap-2">
                   {mensSizes.map((size) => (
                     <button
@@ -591,8 +574,8 @@ export function AdminPanel() {
 
               {/* Toddler Sizes */}
               <div className="mb-4">
-                <h4 className="text-white text-sm font-medium mb-2">Toddler Sizes (1C-7C)</h4>
-                <div className="grid grid-cols-6 gap-2">
+                <h4 className="text-white text-sm font-medium mb-2">Toddler Sizes (0C-13C)</h4>
+                <div className="grid grid-cols-7 gap-2">
                   {toddlerSizes.map((size) => (
                     <button
                       key={size}
@@ -612,7 +595,10 @@ export function AdminPanel() {
 
               {/* Youth Sizes */}
               <div className="mb-4">
-                <h4 className="text-white text-sm font-medium mb-2">Youth Sizes (8C & Up)</h4>
+                <h4 className="text-white text-sm font-medium mb-2">Youth Sizes (1Y-7Y)</h4>
+                <p className="text-xs text-neutral-400 mb-2">
+                  Note: Youth 7Y = Men's 7 (same size, different construction)
+                </p>
                 <div className="grid grid-cols-6 gap-2">
                   {youthSizes.map((size) => (
                     <button
