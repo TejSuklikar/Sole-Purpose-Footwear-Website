@@ -24,7 +24,38 @@ export function LoginPage() {
   const { login, loginWithGoogle, signup } = useAuth()
 
   useEffect(() => {
-    // No need for Google button rendering in demo mode
+    // Render Google Sign-In button when Google is loaded
+    const renderGoogleButton = () => {
+      const googleButtonDiv = document.getElementById("google-signin-button")
+      if (googleButtonDiv && typeof window.google !== "undefined") {
+        // Clear any existing content
+        googleButtonDiv.innerHTML = ""
+
+        window.google.accounts.id.renderButton(googleButtonDiv, {
+          theme: "outline",
+          size: "large",
+          width: "100%",
+          text: "continue_with",
+          shape: "rectangular",
+        })
+      }
+    }
+
+    // Check if Google is already loaded
+    if (typeof window.google !== "undefined") {
+      renderGoogleButton()
+    } else {
+      // Wait for Google to load
+      const checkGoogle = setInterval(() => {
+        if (typeof window.google !== "undefined") {
+          clearInterval(checkGoogle)
+          renderGoogleButton()
+        }
+      }, 100)
+
+      // Clean up interval after 10 seconds
+      setTimeout(() => clearInterval(checkGoogle), 10000)
+    }
   }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -103,15 +134,21 @@ export function LoginPage() {
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Google Sign In Button */}
-            <Button
-              onClick={handleGoogleLogin}
-              disabled={loading}
-              variant="outline"
-              className="w-full bg-white text-black hover:bg-neutral-100"
-            >
-              <Chrome className="mr-2 h-4 w-4" />
-              {loading ? "Opening Google..." : "Continue with Google"}
-            </Button>
+            <div className="space-y-3">
+              {/* Native Google Button (will show user's actual accounts) */}
+              <div id="google-signin-button" className="w-full min-h-[44px] flex items-center justify-center"></div>
+
+              {/* Fallback button if Google button doesn't load */}
+              <Button
+                onClick={handleGoogleLogin}
+                disabled={loading}
+                variant="outline"
+                className="w-full bg-white text-black hover:bg-neutral-100"
+              >
+                <Chrome className="mr-2 h-4 w-4" />
+                {loading ? "Opening Google..." : "Continue with Google"}
+              </Button>
+            </div>
 
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
