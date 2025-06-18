@@ -24,16 +24,7 @@ export function LoginPage() {
   const { login, loginWithGoogle, signup } = useAuth()
 
   useEffect(() => {
-    // Add Google button container
-    const googleButtonDiv = document.getElementById("google-signin-button")
-    if (googleButtonDiv && typeof window.google !== "undefined") {
-      window.google.accounts.id.renderButton(googleButtonDiv, {
-        theme: "outline",
-        size: "large",
-        width: "100%",
-        text: "continue_with",
-      })
-    }
+    // No need for Google button rendering in demo mode
   }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -112,21 +103,15 @@ export function LoginPage() {
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Google Sign In Button */}
-            <div className="space-y-3">
-              {/* Native Google Button (will show user's actual accounts) */}
-              <div id="google-signin-button" className="w-full"></div>
-
-              {/* Fallback button */}
-              <Button
-                onClick={handleGoogleLogin}
-                disabled={loading}
-                variant="outline"
-                className="w-full bg-white text-black hover:bg-neutral-100"
-              >
-                <Chrome className="mr-2 h-4 w-4" />
-                {loading ? "Opening Google..." : "Continue with Google"}
-              </Button>
-            </div>
+            <Button
+              onClick={handleGoogleLogin}
+              disabled={loading}
+              variant="outline"
+              className="w-full bg-white text-black hover:bg-neutral-100"
+            >
+              <Chrome className="mr-2 h-4 w-4" />
+              {loading ? "Opening Google..." : "Continue with Google"}
+            </Button>
 
             <div className="relative">
               <div className="absolute inset-0 flex items-center">

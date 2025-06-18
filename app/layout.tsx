@@ -31,9 +31,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <head>
-        <meta name="google-signin-client_id" content="your-google-client-id.apps.googleusercontent.com" />
-      </head>
       <body className={`${inter.variable} ${playfair.variable} font-sans antialiased`}>
         <AuthProvider>
           <CartProvider>
