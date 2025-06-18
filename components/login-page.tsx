@@ -219,14 +219,6 @@ export function LoginPage() {
                 {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
               </button>
             </div>
-
-            {/* Demo Instructions */}
-            <div className="bg-blue-900/20 border border-blue-500/50 rounded-lg p-3">
-              <p className="text-blue-400 text-xs text-center mb-2">
-                <strong>Demo Mode:</strong> Click "Continue with Google" to see account selection
-              </p>
-              <p className="text-blue-300 text-xs text-center">Use solepurposefootwear813@gmail.com for admin access</p>
-            </div>
           </CardContent>
         </Card>
       </div>
