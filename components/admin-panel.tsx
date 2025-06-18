@@ -21,7 +21,7 @@ interface Shoe {
   isFeatured?: boolean
 }
 
-// All available sizes including men's, women's, and toddler
+// All available sizes including men's, women's, and children's
 const allSizes = [
   // Men's sizes
   "6",
@@ -58,26 +58,46 @@ const allSizes = [
   "11W",
   "11.5W",
   "12W",
-  // Toddler sizes
-  "4T",
-  "5T",
-  "6T",
-  "7T",
-  "8T",
-  "9T",
-  "10T",
-  "10.5T",
-  "11T",
-  "11.5T",
-  "12T",
-  "12.5T",
-  "13T",
-  "13.5T",
+  // Toddler sizes (1C-7C)
+  "1C",
+  "1.5C",
+  "2C",
+  "2.5C",
+  "3C",
+  "3.5C",
+  "4C",
+  "4.5C",
+  "5C",
+  "5.5C",
+  "6C",
+  "6.5C",
+  "7C",
+  // Youth sizes (8C and up)
+  "8C",
+  "8.5C",
+  "9C",
+  "9.5C",
+  "10C",
+  "10.5C",
+  "11C",
+  "11.5C",
+  "12C",
+  "12.5C",
+  "13C",
+  "13.5C",
   "1Y",
   "1.5Y",
   "2Y",
   "2.5Y",
   "3Y",
+  "3.5Y",
+  "4Y",
+  "4.5Y",
+  "5Y",
+  "5.5Y",
+  "6Y",
+  "6.5Y",
+  "7Y",
 ]
 
 // All available shoes in the system
@@ -324,15 +344,19 @@ export function AdminPanel() {
     setNewShoe({ ...newShoe, sizes: [] })
   }
 
-  const selectSizeCategory = (category: "men" | "women" | "toddler") => {
+  const selectSizeCategory = (category: "men" | "women" | "toddler" | "youth") => {
     let categorySizes: string[] = []
 
     if (category === "men") {
-      categorySizes = allSizes.filter((size) => !size.includes("W") && !size.includes("T") && !size.includes("Y"))
+      categorySizes = allSizes.filter((size) => !size.includes("W") && !size.includes("C") && !size.includes("Y"))
     } else if (category === "women") {
       categorySizes = allSizes.filter((size) => size.includes("W"))
     } else if (category === "toddler") {
-      categorySizes = allSizes.filter((size) => size.includes("T") || size.includes("Y"))
+      categorySizes = allSizes.filter((size) => size.includes("C") && Number.parseFloat(size) <= 7)
+    } else if (category === "youth") {
+      categorySizes = allSizes.filter(
+        (size) => (size.includes("C") && Number.parseFloat(size) >= 8) || size.includes("Y"),
+      )
     }
 
     // Add to existing selection (don't replace)
@@ -343,9 +367,12 @@ export function AdminPanel() {
   const featuredShoes = shoes.filter((shoe) => shoe.isFeatured)
 
   // Group sizes for better display
-  const mensSizes = allSizes.filter((size) => !size.includes("W") && !size.includes("T") && !size.includes("Y"))
+  const mensSizes = allSizes.filter((size) => !size.includes("W") && !size.includes("C") && !size.includes("Y"))
   const womensSizes = allSizes.filter((size) => size.includes("W"))
-  const toddlerSizes = allSizes.filter((size) => size.includes("T") || size.includes("Y"))
+  const toddlerSizes = allSizes.filter((size) => size.includes("C") && Number.parseFloat(size) <= 7)
+  const youthSizes = allSizes.filter(
+    (size) => (size.includes("C") && Number.parseFloat(size) >= 8) || size.includes("Y"),
+  )
 
   return (
     <div className="space-y-8">
@@ -509,6 +536,15 @@ export function AdminPanel() {
                 >
                   + Toddler ({toddlerSizes.length})
                 </Button>
+                <Button
+                  type="button"
+                  onClick={() => selectSizeCategory("youth")}
+                  size="sm"
+                  variant="outline"
+                  className="text-xs"
+                >
+                  + Youth ({youthSizes.length})
+                </Button>
               </div>
 
               {/* Men's Sizes */}
@@ -555,9 +591,30 @@ export function AdminPanel() {
 
               {/* Toddler Sizes */}
               <div className="mb-4">
-                <h4 className="text-white text-sm font-medium mb-2">Toddler & Youth Sizes</h4>
+                <h4 className="text-white text-sm font-medium mb-2">Toddler Sizes (1C-7C)</h4>
                 <div className="grid grid-cols-6 gap-2">
                   {toddlerSizes.map((size) => (
+                    <button
+                      key={size}
+                      type="button"
+                      onClick={() => handleSizeToggle(size)}
+                      className={`p-2 rounded border text-sm ${
+                        newShoe.sizes.includes(size)
+                          ? "bg-white text-black border-white"
+                          : "bg-neutral-800 text-white border-neutral-600"
+                      }`}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Youth Sizes */}
+              <div className="mb-4">
+                <h4 className="text-white text-sm font-medium mb-2">Youth Sizes (8C & Up)</h4>
+                <div className="grid grid-cols-6 gap-2">
+                  {youthSizes.map((size) => (
                     <button
                       key={size}
                       type="button"
