@@ -21,7 +21,64 @@ interface Shoe {
   isFeatured?: boolean
 }
 
-const allSizes = ["6", "6.5", "7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11", "11.5", "12", "12.5", "13"]
+// All available sizes including men's, women's, and toddler
+const allSizes = [
+  // Men's sizes
+  "6",
+  "6.5",
+  "7",
+  "7.5",
+  "8",
+  "8.5",
+  "9",
+  "9.5",
+  "10",
+  "10.5",
+  "11",
+  "11.5",
+  "12",
+  "12.5",
+  "13",
+  "13.5",
+  "14",
+  "15",
+  // Women's sizes
+  "5W",
+  "5.5W",
+  "6W",
+  "6.5W",
+  "7W",
+  "7.5W",
+  "8W",
+  "8.5W",
+  "9W",
+  "9.5W",
+  "10W",
+  "10.5W",
+  "11W",
+  "11.5W",
+  "12W",
+  // Toddler sizes
+  "4T",
+  "5T",
+  "6T",
+  "7T",
+  "8T",
+  "9T",
+  "10T",
+  "10.5T",
+  "11T",
+  "11.5T",
+  "12T",
+  "12.5T",
+  "13T",
+  "13.5T",
+  "1Y",
+  "1.5Y",
+  "2Y",
+  "2.5Y",
+  "3Y",
+]
 
 // All available shoes in the system
 const defaultShoes: Shoe[] = [
@@ -259,7 +316,36 @@ export function AdminPanel() {
     setNewShoe({ ...newShoe, sizes: updatedSizes })
   }
 
+  const selectAllSizes = () => {
+    setNewShoe({ ...newShoe, sizes: [...allSizes] })
+  }
+
+  const clearAllSizes = () => {
+    setNewShoe({ ...newShoe, sizes: [] })
+  }
+
+  const selectSizeCategory = (category: "men" | "women" | "toddler") => {
+    let categorySizes: string[] = []
+
+    if (category === "men") {
+      categorySizes = allSizes.filter((size) => !size.includes("W") && !size.includes("T") && !size.includes("Y"))
+    } else if (category === "women") {
+      categorySizes = allSizes.filter((size) => size.includes("W"))
+    } else if (category === "toddler") {
+      categorySizes = allSizes.filter((size) => size.includes("T") || size.includes("Y"))
+    }
+
+    // Add to existing selection (don't replace)
+    const newSizes = [...new Set([...newShoe.sizes, ...categorySizes])]
+    setNewShoe({ ...newShoe, sizes: newSizes })
+  }
+
   const featuredShoes = shoes.filter((shoe) => shoe.isFeatured)
+
+  // Group sizes for better display
+  const mensSizes = allSizes.filter((size) => !size.includes("W") && !size.includes("T") && !size.includes("Y"))
+  const womensSizes = allSizes.filter((size) => size.includes("W"))
+  const toddlerSizes = allSizes.filter((size) => size.includes("T") || size.includes("Y"))
 
   return (
     <div className="space-y-8">
@@ -387,22 +473,107 @@ export function AdminPanel() {
 
             <div>
               <Label className="text-white">Available Sizes</Label>
-              <div className="grid grid-cols-5 gap-2 mt-2">
-                {allSizes.map((size) => (
-                  <button
-                    key={size}
-                    type="button"
-                    onClick={() => handleSizeToggle(size)}
-                    className={`p-2 rounded border text-sm ${
-                      newShoe.sizes.includes(size)
-                        ? "bg-white text-black border-white"
-                        : "bg-neutral-800 text-white border-neutral-600"
-                    }`}
-                  >
-                    {size}
-                  </button>
-                ))}
+
+              {/* Size Selection Controls */}
+              <div className="flex flex-wrap gap-2 mt-2 mb-4">
+                <Button type="button" onClick={selectAllSizes} size="sm" variant="outline" className="text-xs">
+                  Select All ({allSizes.length})
+                </Button>
+                <Button type="button" onClick={clearAllSizes} size="sm" variant="outline" className="text-xs">
+                  Clear All
+                </Button>
+                <Button
+                  type="button"
+                  onClick={() => selectSizeCategory("men")}
+                  size="sm"
+                  variant="outline"
+                  className="text-xs"
+                >
+                  + Men's ({mensSizes.length})
+                </Button>
+                <Button
+                  type="button"
+                  onClick={() => selectSizeCategory("women")}
+                  size="sm"
+                  variant="outline"
+                  className="text-xs"
+                >
+                  + Women's ({womensSizes.length})
+                </Button>
+                <Button
+                  type="button"
+                  onClick={() => selectSizeCategory("toddler")}
+                  size="sm"
+                  variant="outline"
+                  className="text-xs"
+                >
+                  + Toddler ({toddlerSizes.length})
+                </Button>
               </div>
+
+              {/* Men's Sizes */}
+              <div className="mb-4">
+                <h4 className="text-white text-sm font-medium mb-2">Men's Sizes</h4>
+                <div className="grid grid-cols-6 gap-2">
+                  {mensSizes.map((size) => (
+                    <button
+                      key={size}
+                      type="button"
+                      onClick={() => handleSizeToggle(size)}
+                      className={`p-2 rounded border text-sm ${
+                        newShoe.sizes.includes(size)
+                          ? "bg-white text-black border-white"
+                          : "bg-neutral-800 text-white border-neutral-600"
+                      }`}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Women's Sizes */}
+              <div className="mb-4">
+                <h4 className="text-white text-sm font-medium mb-2">Women's Sizes</h4>
+                <div className="grid grid-cols-6 gap-2">
+                  {womensSizes.map((size) => (
+                    <button
+                      key={size}
+                      type="button"
+                      onClick={() => handleSizeToggle(size)}
+                      className={`p-2 rounded border text-sm ${
+                        newShoe.sizes.includes(size)
+                          ? "bg-white text-black border-white"
+                          : "bg-neutral-800 text-white border-neutral-600"
+                      }`}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Toddler Sizes */}
+              <div className="mb-4">
+                <h4 className="text-white text-sm font-medium mb-2">Toddler & Youth Sizes</h4>
+                <div className="grid grid-cols-6 gap-2">
+                  {toddlerSizes.map((size) => (
+                    <button
+                      key={size}
+                      type="button"
+                      onClick={() => handleSizeToggle(size)}
+                      className={`p-2 rounded border text-sm ${
+                        newShoe.sizes.includes(size)
+                          ? "bg-white text-black border-white"
+                          : "bg-neutral-800 text-white border-neutral-600"
+                      }`}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <p className="text-neutral-400 text-sm mt-1">
                 {newShoe.sizes.length === 0 ? "All sizes will be available" : `${newShoe.sizes.length} sizes selected`}
               </p>

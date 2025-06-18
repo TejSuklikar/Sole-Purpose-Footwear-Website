@@ -4,7 +4,63 @@ import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
-const allSizes = ["6", "6.5", "7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11", "11.5", "12", "12.5", "13"]
+const allSizes = [
+  // Men's sizes
+  "6",
+  "6.5",
+  "7",
+  "7.5",
+  "8",
+  "8.5",
+  "9",
+  "9.5",
+  "10",
+  "10.5",
+  "11",
+  "11.5",
+  "12",
+  "12.5",
+  "13",
+  "13.5",
+  "14",
+  "15",
+  // Women's sizes
+  "5W",
+  "5.5W",
+  "6W",
+  "6.5W",
+  "7W",
+  "7.5W",
+  "8W",
+  "8.5W",
+  "9W",
+  "9.5W",
+  "10W",
+  "10.5W",
+  "11W",
+  "11.5W",
+  "12W",
+  // Toddler sizes
+  "4T",
+  "5T",
+  "6T",
+  "7T",
+  "8T",
+  "9T",
+  "10T",
+  "10.5T",
+  "11T",
+  "11.5T",
+  "12T",
+  "12.5T",
+  "13T",
+  "13.5T",
+  "1Y",
+  "1.5Y",
+  "2Y",
+  "2.5Y",
+  "3Y",
+]
 
 const shoes = [
   // Featured shoes (first 3 from hero section)
