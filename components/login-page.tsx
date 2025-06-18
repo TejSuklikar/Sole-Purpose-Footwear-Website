@@ -58,7 +58,7 @@ export function LoginPage() {
     try {
       const success = await loginWithGoogle()
       if (!success) {
-        setError("Google login failed. Please try again.")
+        setError("Google login was cancelled or failed.")
       }
     } catch (err) {
       setError("An error occurred with Google login. Please try again.")
@@ -99,19 +99,15 @@ export function LoginPage() {
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Google Sign In Button */}
-            <div>
-              <Button
-                onClick={handleGoogleLogin}
-                disabled={loading}
-                variant="outline"
-                className="w-full bg-white text-black hover:bg-neutral-100 relative"
-              >
-                <Chrome className="mr-2 h-4 w-4" />
-                Continue with Google
-              </Button>
-              {/* Hidden div for Google button rendering */}
-              <div id="google-signin-button" className="hidden"></div>
-            </div>
+            <Button
+              onClick={handleGoogleLogin}
+              disabled={loading}
+              variant="outline"
+              className="w-full bg-white text-black hover:bg-neutral-100"
+            >
+              <Chrome className="mr-2 h-4 w-4" />
+              {loading ? "Opening Google..." : "Continue with Google"}
+            </Button>
 
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
@@ -226,9 +222,10 @@ export function LoginPage() {
 
             {/* Demo Instructions */}
             <div className="bg-blue-900/20 border border-blue-500/50 rounded-lg p-3">
-              <p className="text-blue-400 text-xs text-center">
-                <strong>Demo:</strong> Use solepurposefootwear813@gmail.com or anitej@suklikar.org for admin access
+              <p className="text-blue-400 text-xs text-center mb-2">
+                <strong>Demo Mode:</strong> Click "Continue with Google" to see account selection
               </p>
+              <p className="text-blue-300 text-xs text-center">Use solepurposefootwear813@gmail.com for admin access</p>
             </div>
           </CardContent>
         </Card>
