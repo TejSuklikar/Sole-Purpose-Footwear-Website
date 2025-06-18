@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useAuth } from "./auth-provider"
-import { Mail, Lock, User, Shield } from 'lucide-react'
+import { Mail, Lock, User, Shield, AlertCircle } from "lucide-react"
 
 export function LoginPage() {
   const [isLogin, setIsLogin] = useState(true)
@@ -32,6 +32,9 @@ export function LoginPage() {
       let success = false
       if (isLogin) {
         success = await login(formData.email, formData.password)
+        if (!success) {
+          setError("Invalid email or password. Please check your credentials.")
+        }
       } else {
         if (!formData.firstName.trim() || !formData.lastName.trim()) {
           setError("Please enter both first and last name")
@@ -39,10 +42,9 @@ export function LoginPage() {
           return
         }
         success = await signup(formData.email, formData.password, formData.firstName, formData.lastName)
-      }
-
-      if (!success) {
-        setError("Authentication failed. Please check your details and try again.")
+        if (!success) {
+          setError("Account with this email already exists. Please try logging in instead.")
+        }
       }
     } catch (err) {
       setError("An error occurred. Please try again.")
@@ -171,11 +173,17 @@ export function LoginPage() {
                     required
                   />
                 </div>
+                {!isLogin && (
+                  <p className="text-neutral-400 text-xs mt-1">Password will be remembered for future logins</p>
+                )}
               </div>
 
               {error && (
                 <div className="bg-red-900/20 border border-red-500/50 rounded-lg p-3">
-                  <p className="text-red-400 text-sm text-center">{error}</p>
+                  <div className="flex items-center space-x-2">
+                    <AlertCircle className="h-4 w-4 text-red-400" />
+                    <p className="text-red-400 text-sm">{error}</p>
+                  </div>
                 </div>
               )}
 

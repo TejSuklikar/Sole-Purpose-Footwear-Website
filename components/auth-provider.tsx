@@ -10,6 +10,14 @@ interface User {
   isAdmin: boolean
 }
 
+interface StoredUser {
+  email: string
+  firstName: string
+  lastName: string
+  password: string
+  isAdmin: boolean
+}
+
 interface AuthContextType {
   user: User | null
   login: (email: string, password: string) => Promise<boolean>
@@ -28,7 +36,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Check if user is logged in on mount
-    const savedUser = localStorage.getItem("sp_user")
+    const savedUser = localStorage.getItem("sp_current_user")
     if (savedUser) {
       const userData = JSON.parse(savedUser)
       setUser({
@@ -43,20 +51,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1000))
 
-    // Simple validation - in production you'd validate against your backend
-    if (!email || !password) {
+    // Get stored users
+    const storedUsers = JSON.parse(localStorage.getItem("sp_users") || "[]") as StoredUser[]
+
+    // Find user with matching email and password
+    const foundUser = storedUsers.find((u) => u.email === email && u.password === password)
+
+    if (!foundUser) {
       return false
     }
 
     const userData = {
-      email,
-      firstName: email.split("@")[0].charAt(0).toUpperCase() + email.split("@")[0].slice(1),
-      lastName: "User",
-      isAdmin: ADMIN_EMAILS.includes(email),
+      email: foundUser.email,
+      firstName: foundUser.firstName,
+      lastName: foundUser.lastName,
+      isAdmin: ADMIN_EMAILS.includes(foundUser.email),
     }
 
     setUser(userData)
-    localStorage.setItem("sp_user", JSON.stringify(userData))
+    localStorage.setItem("sp_current_user", JSON.stringify(userData))
     return true
   }
 
@@ -69,6 +82,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return false
     }
 
+    // Get existing users
+    const storedUsers = JSON.parse(localStorage.getItem("sp_users") || "[]") as StoredUser[]
+
+    // Check if user already exists
+    if (storedUsers.find((u) => u.email === email)) {
+      return false // User already exists
+    }
+
+    // Create new user
+    const newUser: StoredUser = {
+      email,
+      password, // In production, this would be hashed
+      firstName,
+      lastName,
+      isAdmin: ADMIN_EMAILS.includes(email),
+    }
+
+    // Save to storage
+    storedUsers.push(newUser)
+    localStorage.setItem("sp_users", JSON.stringify(storedUsers))
+
+    // Log them in
     const userData = {
       email,
       firstName,
@@ -77,20 +112,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     setUser(userData)
-    localStorage.setItem("sp_user", JSON.stringify(userData))
+    localStorage.setItem("sp_current_user", JSON.stringify(userData))
     return true
   }
 
   const logout = () => {
     setUser(null)
-    localStorage.removeItem("sp_user")
+    localStorage.removeItem("sp_current_user")
   }
 
-  return (
-    <AuthContext.Provider value={{ user, login, signup, logout, loading }}>
-      {children}
-    </AuthContext.Provider>
-  )
+  return <AuthContext.Provider value={{ user, login, signup, logout, loading }}>{children}</AuthContext.Provider>
 }
 
 export function useAuth() {

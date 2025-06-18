@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Plus, Star, Trash2 } from "lucide-react"
+import { Plus, Star, Trash2, StarOff } from "lucide-react"
 import Image from "next/image"
 
 interface Shoe {
@@ -23,10 +23,151 @@ interface Shoe {
 
 const allSizes = ["6", "6.5", "7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11", "11.5", "12", "12.5", "13"]
 
+// All available shoes in the system
+const defaultShoes: Shoe[] = [
+  {
+    id: 1,
+    name: "Red Kuffiyeh AF1",
+    price: 350,
+    image: "/images/kuffiyeh-side-sunset.png",
+    slug: "red-kuffiyeh-af1",
+    sizes: allSizes,
+    description: "Traditional Kuffiyeh patterns hand-painted in bold red on premium white canvas.",
+    details: [
+      "Hand-painted with premium acrylic paints",
+      "Sealed with protective coating",
+      "Based on Nike Air Force 1",
+    ],
+    isFeatured: true,
+  },
+  {
+    id: 2,
+    name: "Mexican Eagle AF1",
+    price: 425,
+    image: "/images/mexican-side-view.png",
+    slug: "mexican-eagle-af1",
+    sizes: allSizes,
+    description: "Detailed Mexican flag design featuring the iconic eagle and serpent coat of arms.",
+    details: ["Hand-painted Mexican coat of arms", "Mexican flag colors on swoosh", "Premium white leather base"],
+    isFeatured: true,
+  },
+  {
+    id: 3,
+    name: "Black & Red Geometric",
+    price: 375,
+    image: "/images/black-red-geometric-hero.jpg",
+    slug: "black-red-geometric",
+    sizes: allSizes,
+    description: "Sleek black forces with striking red geometric patterns.",
+    details: ["All-black leather base", "Hand-painted red geometric patterns", "Matte finish"],
+    isFeatured: true,
+  },
+  {
+    id: 4,
+    name: "Jordanian Flag AF1",
+    price: 400,
+    image: "/images/jordanian-side-view.jpg",
+    slug: "jordanian-flag-af1",
+    sizes: allSizes,
+    description: "Jordanian flag design with traditional colors and patterns.",
+    details: [
+      "Hand-painted Jordanian flag design",
+      "Traditional red, black, white, and green colors",
+      "Kuffiyeh pattern details",
+    ],
+    isFeatured: false,
+  },
+  {
+    id: 5,
+    name: "Geometric Checkered",
+    price: 325,
+    image: "/images/geometric-checkered-side.jpg",
+    slug: "geometric-checkered",
+    sizes: allSizes,
+    description: "Clean geometric checkered pattern in black and white.",
+    details: [
+      "Hand-painted checkered pattern",
+      "Black and white minimalist design",
+      "Palestinian flag colors on branding",
+    ],
+    isFeatured: false,
+  },
+  {
+    id: 6,
+    name: "Chinese Flag AF1",
+    price: 450,
+    image: "/images/chinese-side-sunset.png",
+    slug: "chinese-flag-af1",
+    sizes: allSizes,
+    description: "Chinese flag design featuring the iconic red and gold color scheme.",
+    details: [
+      "Hand-painted Chinese flag design",
+      "Authentic red and gold colors",
+      "Flag elements integrated into swoosh",
+    ],
+    isFeatured: false,
+  },
+  {
+    id: 7,
+    name: "Checkered Drip AF1",
+    price: 395,
+    image: "/images/checkered-drip-sunset.png",
+    slug: "checkered-drip-af1",
+    sizes: allSizes,
+    description: "Bold checkered pattern with artistic paint drip design.",
+    details: ["Hand-painted checkered swoosh", "Artistic paint drip effect", "Street art aesthetic"],
+    isFeatured: false,
+  },
+  {
+    id: 8,
+    name: "Map of Palestine AF1",
+    price: 380,
+    image: "/images/palestine-map-side.jpg",
+    slug: "map-of-palestine-af1",
+    sizes: allSizes,
+    description: "Hand-painted map of Palestine in traditional flag colors.",
+    details: [
+      "Hand-painted map of Palestine",
+      "Traditional Kuffiyeh geometric patterns",
+      "Palestinian flag colors throughout",
+    ],
+    isFeatured: false,
+  },
+  {
+    id: 9,
+    name: "Lebanese Cedar AF1",
+    price: 410,
+    image: "/images/lebanese-side-view.jpg",
+    slug: "lebanese-cedar-af1",
+    sizes: allSizes,
+    description: "Lebanese flag design featuring the iconic cedar tree symbol.",
+    details: [
+      "Hand-painted Lebanese cedar tree",
+      "Traditional red and white flag stripes",
+      "Lebanese flag colors on branding",
+    ],
+    isFeatured: false,
+  },
+  {
+    id: 10,
+    name: "Filipino Sun AF1",
+    price: 420,
+    image: "/images/filipino-side-view.jpg",
+    slug: "filipino-sun-af1",
+    sizes: allSizes,
+    description: "Filipino flag design featuring the golden sun symbol.",
+    details: [
+      "Hand-painted Filipino golden sun",
+      "Authentic blue, red, and yellow colors",
+      "Traditional eight-rayed sun design",
+    ],
+    isFeatured: false,
+  },
+]
+
 export function AdminPanel() {
   const [shoes, setShoes] = useState<Shoe[]>([])
   const [showAddForm, setShowAddForm] = useState(false)
-  const [editingShoe, setEditingShoe] = useState<Shoe | null>(null)
   const [newShoe, setNewShoe] = useState({
     name: "",
     price: "",
@@ -43,45 +184,6 @@ export function AdminPanel() {
       setShoes(JSON.parse(savedShoes))
     } else {
       // Initialize with default shoes
-      const defaultShoes = [
-        {
-          id: 1,
-          name: "Red Kuffiyeh AF1",
-          price: 350,
-          image: "/images/kuffiyeh-side-sunset.png",
-          slug: "red-kuffiyeh-af1",
-          sizes: allSizes,
-          description: "Traditional Kuffiyeh patterns hand-painted in bold red on premium white canvas.",
-          details: [
-            "Hand-painted with premium acrylic paints",
-            "Sealed with protective coating",
-            "Based on Nike Air Force 1",
-          ],
-          isFeatured: true,
-        },
-        {
-          id: 2,
-          name: "Mexican Eagle AF1",
-          price: 425,
-          image: "/images/mexican-side-view.png",
-          slug: "mexican-eagle-af1",
-          sizes: allSizes,
-          description: "Detailed Mexican flag design featuring the iconic eagle and serpent coat of arms.",
-          details: ["Hand-painted Mexican coat of arms", "Mexican flag colors on swoosh", "Premium white leather base"],
-          isFeatured: true,
-        },
-        {
-          id: 3,
-          name: "Black & Red Geometric",
-          price: 375,
-          image: "/images/black-red-geometric-hero.jpg",
-          slug: "black-red-geometric",
-          sizes: allSizes,
-          description: "Sleek black forces with striking red geometric patterns.",
-          details: ["All-black leather base", "Hand-painted red geometric patterns", "Matte finish"],
-          isFeatured: true,
-        },
-      ]
       setShoes(defaultShoes)
       localStorage.setItem("sp_shoes", JSON.stringify(defaultShoes))
     }
@@ -176,6 +278,9 @@ export function AdminPanel() {
             <Star className="mr-2 h-5 w-5 text-yellow-500" />
             Featured Shoes ({featuredShoes.length}/3)
           </CardTitle>
+          <p className="text-neutral-400 text-sm">
+            These shoes appear on the homepage. Click the star on any shoe below to feature/unfeature it.
+          </p>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -200,6 +305,7 @@ export function AdminPanel() {
                   <div className="text-center">
                     <Star className="h-8 w-8 mx-auto mb-2" />
                     <p className="text-sm">Empty Slot</p>
+                    <p className="text-xs text-neutral-600">Click ⭐ on shoes below</p>
                   </div>
                 </div>
               </div>
@@ -318,6 +424,9 @@ export function AdminPanel() {
       <Card className="bg-neutral-900 border-neutral-800">
         <CardHeader>
           <CardTitle className="text-white">All Shoes ({shoes.length})</CardTitle>
+          <p className="text-neutral-400 text-sm">
+            Click the star to feature/unfeature shoes. Only 3 can be featured at a time.
+          </p>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -344,9 +453,10 @@ export function AdminPanel() {
                     onClick={() => toggleFeatured(shoe.id)}
                     size="sm"
                     variant={shoe.isFeatured ? "default" : "outline"}
-                    className={shoe.isFeatured ? "bg-yellow-500 text-black" : ""}
+                    className={shoe.isFeatured ? "bg-yellow-500 text-black hover:bg-yellow-600" : ""}
+                    title={shoe.isFeatured ? "Remove from featured" : "Add to featured"}
                   >
-                    <Star className="h-4 w-4" />
+                    {shoe.isFeatured ? <Star className="h-4 w-4" /> : <StarOff className="h-4 w-4" />}
                   </Button>
                   <Button
                     onClick={() => handleDeleteShoe(shoe.id)}
