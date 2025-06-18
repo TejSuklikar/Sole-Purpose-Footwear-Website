@@ -49,6 +49,33 @@ export function ProductDetail({ shoe }: { shoe: Shoe }) {
     setCurrentImageIndex((prev) => (prev - 1 + shoe.images.length) % shoe.images.length)
   }
 
+  // Group sizes by category for better display
+  const mensSizes = shoe.sizes.filter((size) => !size.includes("W") && !size.includes("C") && !size.includes("Y"))
+  const womensSizes = shoe.sizes.filter((size) => size.includes("W"))
+  const babiesToddlerSizes = shoe.sizes.filter((size) => {
+    if (!size.includes("C")) return false
+    const num = Number.parseFloat(size)
+    return num >= 1 && num <= 10
+  })
+  const littleKidsSizes = shoe.sizes.filter((size) => {
+    if (size.includes("C")) {
+      const num = Number.parseFloat(size)
+      return num >= 8 && num <= 13.5
+    }
+    if (size.includes("Y")) {
+      const num = Number.parseFloat(size)
+      return num >= 1 && num <= 3
+    }
+    return false
+  })
+  const bigKidsSizes = shoe.sizes.filter((size) => {
+    if (size.includes("Y")) {
+      const num = Number.parseFloat(size)
+      return num >= 1 && num <= 7
+    }
+    return false
+  })
+
   return (
     <div className="py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -150,19 +177,116 @@ export function ProductDetail({ shoe }: { shoe: Shoe }) {
             {/* Size Selection */}
             <div>
               <h3 className="text-lg font-semibold mb-3 text-white">Select Size</h3>
-              <div className="grid grid-cols-4 gap-2">
-                {shoe.sizes.map((size) => (
-                  <button
-                    key={size}
-                    onClick={() => setSelectedSize(size)}
-                    className={`p-3 border rounded-lg text-center transition-colors ${
-                      selectedSize === size ? "border-white bg-white text-neutral-900" : "border-neutral-600 text-white"
-                    }`}
-                  >
-                    {size}
-                  </button>
-                ))}
-              </div>
+
+              {/* Men's Sizes */}
+              {mensSizes.length > 0 && (
+                <div className="mb-4">
+                  <h4 className="text-sm font-medium text-neutral-300 mb-2">Men's</h4>
+                  <div className="grid grid-cols-4 gap-2">
+                    {mensSizes.map((size) => (
+                      <button
+                        key={size}
+                        onClick={() => setSelectedSize(size)}
+                        className={`p-3 border rounded-lg text-center transition-colors ${
+                          selectedSize === size
+                            ? "border-white bg-white text-neutral-900"
+                            : "border-neutral-600 text-white"
+                        }`}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Women's Sizes */}
+              {womensSizes.length > 0 && (
+                <div className="mb-4">
+                  <h4 className="text-sm font-medium text-neutral-300 mb-2">Women's</h4>
+                  <div className="grid grid-cols-4 gap-2">
+                    {womensSizes.map((size) => (
+                      <button
+                        key={size}
+                        onClick={() => setSelectedSize(size)}
+                        className={`p-3 border rounded-lg text-center transition-colors ${
+                          selectedSize === size
+                            ? "border-white bg-white text-neutral-900"
+                            : "border-neutral-600 text-white"
+                        }`}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Big Kids */}
+              {bigKidsSizes.length > 0 && (
+                <div className="mb-4">
+                  <h4 className="text-sm font-medium text-neutral-300 mb-2">Big Kids (1Y-7Y)</h4>
+                  <div className="grid grid-cols-4 gap-2">
+                    {bigKidsSizes.map((size) => (
+                      <button
+                        key={size}
+                        onClick={() => setSelectedSize(size)}
+                        className={`p-3 border rounded-lg text-center transition-colors ${
+                          selectedSize === size
+                            ? "border-white bg-white text-neutral-900"
+                            : "border-neutral-600 text-white"
+                        }`}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Little Kids */}
+              {littleKidsSizes.length > 0 && (
+                <div className="mb-4">
+                  <h4 className="text-sm font-medium text-neutral-300 mb-2">Little Kids (8C-3Y)</h4>
+                  <div className="grid grid-cols-4 gap-2">
+                    {littleKidsSizes.map((size) => (
+                      <button
+                        key={size}
+                        onClick={() => setSelectedSize(size)}
+                        className={`p-3 border rounded-lg text-center transition-colors ${
+                          selectedSize === size
+                            ? "border-white bg-white text-neutral-900"
+                            : "border-neutral-600 text-white"
+                        }`}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Babies and Toddlers */}
+              {babiesToddlerSizes.length > 0 && (
+                <div className="mb-4">
+                  <h4 className="text-sm font-medium text-neutral-300 mb-2">Babies & Toddlers (1C-10C)</h4>
+                  <div className="grid grid-cols-4 gap-2">
+                    {babiesToddlerSizes.map((size) => (
+                      <button
+                        key={size}
+                        onClick={() => setSelectedSize(size)}
+                        className={`p-3 border rounded-lg text-center transition-colors ${
+                          selectedSize === size
+                            ? "border-white bg-white text-neutral-900"
+                            : "border-neutral-600 text-white"
+                        }`}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Add to Cart */}

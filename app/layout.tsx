@@ -5,8 +5,10 @@ import "./globals.css"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { CartProvider } from "@/components/cart-provider"
+import { AuthProvider } from "@/components/auth-provider"
 import { CartSidebar } from "@/components/cart-sidebar"
 import { ScrollToTop } from "@/components/scroll-to-top"
+import { AuthGuard } from "@/components/auth-guard"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" })
@@ -30,13 +32,17 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} ${playfair.variable} font-sans antialiased`}>
-        <CartProvider>
-          <ScrollToTop />
-          <Header />
-          <main className="min-h-screen">{children}</main>
-          <Footer />
-          <CartSidebar />
-        </CartProvider>
+        <AuthProvider>
+          <CartProvider>
+            <AuthGuard>
+              <ScrollToTop />
+              <Header />
+              <main className="min-h-screen">{children}</main>
+              <Footer />
+              <CartSidebar />
+            </AuthGuard>
+          </CartProvider>
+        </AuthProvider>
       </body>
     </html>
   )
