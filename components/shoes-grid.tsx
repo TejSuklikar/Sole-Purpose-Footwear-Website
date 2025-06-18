@@ -5,7 +5,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
 const allSizes = [
-  // Men's sizes (starting from 7, as youth 7 = men's 7)
+  // Men's sizes (starting from 7, as youth 7Y = men's 7)
   "7",
   "7.5",
   "8",
@@ -38,27 +38,40 @@ const allSizes = [
   "11W",
   "11.5W",
   "12W",
-  // Toddler sizes (0-13)
-  "0C",
+  // Babies and Toddlers (1C-10C)
   "1C",
+  "1.5C",
   "2C",
+  "2.5C",
   "3C",
+  "3.5C",
   "4C",
+  "4.5C",
   "5C",
+  "5.5C",
   "6C",
+  "6.5C",
   "7C",
+  "7.5C",
   "8C",
+  "8.5C",
   "9C",
+  "9.5C",
   "10C",
+  // Little Kids (8C-3Y) - includes overlap with toddlers
+  "10.5C",
   "11C",
+  "11.5C",
   "12C",
+  "12.5C",
   "13C",
-  // Youth sizes (1-7, where 7Y = 7 Men's)
+  "13.5C",
   "1Y",
   "1.5Y",
   "2Y",
   "2.5Y",
   "3Y",
+  // Big Kids (1Y-7Y) - includes overlap with little kids
   "3.5Y",
   "4Y",
   "4.5Y",
@@ -217,19 +230,7 @@ export function ShoesGrid({ filters }: ShoesGridProps) {
                 <div className="p-6">
                   <h3 className="font-semibold text-lg mb-2 text-neutral-900">{shoe.name}</h3>
                   <p className="text-2xl font-bold text-neutral-900 mb-4">${shoe.price}</p>
-                  <div className="mb-4">
-                    <p className="text-sm text-neutral-600 mb-2">Available Sizes:</p>
-                    <div className="flex flex-wrap gap-1">
-                      {shoe.sizes.map((size) => (
-                        <span
-                          key={size}
-                          className="px-3 py-2 bg-neutral-800 text-white text-sm rounded-lg border border-neutral-600"
-                        >
-                          {size}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
+                  <p className="text-sm text-neutral-600 mb-4">Available in all sizes</p>
                   <Button className="w-full bg-neutral-700 text-white">View Details</Button>
                 </div>
               </div>

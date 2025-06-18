@@ -21,9 +21,9 @@ interface Shoe {
   isFeatured?: boolean
 }
 
-// All available sizes following proper shoe industry standards
+// Nike-style sizing system
 const allSizes = [
-  // Men's sizes (starting from 7, as youth 7 = men's 7)
+  // Men's sizes (starting from 7, as youth 7Y = men's 7)
   "7",
   "7.5",
   "8",
@@ -56,27 +56,40 @@ const allSizes = [
   "11W",
   "11.5W",
   "12W",
-  // Toddler sizes (0-13)
-  "0C",
+  // Babies and Toddlers (1C-10C)
   "1C",
+  "1.5C",
   "2C",
+  "2.5C",
   "3C",
+  "3.5C",
   "4C",
+  "4.5C",
   "5C",
+  "5.5C",
   "6C",
+  "6.5C",
   "7C",
+  "7.5C",
   "8C",
+  "8.5C",
   "9C",
+  "9.5C",
   "10C",
+  // Little Kids (8C-3Y) - includes overlap with toddlers
+  "10.5C",
   "11C",
+  "11.5C",
   "12C",
+  "12.5C",
   "13C",
-  // Youth sizes (1-7, where 7Y = 7 Men's)
+  "13.5C",
   "1Y",
   "1.5Y",
   "2Y",
   "2.5Y",
   "3Y",
+  // Big Kids (1Y-7Y) - includes overlap with little kids
   "3.5Y",
   "4Y",
   "4.5Y",
@@ -331,17 +344,39 @@ export function AdminPanel() {
     setNewShoe({ ...newShoe, sizes: [] })
   }
 
-  const selectSizeCategory = (category: "men" | "women" | "toddler" | "youth") => {
+  const selectSizeCategory = (category: "men" | "women" | "babies-toddlers" | "little-kids" | "big-kids") => {
     let categorySizes: string[] = []
 
     if (category === "men") {
       categorySizes = allSizes.filter((size) => !size.includes("W") && !size.includes("C") && !size.includes("Y"))
     } else if (category === "women") {
       categorySizes = allSizes.filter((size) => size.includes("W"))
-    } else if (category === "toddler") {
-      categorySizes = allSizes.filter((size) => size.includes("C"))
-    } else if (category === "youth") {
-      categorySizes = allSizes.filter((size) => size.includes("Y"))
+    } else if (category === "babies-toddlers") {
+      categorySizes = allSizes.filter((size) => {
+        if (!size.includes("C")) return false
+        const num = Number.parseFloat(size)
+        return num >= 1 && num <= 10
+      })
+    } else if (category === "little-kids") {
+      categorySizes = allSizes.filter((size) => {
+        if (size.includes("C")) {
+          const num = Number.parseFloat(size)
+          return num >= 8 && num <= 13.5
+        }
+        if (size.includes("Y")) {
+          const num = Number.parseFloat(size)
+          return num >= 1 && num <= 3
+        }
+        return false
+      })
+    } else if (category === "big-kids") {
+      categorySizes = allSizes.filter((size) => {
+        if (size.includes("Y")) {
+          const num = Number.parseFloat(size)
+          return num >= 1 && num <= 7
+        }
+        return false
+      })
     }
 
     // Add to existing selection (don't replace)
@@ -354,8 +389,29 @@ export function AdminPanel() {
   // Group sizes for better display
   const mensSizes = allSizes.filter((size) => !size.includes("W") && !size.includes("C") && !size.includes("Y"))
   const womensSizes = allSizes.filter((size) => size.includes("W"))
-  const toddlerSizes = allSizes.filter((size) => size.includes("C"))
-  const youthSizes = allSizes.filter((size) => size.includes("Y"))
+  const babiesToddlerSizes = allSizes.filter((size) => {
+    if (!size.includes("C")) return false
+    const num = Number.parseFloat(size)
+    return num >= 1 && num <= 10
+  })
+  const littleKidsSizes = allSizes.filter((size) => {
+    if (size.includes("C")) {
+      const num = Number.parseFloat(size)
+      return num >= 8 && num <= 13.5
+    }
+    if (size.includes("Y")) {
+      const num = Number.parseFloat(size)
+      return num >= 1 && num <= 3
+    }
+    return false
+  })
+  const bigKidsSizes = allSizes.filter((size) => {
+    if (size.includes("Y")) {
+      const num = Number.parseFloat(size)
+      return num >= 1 && num <= 7
+    }
+    return false
+  })
 
   return (
     <div className="space-y-8">
@@ -482,7 +538,7 @@ export function AdminPanel() {
             </div>
 
             <div>
-              <Label className="text-white">Available Sizes</Label>
+              <Label className="text-white">Available Sizes (Nike Sizing System)</Label>
 
               {/* Size Selection Controls */}
               <div className="flex flex-wrap gap-2 mt-2 mb-4">
@@ -512,21 +568,30 @@ export function AdminPanel() {
                 </Button>
                 <Button
                   type="button"
-                  onClick={() => selectSizeCategory("toddler")}
+                  onClick={() => selectSizeCategory("babies-toddlers")}
                   size="sm"
                   variant="outline"
                   className="text-xs"
                 >
-                  + Toddler ({toddlerSizes.length})
+                  + Babies/Toddlers ({babiesToddlerSizes.length})
                 </Button>
                 <Button
                   type="button"
-                  onClick={() => selectSizeCategory("youth")}
+                  onClick={() => selectSizeCategory("little-kids")}
                   size="sm"
                   variant="outline"
                   className="text-xs"
                 >
-                  + Youth ({youthSizes.length})
+                  + Little Kids ({littleKidsSizes.length})
+                </Button>
+                <Button
+                  type="button"
+                  onClick={() => selectSizeCategory("big-kids")}
+                  size="sm"
+                  variant="outline"
+                  className="text-xs"
+                >
+                  + Big Kids ({bigKidsSizes.length})
                 </Button>
               </div>
 
@@ -572,11 +637,11 @@ export function AdminPanel() {
                 </div>
               </div>
 
-              {/* Toddler Sizes */}
+              {/* Babies and Toddlers */}
               <div className="mb-4">
-                <h4 className="text-white text-sm font-medium mb-2">Toddler Sizes (0C-13C)</h4>
-                <div className="grid grid-cols-7 gap-2">
-                  {toddlerSizes.map((size) => (
+                <h4 className="text-white text-sm font-medium mb-2">Babies and Toddlers (1C-10C)</h4>
+                <div className="grid grid-cols-6 gap-2">
+                  {babiesToddlerSizes.map((size) => (
                     <button
                       key={size}
                       type="button"
@@ -593,14 +658,35 @@ export function AdminPanel() {
                 </div>
               </div>
 
-              {/* Youth Sizes */}
+              {/* Little Kids */}
               <div className="mb-4">
-                <h4 className="text-white text-sm font-medium mb-2">Youth Sizes (1Y-7Y)</h4>
+                <h4 className="text-white text-sm font-medium mb-2">Little Kids (8C-3Y)</h4>
+                <div className="grid grid-cols-6 gap-2">
+                  {littleKidsSizes.map((size) => (
+                    <button
+                      key={size}
+                      type="button"
+                      onClick={() => handleSizeToggle(size)}
+                      className={`p-2 rounded border text-sm ${
+                        newShoe.sizes.includes(size)
+                          ? "bg-white text-black border-white"
+                          : "bg-neutral-800 text-white border-neutral-600"
+                      }`}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Big Kids */}
+              <div className="mb-4">
+                <h4 className="text-white text-sm font-medium mb-2">Big Kids (1Y-7Y)</h4>
                 <p className="text-xs text-neutral-400 mb-2">
-                  Note: Youth 7Y = Men's 7 (same size, different construction)
+                  Note: Big Kids 7Y = Men's 7 (same size, different construction)
                 </p>
                 <div className="grid grid-cols-6 gap-2">
-                  {youthSizes.map((size) => (
+                  {bigKidsSizes.map((size) => (
                     <button
                       key={size}
                       type="button"
