@@ -67,7 +67,7 @@ export function Header() {
               {user && (
                 <div className="flex items-center space-x-2">
                   <span className="text-neutral-300 text-sm hidden sm:block">
-                    {user.name}
+                    {user.firstName} {user.lastName}
                     {user.isAdmin && <span className="text-yellow-500 ml-1">(Admin)</span>}
                   </span>
                   <Button onClick={logout} variant="ghost" size="sm" className="text-neutral-300 hover:text-white">

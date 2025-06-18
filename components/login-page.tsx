@@ -15,7 +15,8 @@ export function LoginPage() {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-    name: "",
+    firstName: "",
+    lastName: "",
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
@@ -32,7 +33,12 @@ export function LoginPage() {
       if (isLogin) {
         success = await login(formData.email, formData.password)
       } else {
-        success = await signup(formData.email, formData.password, formData.name)
+        if (!formData.firstName.trim() || !formData.lastName.trim()) {
+          setError("Please enter both first and last name")
+          setLoading(false)
+          return
+        }
+        success = await signup(formData.email, formData.password, formData.firstName, formData.lastName)
       }
 
       if (!success) {
@@ -55,10 +61,21 @@ export function LoginPage() {
         setError("Google login failed. Please try again.")
       }
     } catch (err) {
-      setError("An error occurred. Please try again.")
+      setError("An error occurred with Google login. Please try again.")
     } finally {
       setLoading(false)
     }
+  }
+
+  const switchMode = () => {
+    setIsLogin(!isLogin)
+    setError("")
+    setFormData({
+      email: "",
+      password: "",
+      firstName: "",
+      lastName: "",
+    })
   }
 
   return (
@@ -71,7 +88,9 @@ export function LoginPage() {
             </div>
             <span className="font-playfair text-2xl font-semibold text-white">Sole Purpose</span>
           </div>
-          <p className="text-neutral-400">Sign in to access your account</p>
+          <p className="text-neutral-400">
+            {isLogin ? "Sign in to access your account" : "Create your account to get started"}
+          </p>
         </div>
 
         <Card className="bg-neutral-900 border-neutral-800">
@@ -79,15 +98,20 @@ export function LoginPage() {
             <CardTitle className="text-white text-center">{isLogin ? "Welcome Back" : "Create Account"}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            <Button
-              onClick={handleGoogleLogin}
-              disabled={loading}
-              variant="outline"
-              className="w-full bg-white text-black hover:bg-neutral-100"
-            >
-              <Chrome className="mr-2 h-4 w-4" />
-              Continue with Google
-            </Button>
+            {/* Google Sign In Button */}
+            <div>
+              <Button
+                onClick={handleGoogleLogin}
+                disabled={loading}
+                variant="outline"
+                className="w-full bg-white text-black hover:bg-neutral-100 relative"
+              >
+                <Chrome className="mr-2 h-4 w-4" />
+                Continue with Google
+              </Button>
+              {/* Hidden div for Google button rendering */}
+              <div id="google-signin-button" className="hidden"></div>
+            </div>
 
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
@@ -100,21 +124,40 @@ export function LoginPage() {
 
             <form onSubmit={handleSubmit} className="space-y-4">
               {!isLogin && (
-                <div>
-                  <Label htmlFor="name" className="text-white">
-                    Full Name
-                  </Label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-3 h-4 w-4 text-neutral-400" />
-                    <Input
-                      id="name"
-                      type="text"
-                      placeholder="Enter your full name"
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="pl-10"
-                      required={!isLogin}
-                    />
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label htmlFor="firstName" className="text-white">
+                      First Name
+                    </Label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-3 h-4 w-4 text-neutral-400" />
+                      <Input
+                        id="firstName"
+                        type="text"
+                        placeholder="John"
+                        value={formData.firstName}
+                        onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                        className="pl-10"
+                        required={!isLogin}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <Label htmlFor="lastName" className="text-white">
+                      Last Name
+                    </Label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-3 h-4 w-4 text-neutral-400" />
+                      <Input
+                        id="lastName"
+                        type="text"
+                        placeholder="Doe"
+                        value={formData.lastName}
+                        onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                        className="pl-10"
+                        required={!isLogin}
+                      />
+                    </div>
                   </div>
                 </div>
               )}
@@ -155,17 +198,37 @@ export function LoginPage() {
                 </div>
               </div>
 
-              {error && <div className="text-red-400 text-sm text-center">{error}</div>}
+              {error && (
+                <div className="bg-red-900/20 border border-red-500/50 rounded-lg p-3">
+                  <p className="text-red-400 text-sm text-center">{error}</p>
+                </div>
+              )}
 
               <Button type="submit" disabled={loading} className="w-full bg-white text-black hover:bg-neutral-100">
-                {loading ? "Please wait..." : isLogin ? "Sign In" : "Create Account"}
+                {loading ? (
+                  <div className="flex items-center">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-black mr-2"></div>
+                    Please wait...
+                  </div>
+                ) : isLogin ? (
+                  "Sign In"
+                ) : (
+                  "Create Account"
+                )}
               </Button>
             </form>
 
             <div className="text-center">
-              <button onClick={() => setIsLogin(!isLogin)} className="text-neutral-400 hover:text-white text-sm">
+              <button onClick={switchMode} className="text-neutral-400 hover:text-white text-sm transition-colors">
                 {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
               </button>
+            </div>
+
+            {/* Demo Instructions */}
+            <div className="bg-blue-900/20 border border-blue-500/50 rounded-lg p-3">
+              <p className="text-blue-400 text-xs text-center">
+                <strong>Demo:</strong> Use solepurposefootwear813@gmail.com or anitej@suklikar.org for admin access
+              </p>
             </div>
           </CardContent>
         </Card>
