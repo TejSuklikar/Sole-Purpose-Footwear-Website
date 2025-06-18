@@ -2,13 +2,13 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useAuth } from "./auth-provider"
-import { Mail, Lock, User, Chrome } from "lucide-react"
+import { Mail, Lock, User, Shield } from 'lucide-react'
 
 export function LoginPage() {
   const [isLogin, setIsLogin] = useState(true)
@@ -21,42 +21,7 @@ export function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
 
-  const { login, loginWithGoogle, signup } = useAuth()
-
-  useEffect(() => {
-    // Render Google Sign-In button when Google is loaded
-    const renderGoogleButton = () => {
-      const googleButtonDiv = document.getElementById("google-signin-button")
-      if (googleButtonDiv && typeof window.google !== "undefined") {
-        // Clear any existing content
-        googleButtonDiv.innerHTML = ""
-
-        window.google.accounts.id.renderButton(googleButtonDiv, {
-          theme: "outline",
-          size: "large",
-          width: "100%",
-          text: "continue_with",
-          shape: "rectangular",
-        })
-      }
-    }
-
-    // Check if Google is already loaded
-    if (typeof window.google !== "undefined") {
-      renderGoogleButton()
-    } else {
-      // Wait for Google to load
-      const checkGoogle = setInterval(() => {
-        if (typeof window.google !== "undefined") {
-          clearInterval(checkGoogle)
-          renderGoogleButton()
-        }
-      }, 100)
-
-      // Clean up interval after 10 seconds
-      setTimeout(() => clearInterval(checkGoogle), 10000)
-    }
-  }, [])
+  const { login, signup } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -77,26 +42,10 @@ export function LoginPage() {
       }
 
       if (!success) {
-        setError("Authentication failed. Please try again.")
+        setError("Authentication failed. Please check your details and try again.")
       }
     } catch (err) {
       setError("An error occurred. Please try again.")
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleGoogleLogin = async () => {
-    setLoading(true)
-    setError("")
-
-    try {
-      const success = await loginWithGoogle()
-      if (!success) {
-        setError("Google login was cancelled or failed.")
-      }
-    } catch (err) {
-      setError("An error occurred with Google login. Please try again.")
     } finally {
       setLoading(false)
     }
@@ -111,6 +60,10 @@ export function LoginPage() {
       firstName: "",
       lastName: "",
     })
+  }
+
+  const isAdminEmail = (email: string) => {
+    return email === "solepurposefootwear813@gmail.com" || email === "anitej@suklikar.org"
   }
 
   return (
@@ -133,32 +86,6 @@ export function LoginPage() {
             <CardTitle className="text-white text-center">{isLogin ? "Welcome Back" : "Create Account"}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Google Sign In Button */}
-            <div className="space-y-3">
-              {/* Native Google Button (will show user's actual accounts) */}
-              <div id="google-signin-button" className="w-full min-h-[44px] flex items-center justify-center"></div>
-
-              {/* Fallback button if Google button doesn't load */}
-              <Button
-                onClick={handleGoogleLogin}
-                disabled={loading}
-                variant="outline"
-                className="w-full bg-white text-black hover:bg-neutral-100"
-              >
-                <Chrome className="mr-2 h-4 w-4" />
-                {loading ? "Opening Google..." : "Continue with Google"}
-              </Button>
-            </div>
-
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-neutral-700" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-neutral-900 px-2 text-neutral-400">Or continue with email</span>
-              </div>
-            </div>
-
             <form onSubmit={handleSubmit} className="space-y-4">
               {!isLogin && (
                 <div className="grid grid-cols-2 gap-3">
@@ -214,7 +141,18 @@ export function LoginPage() {
                     className="pl-10"
                     required
                   />
+                  {formData.email && isAdminEmail(formData.email) && (
+                    <div className="absolute right-3 top-3">
+                      <Shield className="h-4 w-4 text-yellow-500" title="Admin Account" />
+                    </div>
+                  )}
                 </div>
+                {formData.email && isAdminEmail(formData.email) && (
+                  <p className="text-yellow-500 text-xs mt-1 flex items-center">
+                    <Shield className="h-3 w-3 mr-1" />
+                    Admin account detected
+                  </p>
+                )}
               </div>
 
               <div>
@@ -259,6 +197,17 @@ export function LoginPage() {
               <button onClick={switchMode} className="text-neutral-400 hover:text-white text-sm transition-colors">
                 {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
               </button>
+            </div>
+
+            {/* Admin Info */}
+            <div className="bg-neutral-800 border border-neutral-700 rounded-lg p-3">
+              <div className="flex items-center space-x-2 mb-2">
+                <Shield className="h-4 w-4 text-yellow-500" />
+                <span className="text-white text-sm font-medium">Admin Access</span>
+              </div>
+              <p className="text-neutral-400 text-xs">
+                Admin accounts automatically get access to the admin panel for managing shoes and featured items.
+              </p>
             </div>
           </CardContent>
         </Card>
