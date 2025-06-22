@@ -27,23 +27,29 @@ export default function AboutPage() {
                 simple belief: that footwear should be more than just functional—it should be a canvas for creativity
                 and self-expression.
               </p>
+              <p className="text-neutral-300 leading-relaxed mt-4">
+                What started as custom designs for friends and family has grown into a movement celebrating cultural
+                heritage, personal stories, and artistic excellence on every pair.
+              </p>
             </div>
             <Image
-              src="/placeholder.svg?height=400&width=600"
-              alt="Our studio workspace"
+              src="/images/artist-at-work.jpg"
+              alt="Artist wearing custom Palestinian flag Air Force 1s, showcasing the craftsmanship and street style"
               width={600}
               height={400}
               className="rounded-lg shadow-lg"
+              crossOrigin="anonymous"
             />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
             <Image
-              src="/placeholder.svg?height=400&width=600"
-              alt="Custom painting process"
+              src="/images/christmas-family-set.jpg"
+              alt="Family set of custom Palestinian flag Air Force 1s under Christmas tree, showing multiple sizes and holiday spirit"
               width={600}
               height={400}
               className="rounded-lg shadow-lg lg:order-first"
+              crossOrigin="anonymous"
             />
             <div>
               <h2 className="font-playfair text-3xl font-bold text-white mb-4">Our Craft</h2>
@@ -51,6 +57,10 @@ export default function AboutPage() {
                 Each pair begins with premium base materials, carefully selected for durability and comfort. Our artists
                 then apply layers of specialized paints and finishes, ensuring that every design not only looks stunning
                 but maintains its vibrancy over time.
+              </p>
+              <p className="text-neutral-300 leading-relaxed mt-4">
+                From individual pairs to family sets, we create custom designs that bring people together and celebrate
+                shared heritage. Every shoe tells a story, and every story matters.
               </p>
             </div>
           </div>
@@ -61,7 +71,8 @@ export default function AboutPage() {
               <div className="text-center">
                 <h3 className="font-semibold text-xl mb-3 text-white">Authenticity</h3>
                 <p className="text-neutral-300">
-                  Every design tells a genuine story, reflecting the unique personality and vision of its wearer.
+                  Every design tells a genuine story, reflecting the unique personality and cultural heritage of its
+                  wearer.
                 </p>
               </div>
               <div className="text-center">
@@ -71,11 +82,33 @@ export default function AboutPage() {
                 </p>
               </div>
               <div className="text-center">
-                <h3 className="font-semibold text-xl mb-3 text-white">Collaboration</h3>
+                <h3 className="font-semibold text-xl mb-3 text-white">Community</h3>
                 <p className="text-neutral-300">
-                  We work closely with each client to bring their vision to life, creating truly personalized pieces.
+                  We work closely with each client to bring their vision to life, creating truly personalized pieces
+                  that connect families and communities.
                 </p>
               </div>
+            </div>
+          </div>
+
+          <div className="bg-neutral-900/50 backdrop-blur-sm border border-neutral-800 rounded-xl p-8 text-center">
+            <h2 className="font-playfair text-2xl font-bold text-white mb-4">Ready to Start Your Story?</h2>
+            <p className="text-neutral-300 mb-6">
+              Whether it's a single pair or a family set, we're here to help you create something truly special.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <a
+                href="/order"
+                className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-black bg-white hover:bg-neutral-100 transition-colors"
+              >
+                Start Custom Order
+              </a>
+              <a
+                href="/shoes"
+                className="inline-flex items-center justify-center px-6 py-3 border border-white text-base font-medium rounded-md text-white hover:bg-white hover:text-black transition-colors"
+              >
+                View Our Work
+              </a>
             </div>
           </div>
         </div>

@@ -8,60 +8,33 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useAuth } from "./auth-provider"
-import { Mail, Lock, User, Shield, AlertCircle } from "lucide-react"
+import { Mail, Shield, AlertCircle, Users } from "lucide-react"
 
 export function LoginPage() {
-  const [isLogin, setIsLogin] = useState(true)
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    firstName: "",
-    lastName: "",
-  })
-  const [loading, setLoading] = useState(false)
+  const [adminEmail, setAdminEmail] = useState("")
   const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
 
-  const { login, signup } = useAuth()
+  const { loginAsAdmin, loginAsGuest } = useAuth()
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleAdminLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError("")
 
-    try {
-      let success = false
-      if (isLogin) {
-        success = await login(formData.email, formData.password)
-        if (!success) {
-          setError("Invalid email or password. Please check your credentials.")
-        }
-      } else {
-        if (!formData.firstName.trim() || !formData.lastName.trim()) {
-          setError("Please enter both first and last name")
-          setLoading(false)
-          return
-        }
-        success = await signup(formData.email, formData.password, formData.firstName, formData.lastName)
-        if (!success) {
-          setError("Account with this email already exists. Please try logging in instead.")
-        }
-      }
-    } catch (err) {
-      setError("An error occurred. Please try again.")
-    } finally {
-      setLoading(false)
+    // Simulate API call
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+
+    const success = loginAsAdmin(adminEmail)
+    if (!success) {
+      setError("Invalid admin email. Please check your credentials.")
     }
+
+    setLoading(false)
   }
 
-  const switchMode = () => {
-    setIsLogin(!isLogin)
-    setError("")
-    setFormData({
-      email: "",
-      password: "",
-      firstName: "",
-      lastName: "",
-    })
+  const handleGuestLogin = () => {
+    loginAsGuest()
   }
 
   const isAdminEmail = (email: string) => {
@@ -78,147 +51,99 @@ export function LoginPage() {
             </div>
             <span className="font-playfair text-2xl font-semibold text-white">Sole Purpose</span>
           </div>
-          <p className="text-neutral-400">
-            {isLogin ? "Sign in to access your account" : "Create your account to get started"}
-          </p>
+          <p className="text-neutral-400">Choose how you'd like to access the site</p>
         </div>
 
-        <Card className="bg-neutral-900 border-neutral-800">
-          <CardHeader>
-            <CardTitle className="text-white text-center">{isLogin ? "Welcome Back" : "Create Account"}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {!isLogin && (
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <Label htmlFor="firstName" className="text-white">
-                      First Name
-                    </Label>
-                    <div className="relative">
-                      <User className="absolute left-3 top-3 h-4 w-4 text-neutral-400" />
-                      <Input
-                        id="firstName"
-                        type="text"
-                        placeholder="John"
-                        value={formData.firstName}
-                        onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                        className="pl-10"
-                        required={!isLogin}
-                      />
-                    </div>
+        <div className="space-y-4">
+          {/* Admin Login Card */}
+          <Card className="bg-neutral-900 border-neutral-800">
+            <CardHeader>
+              <CardTitle className="text-white text-center flex items-center justify-center">
+                <Shield className="mr-2 h-5 w-5 text-yellow-500" />
+                Admin Access
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <form onSubmit={handleAdminLogin} className="space-y-4">
+                <div>
+                  <Label htmlFor="adminEmail" className="text-white">
+                    Admin Email
+                  </Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-3 h-4 w-4 text-neutral-400" />
+                    <Input
+                      id="adminEmail"
+                      type="email"
+                      placeholder="Enter admin email"
+                      value={adminEmail}
+                      onChange={(e) => setAdminEmail(e.target.value)}
+                      className="pl-10"
+                      required
+                    />
+                    {adminEmail && isAdminEmail(adminEmail) && (
+                      <div className="absolute right-3 top-3">
+                        <Shield className="h-4 w-4 text-yellow-500" title="Valid Admin Email" />
+                      </div>
+                    )}
                   </div>
-                  <div>
-                    <Label htmlFor="lastName" className="text-white">
-                      Last Name
-                    </Label>
-                    <div className="relative">
-                      <User className="absolute left-3 top-3 h-4 w-4 text-neutral-400" />
-                      <Input
-                        id="lastName"
-                        type="text"
-                        placeholder="Doe"
-                        value={formData.lastName}
-                        onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                        className="pl-10"
-                        required={!isLogin}
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              <div>
-                <Label htmlFor="email" className="text-white">
-                  Email
-                </Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-neutral-400" />
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="Enter your email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="pl-10"
-                    required
-                  />
-                  {formData.email && isAdminEmail(formData.email) && (
-                    <div className="absolute right-3 top-3">
-                      <Shield className="h-4 w-4 text-yellow-500" title="Admin Account" />
-                    </div>
+                  {adminEmail && isAdminEmail(adminEmail) && (
+                    <p className="text-yellow-500 text-xs mt-1 flex items-center">
+                      <Shield className="h-3 w-3 mr-1" />
+                      Valid admin email detected
+                    </p>
                   )}
                 </div>
-                {formData.email && isAdminEmail(formData.email) && (
-                  <p className="text-yellow-500 text-xs mt-1 flex items-center">
-                    <Shield className="h-3 w-3 mr-1" />
-                    Admin account detected
-                  </p>
-                )}
-              </div>
 
-              <div>
-                <Label htmlFor="password" className="text-white">
-                  Password
-                </Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-neutral-400" />
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="Enter your password"
-                    value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className="pl-10"
-                    required
-                  />
-                </div>
-                {!isLogin && (
-                  <p className="text-neutral-400 text-xs mt-1">Password will be remembered for future logins</p>
-                )}
-              </div>
-
-              {error && (
-                <div className="bg-red-900/20 border border-red-500/50 rounded-lg p-3">
-                  <div className="flex items-center space-x-2">
-                    <AlertCircle className="h-4 w-4 text-red-400" />
-                    <p className="text-red-400 text-sm">{error}</p>
+                {error && (
+                  <div className="bg-red-900/20 border border-red-500/50 rounded-lg p-3">
+                    <div className="flex items-center space-x-2">
+                      <AlertCircle className="h-4 w-4 text-red-400" />
+                      <p className="text-red-400 text-sm">{error}</p>
+                    </div>
                   </div>
-                </div>
-              )}
-
-              <Button type="submit" disabled={loading} className="w-full bg-white text-black hover:bg-neutral-100">
-                {loading ? (
-                  <div className="flex items-center">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-black mr-2"></div>
-                    Please wait...
-                  </div>
-                ) : isLogin ? (
-                  "Sign In"
-                ) : (
-                  "Create Account"
                 )}
-              </Button>
-            </form>
 
-            <div className="text-center">
-              <button onClick={switchMode} className="text-neutral-400 hover:text-white text-sm transition-colors">
-                {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
-              </button>
-            </div>
+                <Button
+                  type="submit"
+                  disabled={loading || !adminEmail}
+                  className="w-full bg-yellow-600 text-black hover:bg-yellow-500"
+                >
+                  {loading ? (
+                    <div className="flex items-center">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-black mr-2"></div>
+                      Verifying...
+                    </div>
+                  ) : (
+                    <>
+                      <Shield className="mr-2 h-4 w-4" />
+                      Login as Admin
+                    </>
+                  )}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
 
-            {/* Admin Info */}
-            <div className="bg-neutral-800 border border-neutral-700 rounded-lg p-3">
-              <div className="flex items-center space-x-2 mb-2">
-                <Shield className="h-4 w-4 text-yellow-500" />
-                <span className="text-white text-sm font-medium">Admin Access</span>
-              </div>
-              <p className="text-neutral-400 text-xs">
-                Admin accounts automatically get access to the admin panel for managing shoes and featured items.
+          {/* Guest Access Card */}
+          <Card className="bg-neutral-900 border-neutral-800">
+            <CardHeader>
+              <CardTitle className="text-white text-center flex items-center justify-center">
+                <Users className="mr-2 h-5 w-5 text-blue-500" />
+                Guest Access
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-neutral-400 text-sm text-center">
+                Browse our collection, place orders, and shop without creating an account
               </p>
-            </div>
-          </CardContent>
-        </Card>
+
+              <Button onClick={handleGuestLogin} className="w-full bg-white text-black hover:bg-neutral-100">
+                <Users className="mr-2 h-4 w-4" />
+                Continue as Guest
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   )

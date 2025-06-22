@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Plus, Star, Trash2, StarOff } from "lucide-react"
+import { Plus, Star, Trash2, StarOff, Package, Check, X, Calendar, MapPin, Clock, Edit } from "lucide-react"
 import Image from "next/image"
 
 interface Shoe {
@@ -16,9 +16,19 @@ interface Shoe {
   image: string
   slug: string
   sizes: string[]
+  inStockSizes: string[] // New field for inventory management
   description?: string
   details?: string[]
   isFeatured?: boolean
+}
+
+interface Event {
+  id: number
+  title: string
+  date: string
+  time: string
+  location: string
+  description: string
 }
 
 // Nike-style sizing system
@@ -109,6 +119,7 @@ const defaultShoes: Shoe[] = [
     image: "/images/kuffiyeh-side-sunset.png",
     slug: "red-kuffiyeh-af1",
     sizes: allSizes,
+    inStockSizes: allSizes, // All sizes available
     description: "Traditional Kuffiyeh patterns hand-painted in bold red on premium white canvas.",
     details: [
       "Hand-painted with premium acrylic paints",
@@ -124,6 +135,7 @@ const defaultShoes: Shoe[] = [
     image: "/images/mexican-side-view.png",
     slug: "mexican-eagle-af1",
     sizes: allSizes,
+    inStockSizes: allSizes,
     description: "Detailed Mexican flag design featuring the iconic eagle and serpent coat of arms.",
     details: ["Hand-painted Mexican coat of arms", "Mexican flag colors on swoosh", "Premium white leather base"],
     isFeatured: true,
@@ -135,6 +147,7 @@ const defaultShoes: Shoe[] = [
     image: "/images/black-red-geometric-hero.jpg",
     slug: "black-red-geometric",
     sizes: allSizes,
+    inStockSizes: allSizes,
     description: "Sleek black forces with striking red geometric patterns.",
     details: ["All-black leather base", "Hand-painted red geometric patterns", "Matte finish"],
     isFeatured: true,
@@ -146,6 +159,7 @@ const defaultShoes: Shoe[] = [
     image: "/images/jordanian-side-view.jpg",
     slug: "jordanian-flag-af1",
     sizes: allSizes,
+    inStockSizes: allSizes,
     description: "Jordanian flag design with traditional colors and patterns.",
     details: [
       "Hand-painted Jordanian flag design",
@@ -161,6 +175,7 @@ const defaultShoes: Shoe[] = [
     image: "/images/geometric-checkered-side.jpg",
     slug: "geometric-checkered",
     sizes: allSizes,
+    inStockSizes: allSizes,
     description: "Clean geometric checkered pattern in black and white.",
     details: [
       "Hand-painted checkered pattern",
@@ -176,6 +191,7 @@ const defaultShoes: Shoe[] = [
     image: "/images/chinese-side-sunset.png",
     slug: "chinese-flag-af1",
     sizes: allSizes,
+    inStockSizes: allSizes,
     description: "Chinese flag design featuring the iconic red and gold color scheme.",
     details: [
       "Hand-painted Chinese flag design",
@@ -191,6 +207,7 @@ const defaultShoes: Shoe[] = [
     image: "/images/checkered-drip-sunset.png",
     slug: "checkered-drip-af1",
     sizes: allSizes,
+    inStockSizes: allSizes,
     description: "Bold checkered pattern with artistic paint drip design.",
     details: ["Hand-painted checkered swoosh", "Artistic paint drip effect", "Street art aesthetic"],
     isFeatured: false,
@@ -202,6 +219,7 @@ const defaultShoes: Shoe[] = [
     image: "/images/palestine-map-side.jpg",
     slug: "map-of-palestine-af1",
     sizes: allSizes,
+    inStockSizes: allSizes,
     description: "Hand-painted map of Palestine in traditional flag colors.",
     details: [
       "Hand-painted map of Palestine",
@@ -217,6 +235,7 @@ const defaultShoes: Shoe[] = [
     image: "/images/lebanese-side-view.jpg",
     slug: "lebanese-cedar-af1",
     sizes: allSizes,
+    inStockSizes: allSizes,
     description: "Lebanese flag design featuring the iconic cedar tree symbol.",
     details: [
       "Hand-painted Lebanese cedar tree",
@@ -232,6 +251,7 @@ const defaultShoes: Shoe[] = [
     image: "/images/filipino-side-view.jpg",
     slug: "filipino-sun-af1",
     sizes: allSizes,
+    inStockSizes: allSizes,
     description: "Filipino flag design featuring the golden sun symbol.",
     details: [
       "Hand-painted Filipino golden sun",
@@ -242,9 +262,41 @@ const defaultShoes: Shoe[] = [
   },
 ]
 
+// Default events
+const defaultEvents: Event[] = [
+  {
+    id: 1,
+    title: "Pop-Up Gallery Opening",
+    date: "July 15, 2025",
+    time: "6:00 PM - 10:00 PM",
+    location: "Mission District, San Francisco",
+    description: "Exclusive showcase of our latest custom designs",
+  },
+  {
+    id: 2,
+    title: "Custom Design Workshop",
+    date: "July 28, 2025",
+    time: "2:00 PM - 5:00 PM",
+    location: "Soul Purpose Studio, SF",
+    description: "Learn the art of sneaker customization",
+  },
+  {
+    id: 3,
+    title: "Summer Collection Drop",
+    date: "August 5, 2025",
+    time: "12:00 PM PST",
+    location: "Online & SF Studio",
+    description: "Limited edition summer-inspired designs",
+  },
+]
+
 export function AdminPanel() {
   const [shoes, setShoes] = useState<Shoe[]>([])
+  const [events, setEvents] = useState<Event[]>([])
   const [showAddForm, setShowAddForm] = useState(false)
+  const [showAddEventForm, setShowAddEventForm] = useState(false)
+  const [editingInventory, setEditingInventory] = useState<number | null>(null)
+  const [editingEvent, setEditingEvent] = useState<number | null>(null)
   const [newShoe, setNewShoe] = useState({
     name: "",
     price: "",
@@ -253,22 +305,45 @@ export function AdminPanel() {
     details: "",
     sizes: [] as string[],
   })
+  const [newEvent, setNewEvent] = useState({
+    title: "",
+    date: "",
+    time: "",
+    location: "",
+    description: "",
+  })
 
-  // Load shoes from localStorage on mount
+  // Load shoes and events from localStorage on mount
   useEffect(() => {
-    const savedShoes = localStorage.getItem("sp_shoes")
+    const savedShoes = localStorage.getItem("sp_shoes_global")
     if (savedShoes) {
       setShoes(JSON.parse(savedShoes))
     } else {
       // Initialize with default shoes
       setShoes(defaultShoes)
-      localStorage.setItem("sp_shoes", JSON.stringify(defaultShoes))
+      localStorage.setItem("sp_shoes_global", JSON.stringify(defaultShoes))
+    }
+
+    const savedEvents = localStorage.getItem("sp_events_global")
+    if (savedEvents) {
+      setEvents(JSON.parse(savedEvents))
+    } else {
+      // Initialize with default events
+      setEvents(defaultEvents)
+      localStorage.setItem("sp_events_global", JSON.stringify(defaultEvents))
     }
   }, [])
 
   const saveShoes = (updatedShoes: Shoe[]) => {
     setShoes(updatedShoes)
-    localStorage.setItem("sp_shoes", JSON.stringify(updatedShoes))
+    // Save to global storage that all users can access
+    localStorage.setItem("sp_shoes_global", JSON.stringify(updatedShoes))
+  }
+
+  const saveEvents = (updatedEvents: Event[]) => {
+    setEvents(updatedEvents)
+    // Save to global storage that all users can access
+    localStorage.setItem("sp_events_global", JSON.stringify(updatedEvents))
   }
 
   const handleAddShoe = () => {
@@ -284,6 +359,7 @@ export function AdminPanel() {
         .replace(/\s+/g, "-")
         .replace(/[^a-z0-9-]/g, ""),
       sizes: newShoe.sizes.length > 0 ? newShoe.sizes : allSizes,
+      inStockSizes: newShoe.sizes.length > 0 ? newShoe.sizes : allSizes, // Initially all available sizes are in stock
       description: newShoe.description,
       details: newShoe.details ? newShoe.details.split("\n").filter((d) => d.trim()) : [],
       isFeatured: false,
@@ -304,11 +380,50 @@ export function AdminPanel() {
     setShowAddForm(false)
   }
 
+  const handleAddEvent = () => {
+    if (!newEvent.title || !newEvent.date || !newEvent.time || !newEvent.location) return
+
+    const event: Event = {
+      id: Date.now(),
+      title: newEvent.title,
+      date: newEvent.date,
+      time: newEvent.time,
+      location: newEvent.location,
+      description: newEvent.description,
+    }
+
+    const updatedEvents = [...events, event]
+    saveEvents(updatedEvents)
+
+    // Reset form
+    setNewEvent({
+      title: "",
+      date: "",
+      time: "",
+      location: "",
+      description: "",
+    })
+    setShowAddEventForm(false)
+  }
+
   const handleDeleteShoe = (id: number) => {
     if (confirm("Are you sure you want to delete this shoe?")) {
       const updatedShoes = shoes.filter((shoe) => shoe.id !== id)
       saveShoes(updatedShoes)
     }
+  }
+
+  const handleDeleteEvent = (id: number) => {
+    if (confirm("Are you sure you want to delete this event?")) {
+      const updatedEvents = events.filter((event) => event.id !== id)
+      saveEvents(updatedEvents)
+    }
+  }
+
+  const handleUpdateEvent = (id: number, updatedEvent: Partial<Event>) => {
+    const updatedEvents = events.map((event) => (event.id === id ? { ...event, ...updatedEvent } : event))
+    saveEvents(updatedEvents)
+    setEditingEvent(null)
   }
 
   const toggleFeatured = (id: number) => {
@@ -334,6 +449,19 @@ export function AdminPanel() {
       : [...newShoe.sizes, size]
 
     setNewShoe({ ...newShoe, sizes: updatedSizes })
+  }
+
+  const toggleSizeStock = (shoeId: number, size: string) => {
+    const updatedShoes = shoes.map((shoe) => {
+      if (shoe.id === shoeId) {
+        const inStockSizes = shoe.inStockSizes.includes(size)
+          ? shoe.inStockSizes.filter((s) => s !== size)
+          : [...shoe.inStockSizes, size]
+        return { ...shoe, inStockSizes }
+      }
+      return shoe
+    })
+    saveShoes(updatedShoes)
   }
 
   const selectAllSizes = () => {
@@ -417,11 +545,195 @@ export function AdminPanel() {
     <div className="space-y-8">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-white">Admin Panel</h1>
-        <Button onClick={() => setShowAddForm(true)} className="bg-white text-black">
-          <Plus className="mr-2 h-4 w-4" />
-          Add New Shoe
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={() => setShowAddEventForm(true)} className="bg-blue-600 text-white hover:bg-blue-700">
+            <Calendar className="mr-2 h-4 w-4" />
+            Add Event
+          </Button>
+          <Button onClick={() => setShowAddForm(true)} className="bg-white text-black">
+            <Plus className="mr-2 h-4 w-4" />
+            Add Shoe
+          </Button>
+        </div>
       </div>
+
+      {/* Events Management Section */}
+      <Card className="bg-neutral-900 border-neutral-800">
+        <CardHeader>
+          <CardTitle className="text-white flex items-center">
+            <Calendar className="mr-2 h-5 w-5 text-blue-500" />
+            Upcoming Events ({events.length})
+          </CardTitle>
+          <p className="text-neutral-400 text-sm">
+            Manage events that appear on the homepage. Changes are visible to all users immediately.
+          </p>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {events.map((event) => (
+              <div key={event.id} className="bg-neutral-800 rounded-lg p-4">
+                {editingEvent === event.id ? (
+                  <div className="space-y-3">
+                    <Input
+                      value={event.title}
+                      onChange={(e) => handleUpdateEvent(event.id, { title: e.target.value })}
+                      placeholder="Event title"
+                      className="text-sm"
+                    />
+                    <Input
+                      value={event.date}
+                      onChange={(e) => handleUpdateEvent(event.id, { date: e.target.value })}
+                      placeholder="Date"
+                      className="text-sm"
+                    />
+                    <Input
+                      value={event.time}
+                      onChange={(e) => handleUpdateEvent(event.id, { time: e.target.value })}
+                      placeholder="Time"
+                      className="text-sm"
+                    />
+                    <Input
+                      value={event.location}
+                      onChange={(e) => handleUpdateEvent(event.id, { location: e.target.value })}
+                      placeholder="Location"
+                      className="text-sm"
+                    />
+                    <Textarea
+                      value={event.description}
+                      onChange={(e) => handleUpdateEvent(event.id, { description: e.target.value })}
+                      placeholder="Description"
+                      rows={2}
+                      className="text-sm"
+                    />
+                    <Button onClick={() => setEditingEvent(null)} size="sm" className="w-full">
+                      Done
+                    </Button>
+                  </div>
+                ) : (
+                  <>
+                    <h3 className="text-white font-semibold mb-2">{event.title}</h3>
+                    <p className="text-neutral-400 text-sm mb-3">{event.description}</p>
+                    <div className="space-y-1 text-xs text-neutral-500 mb-4">
+                      <div className="flex items-center">
+                        <Calendar className="w-3 h-3 mr-1" />
+                        {event.date}
+                      </div>
+                      <div className="flex items-center">
+                        <Clock className="w-3 h-3 mr-1" />
+                        {event.time}
+                      </div>
+                      <div className="flex items-center">
+                        <MapPin className="w-3 h-3 mr-1" />
+                        {event.location}
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={() => setEditingEvent(event.id)}
+                        size="sm"
+                        variant="outline"
+                        className="text-blue-400 border-blue-400 hover:bg-blue-400 hover:text-white"
+                      >
+                        <Edit className="h-3 w-3" />
+                      </Button>
+                      <Button
+                        onClick={() => handleDeleteEvent(event.id)}
+                        size="sm"
+                        variant="outline"
+                        className="text-red-400 border-red-400 hover:bg-red-400 hover:text-white"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Add Event Form */}
+      {showAddEventForm && (
+        <Card className="bg-neutral-900 border-neutral-800">
+          <CardHeader>
+            <CardTitle className="text-white">Add New Event</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="eventTitle" className="text-white">
+                  Event Title
+                </Label>
+                <Input
+                  id="eventTitle"
+                  value={newEvent.title}
+                  onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
+                  placeholder="e.g., Pop-Up Gallery Opening"
+                />
+              </div>
+              <div>
+                <Label htmlFor="eventDate" className="text-white">
+                  Date
+                </Label>
+                <Input
+                  id="eventDate"
+                  value={newEvent.date}
+                  onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })}
+                  placeholder="e.g., July 15, 2025"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="eventTime" className="text-white">
+                  Time
+                </Label>
+                <Input
+                  id="eventTime"
+                  value={newEvent.time}
+                  onChange={(e) => setNewEvent({ ...newEvent, time: e.target.value })}
+                  placeholder="e.g., 6:00 PM - 10:00 PM"
+                />
+              </div>
+              <div>
+                <Label htmlFor="eventLocation" className="text-white">
+                  Location
+                </Label>
+                <Input
+                  id="eventLocation"
+                  value={newEvent.location}
+                  onChange={(e) => setNewEvent({ ...newEvent, location: e.target.value })}
+                  placeholder="e.g., Mission District, San Francisco"
+                />
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="eventDescription" className="text-white">
+                Description
+              </Label>
+              <Textarea
+                id="eventDescription"
+                value={newEvent.description}
+                onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
+                placeholder="Brief description of the event..."
+                rows={3}
+              />
+            </div>
+
+            <div className="flex gap-2">
+              <Button onClick={handleAddEvent} className="bg-blue-600 text-white hover:bg-blue-700">
+                Add Event
+              </Button>
+              <Button onClick={() => setShowAddEventForm(false)} variant="outline">
+                Cancel
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Featured Shoes Section */}
       <Card className="bg-neutral-900 border-neutral-800">
@@ -449,6 +761,9 @@ export function AdminPanel() {
                 </div>
                 <h3 className="text-white font-semibold">{shoe.name}</h3>
                 <p className="text-neutral-400">${shoe.price}</p>
+                <p className="text-xs text-neutral-500 mt-1">
+                  {shoe.inStockSizes.length}/{shoe.sizes.length} sizes in stock
+                </p>
               </div>
             ))}
             {Array.from({ length: 3 - featuredShoes.length }).map((_, i) => (
@@ -725,7 +1040,7 @@ export function AdminPanel() {
         <CardHeader>
           <CardTitle className="text-white">All Shoes ({shoes.length})</CardTitle>
           <p className="text-neutral-400 text-sm">
-            Click the star to feature/unfeature shoes. Only 3 can be featured at a time.
+            Manage featured status and inventory. Click the package icon to manage size availability.
           </p>
         </CardHeader>
         <CardContent>
@@ -747,7 +1062,47 @@ export function AdminPanel() {
                   )}
                 </div>
                 <h3 className="text-white font-semibold mb-1">{shoe.name}</h3>
-                <p className="text-neutral-400 mb-3">${shoe.price}</p>
+                <p className="text-neutral-400 mb-1">${shoe.price}</p>
+                <p className="text-xs text-neutral-500 mb-3">
+                  {shoe.inStockSizes.length}/{shoe.sizes.length} sizes in stock
+                </p>
+
+                {/* Inventory Management */}
+                {editingInventory === shoe.id && (
+                  <div className="mb-4 p-3 bg-neutral-700 rounded-lg">
+                    <h4 className="text-white text-sm font-medium mb-2">Size Inventory</h4>
+                    <div className="grid grid-cols-4 gap-1 max-h-32 overflow-y-auto">
+                      {shoe.sizes.map((size) => (
+                        <button
+                          key={size}
+                          onClick={() => toggleSizeStock(shoe.id, size)}
+                          className={`p-1 rounded text-xs border ${
+                            shoe.inStockSizes.includes(size)
+                              ? "bg-green-600 text-white border-green-500"
+                              : "bg-red-600 text-white border-red-500"
+                          }`}
+                          title={shoe.inStockSizes.includes(size) ? "In Stock" : "Out of Stock"}
+                        >
+                          {size}
+                          {shoe.inStockSizes.includes(size) ? (
+                            <Check className="h-2 w-2 inline ml-1" />
+                          ) : (
+                            <X className="h-2 w-2 inline ml-1" />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                    <Button
+                      onClick={() => setEditingInventory(null)}
+                      size="sm"
+                      variant="outline"
+                      className="mt-2 w-full"
+                    >
+                      Done
+                    </Button>
+                  </div>
+                )}
+
                 <div className="flex gap-2">
                   <Button
                     onClick={() => toggleFeatured(shoe.id)}
@@ -757,6 +1112,15 @@ export function AdminPanel() {
                     title={shoe.isFeatured ? "Remove from featured" : "Add to featured"}
                   >
                     {shoe.isFeatured ? <Star className="h-4 w-4" /> : <StarOff className="h-4 w-4" />}
+                  </Button>
+                  <Button
+                    onClick={() => setEditingInventory(editingInventory === shoe.id ? null : shoe.id)}
+                    size="sm"
+                    variant="outline"
+                    className="text-blue-400 border-blue-400 hover:bg-blue-400 hover:text-white"
+                    title="Manage inventory"
+                  >
+                    <Package className="h-4 w-4" />
                   </Button>
                   <Button
                     onClick={() => handleDeleteShoe(shoe.id)}

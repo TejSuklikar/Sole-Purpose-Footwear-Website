@@ -22,6 +22,9 @@ const shoeModels = [
 
 const allSizes = [
   // Men's sizes (starting from 7, as youth 7Y = men's 7)
+  <h4 key="men-sizes-header" className="text-neutral-900 text-sm font-medium mb-2">
+    Men's Sizes (7-15)
+  </h4>,
   "7",
   "7.5",
   "8",
@@ -39,6 +42,9 @@ const allSizes = [
   "14",
   "15",
   // Women's sizes
+  <h4 key="women-sizes-header" className="text-neutral-900 text-sm font-medium mb-2">
+    Women's Sizes
+  </h4>,
   "5W",
   "5.5W",
   "6W",
@@ -55,6 +61,9 @@ const allSizes = [
   "11.5W",
   "12W",
   // Babies and Toddlers (1C-10C)
+  <h4 key="babies-toddlers-header" className="text-neutral-900 text-sm font-medium mb-2">
+    Babies and Toddlers
+  </h4>,
   "1C",
   "1.5C",
   "2C",
@@ -75,6 +84,9 @@ const allSizes = [
   "9.5C",
   "10C",
   // Little Kids (8C-3Y) - includes overlap with toddlers
+  <h4 key="little-kids-header" className="text-neutral-900 text-sm font-medium mb-2">
+    Little Kids
+  </h4>,
   "10.5C",
   "11C",
   "11.5C",
@@ -88,6 +100,9 @@ const allSizes = [
   "2.5Y",
   "3Y",
   // Big Kids (1Y-7Y) - includes overlap with little kids
+  <h4 key="big-kids-header" className="text-neutral-900 text-sm font-medium mb-2">
+    Big Kids
+  </h4>,
   "3.5Y",
   "4Y",
   "4.5Y",
@@ -202,7 +217,7 @@ export function OrderForm() {
           <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
-                <Label htmlFor="firstName" className="text-white text-sm sm:text-base">
+                <Label htmlFor="firstName" className="text-neutral-900 text-sm sm:text-base font-medium">
                   First Name
                 </Label>
                 <Input
@@ -215,7 +230,7 @@ export function OrderForm() {
                 />
               </div>
               <div>
-                <Label htmlFor="lastName" className="text-white text-sm sm:text-base">
+                <Label htmlFor="lastName" className="text-neutral-900 text-sm sm:text-base font-medium">
                   Last Name
                 </Label>
                 <Input
@@ -231,7 +246,7 @@ export function OrderForm() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
-                <Label htmlFor="email" className="text-white text-sm sm:text-base">
+                <Label htmlFor="email" className="text-neutral-900 text-sm sm:text-base font-medium">
                   Email Address
                 </Label>
                 <Input
@@ -245,7 +260,7 @@ export function OrderForm() {
                 />
               </div>
               <div>
-                <Label htmlFor="phone" className="text-white text-sm sm:text-base">
+                <Label htmlFor="phone" className="text-neutral-900 text-sm sm:text-base font-medium">
                   Phone Number
                 </Label>
                 <Input
@@ -261,7 +276,7 @@ export function OrderForm() {
             </div>
 
             <div>
-              <Label htmlFor="shoeModel" className="text-white text-sm sm:text-base">
+              <Label htmlFor="shoeModel" className="text-neutral-900 text-sm sm:text-base font-medium">
                 Shoe Model
               </Label>
               <Select
@@ -284,7 +299,7 @@ export function OrderForm() {
             </div>
 
             <div>
-              <Label htmlFor="size" className="text-white text-sm sm:text-base">
+              <Label htmlFor="size" className="text-neutral-900 text-sm sm:text-base font-medium">
                 Shoe Size
               </Label>
               <Select
@@ -307,7 +322,7 @@ export function OrderForm() {
             </div>
 
             <div>
-              <Label htmlFor="designDescription" className="text-white text-sm sm:text-base">
+              <Label htmlFor="designDescription" className="text-neutral-900 text-sm sm:text-base font-medium">
                 Design Description
               </Label>
               <Textarea
@@ -323,7 +338,7 @@ export function OrderForm() {
             </div>
 
             <div>
-              <Label htmlFor="address" className="text-white text-sm sm:text-base">
+              <Label htmlFor="address" className="text-neutral-900 text-sm sm:text-base font-medium">
                 Shipping Address
               </Label>
               <Textarea

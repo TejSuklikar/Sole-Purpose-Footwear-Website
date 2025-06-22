@@ -1,9 +1,28 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
+interface Shoe {
+  id: number
+  name: string
+  price: number
+  image: string
+  slug: string
+  sizes: string[]
+  inStockSizes: string[]
+}
+
+interface ShoesGridProps {
+  filters: {
+    sizes: string[]
+    priceRanges: { min: number; max: number }[]
+  }
+}
+
+// All available sizes in the system
 const allSizes = [
   // Men's sizes (starting from 7, as youth 7Y = men's 7)
   "7",
@@ -82,8 +101,8 @@ const allSizes = [
   "7Y",
 ]
 
-const shoes = [
-  // Featured shoes (first 3 from hero section)
+// Default shoes data with ALL sizes available
+const defaultShoes: Shoe[] = [
   {
     id: 1,
     name: "Red Kuffiyeh AF1",
@@ -91,6 +110,7 @@ const shoes = [
     image: "/images/kuffiyeh-side-sunset.png",
     slug: "red-kuffiyeh-af1",
     sizes: allSizes,
+    inStockSizes: allSizes, // ALL sizes available
   },
   {
     id: 2,
@@ -99,6 +119,7 @@ const shoes = [
     image: "/images/mexican-side-view.png",
     slug: "mexican-eagle-af1",
     sizes: allSizes,
+    inStockSizes: allSizes, // ALL sizes available
   },
   {
     id: 3,
@@ -107,8 +128,8 @@ const shoes = [
     image: "/images/black-red-geometric-hero.jpg",
     slug: "black-red-geometric",
     sizes: allSizes,
+    inStockSizes: allSizes, // ALL sizes available
   },
-  // Other shoes
   {
     id: 4,
     name: "Jordanian Flag AF1",
@@ -116,6 +137,7 @@ const shoes = [
     image: "/images/jordanian-side-view.jpg",
     slug: "jordanian-flag-af1",
     sizes: allSizes,
+    inStockSizes: allSizes, // ALL sizes available
   },
   {
     id: 5,
@@ -124,6 +146,7 @@ const shoes = [
     image: "/images/geometric-checkered-side.jpg",
     slug: "geometric-checkered",
     sizes: allSizes,
+    inStockSizes: allSizes, // ALL sizes available
   },
   {
     id: 6,
@@ -132,6 +155,7 @@ const shoes = [
     image: "/images/chinese-side-sunset.png",
     slug: "chinese-flag-af1",
     sizes: allSizes,
+    inStockSizes: allSizes, // ALL sizes available
   },
   {
     id: 7,
@@ -140,6 +164,7 @@ const shoes = [
     image: "/images/checkered-drip-sunset.png",
     slug: "checkered-drip-af1",
     sizes: allSizes,
+    inStockSizes: allSizes, // ALL sizes available
   },
   {
     id: 8,
@@ -148,8 +173,8 @@ const shoes = [
     image: "/images/palestine-map-side.jpg",
     slug: "map-of-palestine-af1",
     sizes: allSizes,
+    inStockSizes: allSizes, // ALL sizes available
   },
-  // New shoes added at the bottom
   {
     id: 9,
     name: "Lebanese Cedar AF1",
@@ -157,6 +182,7 @@ const shoes = [
     image: "/images/lebanese-side-view.jpg",
     slug: "lebanese-cedar-af1",
     sizes: allSizes,
+    inStockSizes: allSizes, // ALL sizes available
   },
   {
     id: 10,
@@ -165,22 +191,68 @@ const shoes = [
     image: "/images/filipino-side-view.jpg",
     slug: "filipino-sun-af1",
     sizes: allSizes,
+    inStockSizes: allSizes, // ALL sizes available
   },
 ]
 
-interface ShoesGridProps {
-  filters: {
-    sizes: string[]
-    priceRanges: { min: number; max: number }[]
-  }
-}
-
 export function ShoesGrid({ filters }: ShoesGridProps) {
+  const [shoes, setShoes] = useState<Shoe[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  // Load shoes from global storage
+  useEffect(() => {
+    const loadShoes = () => {
+      try {
+        const savedShoes = localStorage.getItem("sp_shoes_global")
+        if (savedShoes) {
+          const parsedShoes = JSON.parse(savedShoes)
+          if (Array.isArray(parsedShoes) && parsedShoes.length > 0) {
+            setShoes(parsedShoes)
+          } else {
+            // If saved shoes is empty or invalid, use default shoes
+            setShoes(defaultShoes)
+            localStorage.setItem("sp_shoes_global", JSON.stringify(defaultShoes))
+          }
+        } else {
+          // If no saved shoes, initialize with default shoes
+          setShoes(defaultShoes)
+          localStorage.setItem("sp_shoes_global", JSON.stringify(defaultShoes))
+        }
+      } catch (error) {
+        console.error("Error loading shoes:", error)
+        // Fallback to default shoes if there's an error
+        setShoes(defaultShoes)
+        localStorage.setItem("sp_shoes_global", JSON.stringify(defaultShoes))
+      }
+      setIsLoading(false)
+    }
+
+    // Load shoes immediately
+    loadShoes()
+
+    // Listen for storage changes to update when admin makes changes
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "sp_shoes_global") {
+        loadShoes()
+      }
+    }
+
+    window.addEventListener("storage", handleStorageChange)
+
+    // Also check for changes periodically (for same-tab updates)
+    const interval = setInterval(loadShoes, 2000)
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange)
+      clearInterval(interval)
+    }
+  }, [])
+
   const filteredShoes = shoes.filter((shoe) => {
-    // Size filter
+    // Size filter - only show shoes that have the selected sizes IN STOCK
     if (filters.sizes.length > 0) {
-      const hasMatchingSize = filters.sizes.some((size) => shoe.sizes.includes(size))
-      if (!hasMatchingSize) return false
+      const hasMatchingInStockSize = filters.sizes.some((size) => shoe.inStockSizes.includes(size))
+      if (!hasMatchingInStockSize) return false
     }
 
     // Price range filter
@@ -192,11 +264,22 @@ export function ShoesGrid({ filters }: ShoesGridProps) {
     return true
   })
 
+  if (isLoading) {
+    return (
+      <div className="text-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-4"></div>
+        <p className="text-white">Loading shoes...</p>
+      </div>
+    )
+  }
+
   if (filteredShoes.length === 0) {
     return (
       <div className="text-center py-12">
         <p className="text-white text-lg mb-4">No shoes match your current filters.</p>
-        <p className="text-neutral-400">Try adjusting your size or price range selections.</p>
+        <p className="text-neutral-400">
+          Try adjusting your size or price range selections, or check back later for restocked items.
+        </p>
       </div>
     )
   }
@@ -206,6 +289,7 @@ export function ShoesGrid({ filters }: ShoesGridProps) {
       <div className="mb-6">
         <p className="text-neutral-400 text-sm">
           Showing {filteredShoes.length} of {shoes.length} shoes
+          {filters.sizes.length > 0 && " with selected sizes in stock"}
         </p>
       </div>
 
@@ -229,8 +313,8 @@ export function ShoesGrid({ filters }: ShoesGridProps) {
                 </div>
                 <div className="p-6">
                   <h3 className="font-semibold text-lg mb-2 text-neutral-900">{shoe.name}</h3>
-                  <p className="text-2xl font-bold text-neutral-900 mb-4">${shoe.price}</p>
-                  <p className="text-sm text-neutral-600 mb-4">Available in all sizes</p>
+                  <p className="text-2xl font-bold text-neutral-900 mb-2">${shoe.price}</p>
+                  <p className="text-sm text-neutral-600 mb-4">Available in {shoe.inStockSizes.length} sizes</p>
                   <Button className="w-full bg-neutral-700 text-white">View Details</Button>
                 </div>
               </div>
