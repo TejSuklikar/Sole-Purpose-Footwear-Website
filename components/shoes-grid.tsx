@@ -22,18 +22,133 @@ interface ShoesGridProps {
   }
 }
 
+// Default shoes data as fallback
+const defaultShoes: Shoe[] = [
+  {
+    id: 1,
+    name: "Red Kuffiyeh AF1",
+    price: 350,
+    image: "/images/kuffiyeh-side-sunset.png",
+    slug: "red-kuffiyeh-af1",
+    sizes: ["7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11", "11.5", "12"],
+    inStockSizes: ["7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11", "11.5", "12"],
+  },
+  {
+    id: 2,
+    name: "Mexican Eagle AF1",
+    price: 425,
+    image: "/images/mexican-side-view.png",
+    slug: "mexican-eagle-af1",
+    sizes: ["7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11", "11.5", "12"],
+    inStockSizes: ["7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11", "11.5", "12"],
+  },
+  {
+    id: 3,
+    name: "Black & Red Geometric",
+    price: 375,
+    image: "/images/black-red-geometric-hero.jpg",
+    slug: "black-red-geometric",
+    sizes: ["7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11", "11.5", "12"],
+    inStockSizes: ["7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11", "11.5", "12"],
+  },
+  {
+    id: 4,
+    name: "Jordanian Flag AF1",
+    price: 400,
+    image: "/images/jordanian-side-view.jpg",
+    slug: "jordanian-flag-af1",
+    sizes: ["7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11", "11.5", "12"],
+    inStockSizes: ["7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11", "11.5", "12"],
+  },
+  {
+    id: 5,
+    name: "Geometric Checkered",
+    price: 325,
+    image: "/images/geometric-checkered-side.jpg",
+    slug: "geometric-checkered",
+    sizes: ["7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11", "11.5", "12"],
+    inStockSizes: ["7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11", "11.5", "12"],
+  },
+  {
+    id: 6,
+    name: "Chinese Flag AF1",
+    price: 450,
+    image: "/images/chinese-side-sunset.png",
+    slug: "chinese-flag-af1",
+    sizes: ["7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11", "11.5", "12"],
+    inStockSizes: ["7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11", "11.5", "12"],
+  },
+  {
+    id: 7,
+    name: "Checkered Drip AF1",
+    price: 395,
+    image: "/images/checkered-drip-sunset.png",
+    slug: "checkered-drip-af1",
+    sizes: ["7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11", "11.5", "12"],
+    inStockSizes: ["7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11", "11.5", "12"],
+  },
+  {
+    id: 8,
+    name: "Map of Palestine AF1",
+    price: 380,
+    image: "/images/palestine-map-side.jpg",
+    slug: "map-of-palestine-af1",
+    sizes: ["7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11", "11.5", "12"],
+    inStockSizes: ["7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11", "11.5", "12"],
+  },
+  {
+    id: 9,
+    name: "Lebanese Cedar AF1",
+    price: 410,
+    image: "/images/lebanese-side-view.jpg",
+    slug: "lebanese-cedar-af1",
+    sizes: ["7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11", "11.5", "12"],
+    inStockSizes: ["7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11", "11.5", "12"],
+  },
+  {
+    id: 10,
+    name: "Filipino Sun AF1",
+    price: 420,
+    image: "/images/filipino-side-view.jpg",
+    slug: "filipino-sun-af1",
+    sizes: ["7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11", "11.5", "12"],
+    inStockSizes: ["7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11", "11.5", "12"],
+  },
+]
+
 export function ShoesGrid({ filters }: ShoesGridProps) {
   const [shoes, setShoes] = useState<Shoe[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
   // Load shoes from global storage
   useEffect(() => {
     const loadShoes = () => {
-      const savedShoes = localStorage.getItem("sp_shoes_global")
-      if (savedShoes) {
-        setShoes(JSON.parse(savedShoes))
+      try {
+        const savedShoes = localStorage.getItem("sp_shoes_global")
+        if (savedShoes) {
+          const parsedShoes = JSON.parse(savedShoes)
+          if (Array.isArray(parsedShoes) && parsedShoes.length > 0) {
+            setShoes(parsedShoes)
+          } else {
+            // If saved shoes is empty or invalid, use default shoes
+            setShoes(defaultShoes)
+            localStorage.setItem("sp_shoes_global", JSON.stringify(defaultShoes))
+          }
+        } else {
+          // If no saved shoes, initialize with default shoes
+          setShoes(defaultShoes)
+          localStorage.setItem("sp_shoes_global", JSON.stringify(defaultShoes))
+        }
+      } catch (error) {
+        console.error("Error loading shoes:", error)
+        // Fallback to default shoes if there's an error
+        setShoes(defaultShoes)
+        localStorage.setItem("sp_shoes_global", JSON.stringify(defaultShoes))
       }
+      setIsLoading(false)
     }
 
+    // Load shoes immediately
     loadShoes()
 
     // Listen for storage changes to update when admin makes changes
@@ -46,7 +161,7 @@ export function ShoesGrid({ filters }: ShoesGridProps) {
     window.addEventListener("storage", handleStorageChange)
 
     // Also check for changes periodically (for same-tab updates)
-    const interval = setInterval(loadShoes, 1000)
+    const interval = setInterval(loadShoes, 2000)
 
     return () => {
       window.removeEventListener("storage", handleStorageChange)
@@ -69,6 +184,15 @@ export function ShoesGrid({ filters }: ShoesGridProps) {
 
     return true
   })
+
+  if (isLoading) {
+    return (
+      <div className="text-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-4"></div>
+        <p className="text-white">Loading shoes...</p>
+      </div>
+    )
+  }
 
   if (filteredShoes.length === 0) {
     return (
