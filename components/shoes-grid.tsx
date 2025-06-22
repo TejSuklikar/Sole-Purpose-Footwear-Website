@@ -101,7 +101,7 @@ const allSizes = [
   "7Y",
 ]
 
-// Default shoes data with realistic stock levels
+// Default shoes data with ALL sizes available
 const defaultShoes: Shoe[] = [
   {
     id: 1,
@@ -110,32 +110,7 @@ const defaultShoes: Shoe[] = [
     image: "/images/kuffiyeh-side-sunset.png",
     slug: "red-kuffiyeh-af1",
     sizes: allSizes,
-    // Popular sizes mostly in stock, some sold out
-    inStockSizes: [
-      "7.5",
-      "8",
-      "8.5",
-      "9",
-      "9.5",
-      "10",
-      "10.5",
-      "11",
-      "6W",
-      "6.5W",
-      "7W",
-      "7.5W",
-      "8W",
-      "8.5W",
-      "9W",
-      "5Y",
-      "6Y",
-      "7Y",
-      "1C",
-      "2C",
-      "3C",
-      "4C",
-      "5C",
-    ],
+    inStockSizes: allSizes, // ALL sizes available
   },
   {
     id: 2,
@@ -144,30 +119,7 @@ const defaultShoes: Shoe[] = [
     image: "/images/mexican-side-view.png",
     slug: "mexican-eagle-af1",
     sizes: allSizes,
-    // Different availability pattern
-    inStockSizes: [
-      "7",
-      "8",
-      "9",
-      "10",
-      "11",
-      "12",
-      "5.5W",
-      "6W",
-      "7W",
-      "8W",
-      "9W",
-      "10W",
-      "3Y",
-      "4Y",
-      "5Y",
-      "6Y",
-      "2C",
-      "3C",
-      "4C",
-      "5C",
-      "6C",
-    ],
+    inStockSizes: allSizes, // ALL sizes available
   },
   {
     id: 3,
@@ -176,8 +128,7 @@ const defaultShoes: Shoe[] = [
     image: "/images/black-red-geometric-hero.jpg",
     slug: "black-red-geometric",
     sizes: allSizes,
-    // Limited stock on this popular design
-    inStockSizes: ["8", "8.5", "9", "10", "6.5W", "7W", "7.5W", "8W", "4Y", "5Y", "6Y"],
+    inStockSizes: allSizes, // ALL sizes available
   },
   {
     id: 4,
@@ -186,35 +137,7 @@ const defaultShoes: Shoe[] = [
     image: "/images/jordanian-side-view.jpg",
     slug: "jordanian-flag-af1",
     sizes: allSizes,
-    // Good availability across sizes
-    inStockSizes: [
-      "7",
-      "7.5",
-      "8",
-      "8.5",
-      "9",
-      "9.5",
-      "10",
-      "10.5",
-      "11",
-      "11.5",
-      "12",
-      "5W",
-      "5.5W",
-      "6W",
-      "6.5W",
-      "7W",
-      "7.5W",
-      "8W",
-      "8.5W",
-      "9W",
-      "2Y",
-      "3Y",
-      "4Y",
-      "5Y",
-      "6Y",
-      "7Y",
-    ],
+    inStockSizes: allSizes, // ALL sizes available
   },
   {
     id: 5,
@@ -223,8 +146,7 @@ const defaultShoes: Shoe[] = [
     image: "/images/geometric-checkered-side.jpg",
     slug: "geometric-checkered",
     sizes: allSizes,
-    // Moderate stock levels
-    inStockSizes: ["7.5", "8", "9", "9.5", "10", "11", "6W", "7W", "8W", "9W", "3Y", "4Y", "5Y", "1C", "2C", "3C"],
+    inStockSizes: allSizes, // ALL sizes available
   },
   {
     id: 6,
@@ -233,8 +155,7 @@ const defaultShoes: Shoe[] = [
     image: "/images/chinese-side-sunset.png",
     slug: "chinese-flag-af1",
     sizes: allSizes,
-    // Premium design with limited availability
-    inStockSizes: ["8", "9", "10", "11", "6.5W", "7W", "8W", "5Y", "6Y"],
+    inStockSizes: allSizes, // ALL sizes available
   },
   {
     id: 7,
@@ -243,27 +164,7 @@ const defaultShoes: Shoe[] = [
     image: "/images/checkered-drip-sunset.png",
     slug: "checkered-drip-af1",
     sizes: allSizes,
-    // Street art style - popular with younger crowd
-    inStockSizes: [
-      "7",
-      "8",
-      "8.5",
-      "9",
-      "9.5",
-      "10",
-      "6W",
-      "6.5W",
-      "7W",
-      "7.5W",
-      "8W",
-      "1Y",
-      "2Y",
-      "3Y",
-      "4Y",
-      "5Y",
-      "6Y",
-      "7Y",
-    ],
+    inStockSizes: allSizes, // ALL sizes available
   },
   {
     id: 8,
@@ -272,33 +173,7 @@ const defaultShoes: Shoe[] = [
     image: "/images/palestine-map-side.jpg",
     slug: "map-of-palestine-af1",
     sizes: allSizes,
-    // Cultural design with good family sizing
-    inStockSizes: [
-      "7.5",
-      "8",
-      "8.5",
-      "9",
-      "10",
-      "10.5",
-      "11",
-      "5.5W",
-      "6W",
-      "6.5W",
-      "7W",
-      "8W",
-      "9W",
-      "2Y",
-      "3Y",
-      "4Y",
-      "5Y",
-      "6Y",
-      "1C",
-      "2C",
-      "3C",
-      "4C",
-      "5C",
-      "6C",
-    ],
+    inStockSizes: allSizes, // ALL sizes available
   },
   {
     id: 9,
@@ -307,30 +182,7 @@ const defaultShoes: Shoe[] = [
     image: "/images/lebanese-side-view.jpg",
     slug: "lebanese-cedar-af1",
     sizes: allSizes,
-    // Newer design with fresh stock
-    inStockSizes: [
-      "7",
-      "7.5",
-      "8",
-      "8.5",
-      "9",
-      "9.5",
-      "10",
-      "10.5",
-      "11",
-      "12",
-      "5W",
-      "6W",
-      "7W",
-      "8W",
-      "9W",
-      "10W",
-      "3Y",
-      "4Y",
-      "5Y",
-      "6Y",
-      "7Y",
-    ],
+    inStockSizes: allSizes, // ALL sizes available
   },
   {
     id: 10,
@@ -339,8 +191,7 @@ const defaultShoes: Shoe[] = [
     image: "/images/filipino-side-view.jpg",
     slug: "filipino-sun-af1",
     sizes: allSizes,
-    // Limited edition with selective availability
-    inStockSizes: ["8", "8.5", "9", "10", "11", "6.5W", "7W", "7.5W", "8W", "4Y", "5Y", "6Y"],
+    inStockSizes: allSizes, // ALL sizes available
   },
 ]
 
@@ -463,13 +314,7 @@ export function ShoesGrid({ filters }: ShoesGridProps) {
                 <div className="p-6">
                   <h3 className="font-semibold text-lg mb-2 text-neutral-900">{shoe.name}</h3>
                   <p className="text-2xl font-bold text-neutral-900 mb-2">${shoe.price}</p>
-                  <p className="text-sm text-neutral-600 mb-4">
-                    {shoe.inStockSizes.length > 0 ? (
-                      <>Available in {shoe.inStockSizes.length} sizes</>
-                    ) : (
-                      <span className="text-red-600">Currently out of stock</span>
-                    )}
-                  </p>
+                  <p className="text-sm text-neutral-600 mb-4">Available in {shoe.inStockSizes.length} sizes</p>
                   <Button className="w-full bg-neutral-700 text-white">View Details</Button>
                 </div>
               </div>
