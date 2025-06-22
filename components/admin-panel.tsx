@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Plus, Star, Trash2, StarOff, Package, Check, X } from "lucide-react"
+import { Plus, Star, Trash2, StarOff, Package, Check, X, Calendar, MapPin, Clock, Edit } from "lucide-react"
 import Image from "next/image"
 
 interface Shoe {
@@ -20,6 +20,15 @@ interface Shoe {
   description?: string
   details?: string[]
   isFeatured?: boolean
+}
+
+interface Event {
+  id: number
+  title: string
+  date: string
+  time: string
+  location: string
+  description: string
 }
 
 // Nike-style sizing system
@@ -110,7 +119,7 @@ const defaultShoes: Shoe[] = [
     image: "/images/kuffiyeh-side-sunset.png",
     slug: "red-kuffiyeh-af1",
     sizes: allSizes,
-    inStockSizes: allSizes, // Initially all sizes in stock
+    inStockSizes: allSizes, // All sizes available
     description: "Traditional Kuffiyeh patterns hand-painted in bold red on premium white canvas.",
     details: [
       "Hand-painted with premium acrylic paints",
@@ -253,10 +262,41 @@ const defaultShoes: Shoe[] = [
   },
 ]
 
+// Default events
+const defaultEvents: Event[] = [
+  {
+    id: 1,
+    title: "Pop-Up Gallery Opening",
+    date: "July 15, 2025",
+    time: "6:00 PM - 10:00 PM",
+    location: "Mission District, San Francisco",
+    description: "Exclusive showcase of our latest custom designs",
+  },
+  {
+    id: 2,
+    title: "Custom Design Workshop",
+    date: "July 28, 2025",
+    time: "2:00 PM - 5:00 PM",
+    location: "Soul Purpose Studio, SF",
+    description: "Learn the art of sneaker customization",
+  },
+  {
+    id: 3,
+    title: "Summer Collection Drop",
+    date: "August 5, 2025",
+    time: "12:00 PM PST",
+    location: "Online & SF Studio",
+    description: "Limited edition summer-inspired designs",
+  },
+]
+
 export function AdminPanel() {
   const [shoes, setShoes] = useState<Shoe[]>([])
+  const [events, setEvents] = useState<Event[]>([])
   const [showAddForm, setShowAddForm] = useState(false)
+  const [showAddEventForm, setShowAddEventForm] = useState(false)
   const [editingInventory, setEditingInventory] = useState<number | null>(null)
+  const [editingEvent, setEditingEvent] = useState<number | null>(null)
   const [newShoe, setNewShoe] = useState({
     name: "",
     price: "",
@@ -265,8 +305,15 @@ export function AdminPanel() {
     details: "",
     sizes: [] as string[],
   })
+  const [newEvent, setNewEvent] = useState({
+    title: "",
+    date: "",
+    time: "",
+    location: "",
+    description: "",
+  })
 
-  // Load shoes from localStorage on mount
+  // Load shoes and events from localStorage on mount
   useEffect(() => {
     const savedShoes = localStorage.getItem("sp_shoes_global")
     if (savedShoes) {
@@ -276,12 +323,27 @@ export function AdminPanel() {
       setShoes(defaultShoes)
       localStorage.setItem("sp_shoes_global", JSON.stringify(defaultShoes))
     }
+
+    const savedEvents = localStorage.getItem("sp_events_global")
+    if (savedEvents) {
+      setEvents(JSON.parse(savedEvents))
+    } else {
+      // Initialize with default events
+      setEvents(defaultEvents)
+      localStorage.setItem("sp_events_global", JSON.stringify(defaultEvents))
+    }
   }, [])
 
   const saveShoes = (updatedShoes: Shoe[]) => {
     setShoes(updatedShoes)
     // Save to global storage that all users can access
     localStorage.setItem("sp_shoes_global", JSON.stringify(updatedShoes))
+  }
+
+  const saveEvents = (updatedEvents: Event[]) => {
+    setEvents(updatedEvents)
+    // Save to global storage that all users can access
+    localStorage.setItem("sp_events_global", JSON.stringify(updatedEvents))
   }
 
   const handleAddShoe = () => {
@@ -318,11 +380,50 @@ export function AdminPanel() {
     setShowAddForm(false)
   }
 
+  const handleAddEvent = () => {
+    if (!newEvent.title || !newEvent.date || !newEvent.time || !newEvent.location) return
+
+    const event: Event = {
+      id: Date.now(),
+      title: newEvent.title,
+      date: newEvent.date,
+      time: newEvent.time,
+      location: newEvent.location,
+      description: newEvent.description,
+    }
+
+    const updatedEvents = [...events, event]
+    saveEvents(updatedEvents)
+
+    // Reset form
+    setNewEvent({
+      title: "",
+      date: "",
+      time: "",
+      location: "",
+      description: "",
+    })
+    setShowAddEventForm(false)
+  }
+
   const handleDeleteShoe = (id: number) => {
     if (confirm("Are you sure you want to delete this shoe?")) {
       const updatedShoes = shoes.filter((shoe) => shoe.id !== id)
       saveShoes(updatedShoes)
     }
+  }
+
+  const handleDeleteEvent = (id: number) => {
+    if (confirm("Are you sure you want to delete this event?")) {
+      const updatedEvents = events.filter((event) => event.id !== id)
+      saveEvents(updatedEvents)
+    }
+  }
+
+  const handleUpdateEvent = (id: number, updatedEvent: Partial<Event>) => {
+    const updatedEvents = events.map((event) => (event.id === id ? { ...event, ...updatedEvent } : event))
+    saveEvents(updatedEvents)
+    setEditingEvent(null)
   }
 
   const toggleFeatured = (id: number) => {
@@ -444,11 +545,195 @@ export function AdminPanel() {
     <div className="space-y-8">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-white">Admin Panel</h1>
-        <Button onClick={() => setShowAddForm(true)} className="bg-white text-black">
-          <Plus className="mr-2 h-4 w-4" />
-          Add New Shoe
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={() => setShowAddEventForm(true)} className="bg-blue-600 text-white hover:bg-blue-700">
+            <Calendar className="mr-2 h-4 w-4" />
+            Add Event
+          </Button>
+          <Button onClick={() => setShowAddForm(true)} className="bg-white text-black">
+            <Plus className="mr-2 h-4 w-4" />
+            Add Shoe
+          </Button>
+        </div>
       </div>
+
+      {/* Events Management Section */}
+      <Card className="bg-neutral-900 border-neutral-800">
+        <CardHeader>
+          <CardTitle className="text-white flex items-center">
+            <Calendar className="mr-2 h-5 w-5 text-blue-500" />
+            Upcoming Events ({events.length})
+          </CardTitle>
+          <p className="text-neutral-400 text-sm">
+            Manage events that appear on the homepage. Changes are visible to all users immediately.
+          </p>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {events.map((event) => (
+              <div key={event.id} className="bg-neutral-800 rounded-lg p-4">
+                {editingEvent === event.id ? (
+                  <div className="space-y-3">
+                    <Input
+                      value={event.title}
+                      onChange={(e) => handleUpdateEvent(event.id, { title: e.target.value })}
+                      placeholder="Event title"
+                      className="text-sm"
+                    />
+                    <Input
+                      value={event.date}
+                      onChange={(e) => handleUpdateEvent(event.id, { date: e.target.value })}
+                      placeholder="Date"
+                      className="text-sm"
+                    />
+                    <Input
+                      value={event.time}
+                      onChange={(e) => handleUpdateEvent(event.id, { time: e.target.value })}
+                      placeholder="Time"
+                      className="text-sm"
+                    />
+                    <Input
+                      value={event.location}
+                      onChange={(e) => handleUpdateEvent(event.id, { location: e.target.value })}
+                      placeholder="Location"
+                      className="text-sm"
+                    />
+                    <Textarea
+                      value={event.description}
+                      onChange={(e) => handleUpdateEvent(event.id, { description: e.target.value })}
+                      placeholder="Description"
+                      rows={2}
+                      className="text-sm"
+                    />
+                    <Button onClick={() => setEditingEvent(null)} size="sm" className="w-full">
+                      Done
+                    </Button>
+                  </div>
+                ) : (
+                  <>
+                    <h3 className="text-white font-semibold mb-2">{event.title}</h3>
+                    <p className="text-neutral-400 text-sm mb-3">{event.description}</p>
+                    <div className="space-y-1 text-xs text-neutral-500 mb-4">
+                      <div className="flex items-center">
+                        <Calendar className="w-3 h-3 mr-1" />
+                        {event.date}
+                      </div>
+                      <div className="flex items-center">
+                        <Clock className="w-3 h-3 mr-1" />
+                        {event.time}
+                      </div>
+                      <div className="flex items-center">
+                        <MapPin className="w-3 h-3 mr-1" />
+                        {event.location}
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={() => setEditingEvent(event.id)}
+                        size="sm"
+                        variant="outline"
+                        className="text-blue-400 border-blue-400 hover:bg-blue-400 hover:text-white"
+                      >
+                        <Edit className="h-3 w-3" />
+                      </Button>
+                      <Button
+                        onClick={() => handleDeleteEvent(event.id)}
+                        size="sm"
+                        variant="outline"
+                        className="text-red-400 border-red-400 hover:bg-red-400 hover:text-white"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Add Event Form */}
+      {showAddEventForm && (
+        <Card className="bg-neutral-900 border-neutral-800">
+          <CardHeader>
+            <CardTitle className="text-white">Add New Event</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="eventTitle" className="text-white">
+                  Event Title
+                </Label>
+                <Input
+                  id="eventTitle"
+                  value={newEvent.title}
+                  onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
+                  placeholder="e.g., Pop-Up Gallery Opening"
+                />
+              </div>
+              <div>
+                <Label htmlFor="eventDate" className="text-white">
+                  Date
+                </Label>
+                <Input
+                  id="eventDate"
+                  value={newEvent.date}
+                  onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })}
+                  placeholder="e.g., July 15, 2025"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="eventTime" className="text-white">
+                  Time
+                </Label>
+                <Input
+                  id="eventTime"
+                  value={newEvent.time}
+                  onChange={(e) => setNewEvent({ ...newEvent, time: e.target.value })}
+                  placeholder="e.g., 6:00 PM - 10:00 PM"
+                />
+              </div>
+              <div>
+                <Label htmlFor="eventLocation" className="text-white">
+                  Location
+                </Label>
+                <Input
+                  id="eventLocation"
+                  value={newEvent.location}
+                  onChange={(e) => setNewEvent({ ...newEvent, location: e.target.value })}
+                  placeholder="e.g., Mission District, San Francisco"
+                />
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="eventDescription" className="text-white">
+                Description
+              </Label>
+              <Textarea
+                id="eventDescription"
+                value={newEvent.description}
+                onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
+                placeholder="Brief description of the event..."
+                rows={3}
+              />
+            </div>
+
+            <div className="flex gap-2">
+              <Button onClick={handleAddEvent} className="bg-blue-600 text-white hover:bg-blue-700">
+                Add Event
+              </Button>
+              <Button onClick={() => setShowAddEventForm(false)} variant="outline">
+                Cancel
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Featured Shoes Section */}
       <Card className="bg-neutral-900 border-neutral-800">
