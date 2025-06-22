@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Instagram, Facebook, Mail } from "lucide-react"
+import { Instagram, Mail } from "lucide-react"
 
 export function Footer() {
   return (
@@ -50,9 +50,6 @@ export function Footer() {
                 className="text-neutral-400 hover:text-white transition-colors"
               >
                 <Instagram className="w-5 h-5" />
-              </a>
-              <a href="#" className="text-neutral-400 hover:text-white transition-colors">
-                <Facebook className="w-5 h-5" />
               </a>
               <a
                 href="mailto:solepurposefootwear813@gmail.com?subject=Inquiry%20from%20Website"
