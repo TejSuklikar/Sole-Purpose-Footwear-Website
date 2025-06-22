@@ -121,19 +121,6 @@ export function LoginPage() {
                   )}
                 </Button>
               </form>
-
-              <div className="bg-neutral-800 border border-neutral-700 rounded-lg p-3">
-                <div className="flex items-center space-x-2 mb-2">
-                  <Shield className="h-4 w-4 text-yellow-500" />
-                  <span className="text-white text-sm font-medium">Admin Features</span>
-                </div>
-                <ul className="text-neutral-400 text-xs space-y-1">
-                  <li>• Manage shoe inventory and sizes</li>
-                  <li>• Add/edit/delete shoes</li>
-                  <li>• Control featured items</li>
-                  <li>• Update size availability</li>
-                </ul>
-              </div>
             </CardContent>
           </Card>
 
@@ -154,19 +141,6 @@ export function LoginPage() {
                 <Users className="mr-2 h-4 w-4" />
                 Continue as Guest
               </Button>
-
-              <div className="bg-neutral-800 border border-neutral-700 rounded-lg p-3">
-                <div className="flex items-center space-x-2 mb-2">
-                  <Users className="h-4 w-4 text-blue-500" />
-                  <span className="text-white text-sm font-medium">Guest Features</span>
-                </div>
-                <ul className="text-neutral-400 text-xs space-y-1">
-                  <li>• Browse all shoes and designs</li>
-                  <li>• Add items to cart</li>
-                  <li>• Place custom orders</li>
-                  <li>• Filter by size and price</li>
-                </ul>
-              </div>
             </CardContent>
           </Card>
         </div>
