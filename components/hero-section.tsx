@@ -52,19 +52,21 @@ export function HeroSection() {
   return (
     <section className="hero-gradient py-20 lg:py-32">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16 fade-in-up">
-          <h1 className="font-playfair text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-4">Sole Purpose</h1>
-          <p className="text-xl md:text-2xl font-medium text-neutral-300 mb-6 font-sans">
+        <div className="text-center mb-12 sm:mb-16 fade-in-up">
+          <h1 className="font-playfair text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-4">
+            Sole Purpose
+          </h1>
+          <p className="text-lg sm:text-xl md:text-2xl font-medium text-neutral-300 mb-4 sm:mb-6 font-sans px-4">
             Personalize your step with a unique hand painted design
           </p>
-          <p className="text-lg md:text-xl text-neutral-200 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-lg md:text-xl text-neutral-200 max-w-3xl mx-auto leading-relaxed px-4">
             Where contemporary design meets traditional craftsmanship. Each pair celebrates culture, identity, and
             personal expression through meticulous hand-painted artistry.
           </p>
         </div>
 
         {featuredShoes.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-12 px-4 sm:px-0">
             {featuredShoes.map((shoe, index) => (
               <div
                 key={shoe.id}
@@ -97,19 +99,19 @@ export function HeroSection() {
           </div>
         )}
 
-        <div className="text-center mt-16">
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+        <div className="text-center mt-12 sm:mt-16 px-4">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center max-w-md sm:max-w-none mx-auto">
             <Button
               asChild
               size="lg"
-              className="bg-white text-black border-2 border-black px-8 py-3 text-lg font-medium"
+              className="w-full sm:w-auto bg-white text-black border-2 border-black px-6 sm:px-8 py-3 text-base sm:text-lg font-medium"
             >
               <Link href="/shoes">View All Designs</Link>
             </Button>
             <Button
               asChild
               size="lg"
-              className="bg-white text-black border-2 border-black px-8 py-3 text-lg font-medium"
+              className="w-full sm:w-auto bg-white text-black border-2 border-black px-6 sm:px-8 py-3 text-base sm:text-lg font-medium"
             >
               <Link href="/order">Start a Custom Order</Link>
             </Button>

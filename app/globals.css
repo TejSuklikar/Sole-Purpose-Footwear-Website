@@ -51,7 +51,7 @@
     @apply bg-neutral-900/30;
   }
 
-  /* Form styling fixes */
+  /* Enhanced form styling */
   .form-input {
     @apply w-full px-3 py-2 text-neutral-900 bg-white border border-neutral-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:border-neutral-500;
   }
@@ -62,6 +62,39 @@
 
   .form-select {
     @apply w-full px-3 py-2 text-neutral-900 bg-white border border-neutral-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:border-neutral-500;
+  }
+
+  /* Responsive text sizing */
+  .responsive-text-sm {
+    @apply text-xs sm:text-sm md:text-base;
+  }
+
+  .responsive-text-base {
+    @apply text-sm sm:text-base md:text-lg;
+  }
+
+  .responsive-text-lg {
+    @apply text-base sm:text-lg md:text-xl;
+  }
+
+  .responsive-text-xl {
+    @apply text-lg sm:text-xl md:text-2xl;
+  }
+
+  /* Enhanced mobile navigation */
+  @media (max-width: 768px) {
+    .mobile-nav {
+      @apply fixed inset-x-0 top-16 bg-neutral-950/95 backdrop-blur-sm border-b border-neutral-800 p-4;
+    }
+  }
+
+  /* Better spacing for mobile */
+  .mobile-spacing {
+    @apply px-4 sm:px-6 lg:px-8;
+  }
+
+  .mobile-section-spacing {
+    @apply py-8 sm:py-12 lg:py-20;
   }
 }
 
@@ -96,4 +129,29 @@
   opacity: 0;
   transform: translateY(20px);
   animation: fadeInUp 0.8s ease-out 0.4s forwards;
+}
+
+/* Enhanced responsive breakpoints */
+@media (max-width: 640px) {
+  .hero-gradient {
+    @apply py-12;
+  }
+
+  .fade-in-up,
+  .fade-in-up-delay-1,
+  .fade-in-up-delay-2 {
+    animation-duration: 0.6s;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .tablet-grid {
+    @apply grid-cols-2;
+  }
+}
+
+@media (min-width: 1025px) {
+  .desktop-grid {
+    @apply grid-cols-3;
+  }
 }
