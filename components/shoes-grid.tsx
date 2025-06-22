@@ -1,172 +1,19 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
-const allSizes = [
-  // Men's sizes (starting from 7, as youth 7Y = men's 7)
-  "7",
-  "7.5",
-  "8",
-  "8.5",
-  "9",
-  "9.5",
-  "10",
-  "10.5",
-  "11",
-  "11.5",
-  "12",
-  "12.5",
-  "13",
-  "13.5",
-  "14",
-  "15",
-  // Women's sizes
-  "5W",
-  "5.5W",
-  "6W",
-  "6.5W",
-  "7W",
-  "7.5W",
-  "8W",
-  "8.5W",
-  "9W",
-  "9.5W",
-  "10W",
-  "10.5W",
-  "11W",
-  "11.5W",
-  "12W",
-  // Babies and Toddlers (1C-10C)
-  "1C",
-  "1.5C",
-  "2C",
-  "2.5C",
-  "3C",
-  "3.5C",
-  "4C",
-  "4.5C",
-  "5C",
-  "5.5C",
-  "6C",
-  "6.5C",
-  "7C",
-  "7.5C",
-  "8C",
-  "8.5C",
-  "9C",
-  "9.5C",
-  "10C",
-  // Little Kids (8C-3Y) - includes overlap with toddlers
-  "10.5C",
-  "11C",
-  "11.5C",
-  "12C",
-  "12.5C",
-  "13C",
-  "13.5C",
-  "1Y",
-  "1.5Y",
-  "2Y",
-  "2.5Y",
-  "3Y",
-  // Big Kids (1Y-7Y) - includes overlap with little kids
-  "3.5Y",
-  "4Y",
-  "4.5Y",
-  "5Y",
-  "5.5Y",
-  "6Y",
-  "6.5Y",
-  "7Y",
-]
-
-const shoes = [
-  // Featured shoes (first 3 from hero section)
-  {
-    id: 1,
-    name: "Red Kuffiyeh AF1",
-    price: 350,
-    image: "/images/kuffiyeh-side-sunset.png",
-    slug: "red-kuffiyeh-af1",
-    sizes: allSizes,
-  },
-  {
-    id: 2,
-    name: "Mexican Eagle AF1",
-    price: 425,
-    image: "/images/mexican-side-view.png",
-    slug: "mexican-eagle-af1",
-    sizes: allSizes,
-  },
-  {
-    id: 3,
-    name: "Black & Red Geometric",
-    price: 375,
-    image: "/images/black-red-geometric-hero.jpg",
-    slug: "black-red-geometric",
-    sizes: allSizes,
-  },
-  // Other shoes
-  {
-    id: 4,
-    name: "Jordanian Flag AF1",
-    price: 400,
-    image: "/images/jordanian-side-view.jpg",
-    slug: "jordanian-flag-af1",
-    sizes: allSizes,
-  },
-  {
-    id: 5,
-    name: "Geometric Checkered",
-    price: 325,
-    image: "/images/geometric-checkered-side.jpg",
-    slug: "geometric-checkered",
-    sizes: allSizes,
-  },
-  {
-    id: 6,
-    name: "Chinese Flag AF1",
-    price: 450,
-    image: "/images/chinese-side-sunset.png",
-    slug: "chinese-flag-af1",
-    sizes: allSizes,
-  },
-  {
-    id: 7,
-    name: "Checkered Drip AF1",
-    price: 395,
-    image: "/images/checkered-drip-sunset.png",
-    slug: "checkered-drip-af1",
-    sizes: allSizes,
-  },
-  {
-    id: 8,
-    name: "Map of Palestine AF1",
-    price: 380,
-    image: "/images/palestine-map-side.jpg",
-    slug: "map-of-palestine-af1",
-    sizes: allSizes,
-  },
-  // New shoes added at the bottom
-  {
-    id: 9,
-    name: "Lebanese Cedar AF1",
-    price: 410,
-    image: "/images/lebanese-side-view.jpg",
-    slug: "lebanese-cedar-af1",
-    sizes: allSizes,
-  },
-  {
-    id: 10,
-    name: "Filipino Sun AF1",
-    price: 420,
-    image: "/images/filipino-side-view.jpg",
-    slug: "filipino-sun-af1",
-    sizes: allSizes,
-  },
-]
+interface Shoe {
+  id: number
+  name: string
+  price: number
+  image: string
+  slug: string
+  sizes: string[]
+  inStockSizes: string[]
+}
 
 interface ShoesGridProps {
   filters: {
@@ -176,11 +23,42 @@ interface ShoesGridProps {
 }
 
 export function ShoesGrid({ filters }: ShoesGridProps) {
+  const [shoes, setShoes] = useState<Shoe[]>([])
+
+  // Load shoes from global storage
+  useEffect(() => {
+    const loadShoes = () => {
+      const savedShoes = localStorage.getItem("sp_shoes_global")
+      if (savedShoes) {
+        setShoes(JSON.parse(savedShoes))
+      }
+    }
+
+    loadShoes()
+
+    // Listen for storage changes to update when admin makes changes
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "sp_shoes_global") {
+        loadShoes()
+      }
+    }
+
+    window.addEventListener("storage", handleStorageChange)
+
+    // Also check for changes periodically (for same-tab updates)
+    const interval = setInterval(loadShoes, 1000)
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange)
+      clearInterval(interval)
+    }
+  }, [])
+
   const filteredShoes = shoes.filter((shoe) => {
-    // Size filter
+    // Size filter - only show shoes that have the selected sizes IN STOCK
     if (filters.sizes.length > 0) {
-      const hasMatchingSize = filters.sizes.some((size) => shoe.sizes.includes(size))
-      if (!hasMatchingSize) return false
+      const hasMatchingInStockSize = filters.sizes.some((size) => shoe.inStockSizes.includes(size))
+      if (!hasMatchingInStockSize) return false
     }
 
     // Price range filter
@@ -196,7 +74,9 @@ export function ShoesGrid({ filters }: ShoesGridProps) {
     return (
       <div className="text-center py-12">
         <p className="text-white text-lg mb-4">No shoes match your current filters.</p>
-        <p className="text-neutral-400">Try adjusting your size or price range selections.</p>
+        <p className="text-neutral-400">
+          Try adjusting your size or price range selections, or check back later for restocked items.
+        </p>
       </div>
     )
   }
@@ -206,6 +86,7 @@ export function ShoesGrid({ filters }: ShoesGridProps) {
       <div className="mb-6">
         <p className="text-neutral-400 text-sm">
           Showing {filteredShoes.length} of {shoes.length} shoes
+          {filters.sizes.length > 0 && " with selected sizes in stock"}
         </p>
       </div>
 
@@ -229,8 +110,14 @@ export function ShoesGrid({ filters }: ShoesGridProps) {
                 </div>
                 <div className="p-6">
                   <h3 className="font-semibold text-lg mb-2 text-neutral-900">{shoe.name}</h3>
-                  <p className="text-2xl font-bold text-neutral-900 mb-4">${shoe.price}</p>
-                  <p className="text-sm text-neutral-600 mb-4">Available in all sizes</p>
+                  <p className="text-2xl font-bold text-neutral-900 mb-2">${shoe.price}</p>
+                  <p className="text-sm text-neutral-600 mb-4">
+                    {shoe.inStockSizes.length > 0 ? (
+                      <>Available in {shoe.inStockSizes.length} sizes</>
+                    ) : (
+                      <span className="text-red-600">Currently out of stock</span>
+                    )}
+                  </p>
                   <Button className="w-full bg-neutral-700 text-white">View Details</Button>
                 </div>
               </div>

@@ -1,10 +1,10 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import Image from "next/image"
-import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { useCart } from "./cart-provider"
-import { Check, ChevronLeft, ChevronRight, ArrowLeft } from "lucide-react"
+import { Check, ChevronLeft, ChevronRight, ArrowLeft, Package } from "lucide-react"
 import Link from "next/link"
 
 interface Shoe {
@@ -13,15 +13,50 @@ interface Shoe {
   price: number
   images: string[]
   sizes: string[]
+  inStockSizes?: string[]
   description: string
   details: string[]
 }
 
-export function ProductDetail({ shoe }: { shoe: Shoe }) {
+export function ProductDetail({ shoe: initialShoe }: { shoe: Shoe }) {
+  const [shoe, setShoe] = useState(initialShoe)
   const [selectedSize, setSelectedSize] = useState<string>("")
   const [isAdded, setIsAdded] = useState(false)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const { dispatch } = useCart()
+
+  // Load current shoe data from global storage to get latest inventory
+  useEffect(() => {
+    const loadShoeData = () => {
+      const savedShoes = localStorage.getItem("sp_shoes_global")
+      if (savedShoes) {
+        const shoes = JSON.parse(savedShoes)
+        const currentShoe = shoes.find((s: Shoe) => s.id === initialShoe.id)
+        if (currentShoe) {
+          setShoe({ ...initialShoe, inStockSizes: currentShoe.inStockSizes || initialShoe.sizes })
+        }
+      }
+    }
+
+    loadShoeData()
+
+    // Listen for storage changes
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "sp_shoes_global") {
+        loadShoeData()
+      }
+    }
+
+    window.addEventListener("storage", handleStorageChange)
+
+    // Also check for changes periodically
+    const interval = setInterval(loadShoeData, 1000)
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange)
+      clearInterval(interval)
+    }
+  }, [initialShoe])
 
   const handleAddToCart = () => {
     if (!selectedSize) return
@@ -49,6 +84,8 @@ export function ProductDetail({ shoe }: { shoe: Shoe }) {
     setCurrentImageIndex((prev) => (prev - 1 + shoe.images.length) % shoe.images.length)
   }
 
+  const inStockSizes = shoe.inStockSizes || shoe.sizes
+
   // Group sizes by category for better display
   const mensSizes = shoe.sizes.filter((size) => !size.includes("W") && !size.includes("C") && !size.includes("Y"))
   const womensSizes = shoe.sizes.filter((size) => size.includes("W"))
@@ -75,6 +112,46 @@ export function ProductDetail({ shoe }: { shoe: Shoe }) {
     }
     return false
   })
+
+  const renderSizeCategory = (categoryName: string, categorySizes: string[]) => {
+    if (categorySizes.length === 0) return null
+
+    return (
+      <div className="mb-4">
+        <h4 className="text-sm font-medium text-neutral-300 mb-2">{categoryName}</h4>
+        <div className="grid grid-cols-4 gap-2">
+          {categorySizes.map((size) => {
+            const isInStock = inStockSizes.includes(size)
+            const isSelected = selectedSize === size
+
+            return (
+              <button
+                key={size}
+                onClick={() => isInStock && setSelectedSize(size)}
+                disabled={!isInStock}
+                className={`p-3 border rounded-lg text-center transition-colors relative ${
+                  isSelected
+                    ? "border-white bg-white text-neutral-900"
+                    : isInStock
+                      ? "border-neutral-600 text-white hover:border-neutral-400"
+                      : "border-neutral-700 text-neutral-500 cursor-not-allowed"
+                }`}
+              >
+                {size}
+                {!isInStock && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-neutral-800/80 rounded-lg">
+                    <span className="text-xs text-red-400">Out</span>
+                  </div>
+                )}
+              </button>
+            )
+          })}
+        </div>
+      </div>
+    )
+  }
+
+  const canAddToCart = selectedSize && inStockSizes.includes(selectedSize)
 
   return (
     <div className="py-20">
@@ -174,128 +251,43 @@ export function ProductDetail({ shoe }: { shoe: Shoe }) {
 
             <p className="text-lg text-neutral-300 leading-relaxed">{shoe.description}</p>
 
+            {/* Stock Status */}
+            <div className="flex items-center space-x-2 text-sm">
+              <Package className="w-4 h-4 text-neutral-400" />
+              <span className="text-neutral-400">
+                {inStockSizes.length > 0 ? (
+                  <>
+                    <span className="text-green-400">{inStockSizes.length}</span> of {shoe.sizes.length} sizes in stock
+                  </>
+                ) : (
+                  <span className="text-red-400">Currently out of stock</span>
+                )}
+              </span>
+            </div>
+
             {/* Size Selection */}
             <div>
               <h3 className="text-lg font-semibold mb-3 text-white">Select Size</h3>
+              <p className="text-sm text-neutral-400 mb-4">Sizes marked "Out" are currently unavailable</p>
 
-              {/* Men's Sizes */}
-              {mensSizes.length > 0 && (
-                <div className="mb-4">
-                  <h4 className="text-sm font-medium text-neutral-300 mb-2">Men's</h4>
-                  <div className="grid grid-cols-4 gap-2">
-                    {mensSizes.map((size) => (
-                      <button
-                        key={size}
-                        onClick={() => setSelectedSize(size)}
-                        className={`p-3 border rounded-lg text-center transition-colors ${
-                          selectedSize === size
-                            ? "border-white bg-white text-neutral-900"
-                            : "border-neutral-600 text-white"
-                        }`}
-                      >
-                        {size}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Women's Sizes */}
-              {womensSizes.length > 0 && (
-                <div className="mb-4">
-                  <h4 className="text-sm font-medium text-neutral-300 mb-2">Women's</h4>
-                  <div className="grid grid-cols-4 gap-2">
-                    {womensSizes.map((size) => (
-                      <button
-                        key={size}
-                        onClick={() => setSelectedSize(size)}
-                        className={`p-3 border rounded-lg text-center transition-colors ${
-                          selectedSize === size
-                            ? "border-white bg-white text-neutral-900"
-                            : "border-neutral-600 text-white"
-                        }`}
-                      >
-                        {size}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Big Kids */}
-              {bigKidsSizes.length > 0 && (
-                <div className="mb-4">
-                  <h4 className="text-sm font-medium text-neutral-300 mb-2">Big Kids (1Y-7Y)</h4>
-                  <div className="grid grid-cols-4 gap-2">
-                    {bigKidsSizes.map((size) => (
-                      <button
-                        key={size}
-                        onClick={() => setSelectedSize(size)}
-                        className={`p-3 border rounded-lg text-center transition-colors ${
-                          selectedSize === size
-                            ? "border-white bg-white text-neutral-900"
-                            : "border-neutral-600 text-white"
-                        }`}
-                      >
-                        {size}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Little Kids */}
-              {littleKidsSizes.length > 0 && (
-                <div className="mb-4">
-                  <h4 className="text-sm font-medium text-neutral-300 mb-2">Little Kids (8C-3Y)</h4>
-                  <div className="grid grid-cols-4 gap-2">
-                    {littleKidsSizes.map((size) => (
-                      <button
-                        key={size}
-                        onClick={() => setSelectedSize(size)}
-                        className={`p-3 border rounded-lg text-center transition-colors ${
-                          selectedSize === size
-                            ? "border-white bg-white text-neutral-900"
-                            : "border-neutral-600 text-white"
-                        }`}
-                      >
-                        {size}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Babies and Toddlers */}
-              {babiesToddlerSizes.length > 0 && (
-                <div className="mb-4">
-                  <h4 className="text-sm font-medium text-neutral-300 mb-2">Babies & Toddlers (1C-10C)</h4>
-                  <div className="grid grid-cols-4 gap-2">
-                    {babiesToddlerSizes.map((size) => (
-                      <button
-                        key={size}
-                        onClick={() => setSelectedSize(size)}
-                        className={`p-3 border rounded-lg text-center transition-colors ${
-                          selectedSize === size
-                            ? "border-white bg-white text-neutral-900"
-                            : "border-neutral-600 text-white"
-                        }`}
-                      >
-                        {size}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
+              {renderSizeCategory("Men's", mensSizes)}
+              {renderSizeCategory("Women's", womensSizes)}
+              {renderSizeCategory("Big Kids (1Y-7Y)", bigKidsSizes)}
+              {renderSizeCategory("Little Kids (8C-3Y)", littleKidsSizes)}
+              {renderSizeCategory("Babies & Toddlers (1C-10C)", babiesToddlerSizes)}
             </div>
 
             {/* Add to Cart */}
-            <Button onClick={handleAddToCart} disabled={!selectedSize} size="lg" className="w-full">
+            <Button onClick={handleAddToCart} disabled={!canAddToCart} size="lg" className="w-full">
               {isAdded ? (
                 <>
                   <Check className="mr-2 h-5 w-5" />
                   Added to Cart
                 </>
+              ) : !selectedSize ? (
+                "Select a Size"
+              ) : !inStockSizes.includes(selectedSize) ? (
+                "Size Out of Stock"
               ) : (
                 "Add to Cart"
               )}

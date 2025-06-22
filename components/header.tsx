@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { useCart } from "./cart-provider"
 import { useAuth } from "./auth-provider"
-import { ShoppingBag, LogOut } from "lucide-react"
+import { ShoppingBag, LogOut, Shield, Users } from "lucide-react"
 import { Button } from "./ui/button"
 
 export function Header() {
@@ -66,10 +66,14 @@ export function Header() {
 
               {user && (
                 <div className="flex items-center space-x-2">
-                  <span className="text-neutral-300 text-sm hidden sm:block">
-                    {user.firstName} {user.lastName}
-                    {user.isAdmin && <span className="text-yellow-500 ml-1">(Admin)</span>}
-                  </span>
+                  <div className="flex items-center space-x-1">
+                    {user.isAdmin ? (
+                      <Shield className="h-4 w-4 text-yellow-500" />
+                    ) : (
+                      <Users className="h-4 w-4 text-blue-500" />
+                    )}
+                    <span className="text-neutral-300 text-sm hidden sm:block">{user.isAdmin ? "Admin" : "Guest"}</span>
+                  </div>
                   <Button onClick={logout} variant="ghost" size="sm" className="text-neutral-300 hover:text-white">
                     <LogOut className="h-4 w-4" />
                   </Button>

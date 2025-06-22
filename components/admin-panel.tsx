@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Plus, Star, Trash2, StarOff } from "lucide-react"
+import { Plus, Star, Trash2, StarOff, Package, Check, X } from "lucide-react"
 import Image from "next/image"
 
 interface Shoe {
@@ -16,6 +16,7 @@ interface Shoe {
   image: string
   slug: string
   sizes: string[]
+  inStockSizes: string[] // New field for inventory management
   description?: string
   details?: string[]
   isFeatured?: boolean
@@ -109,6 +110,7 @@ const defaultShoes: Shoe[] = [
     image: "/images/kuffiyeh-side-sunset.png",
     slug: "red-kuffiyeh-af1",
     sizes: allSizes,
+    inStockSizes: allSizes, // Initially all sizes in stock
     description: "Traditional Kuffiyeh patterns hand-painted in bold red on premium white canvas.",
     details: [
       "Hand-painted with premium acrylic paints",
@@ -124,6 +126,7 @@ const defaultShoes: Shoe[] = [
     image: "/images/mexican-side-view.png",
     slug: "mexican-eagle-af1",
     sizes: allSizes,
+    inStockSizes: allSizes,
     description: "Detailed Mexican flag design featuring the iconic eagle and serpent coat of arms.",
     details: ["Hand-painted Mexican coat of arms", "Mexican flag colors on swoosh", "Premium white leather base"],
     isFeatured: true,
@@ -135,6 +138,7 @@ const defaultShoes: Shoe[] = [
     image: "/images/black-red-geometric-hero.jpg",
     slug: "black-red-geometric",
     sizes: allSizes,
+    inStockSizes: allSizes,
     description: "Sleek black forces with striking red geometric patterns.",
     details: ["All-black leather base", "Hand-painted red geometric patterns", "Matte finish"],
     isFeatured: true,
@@ -146,6 +150,7 @@ const defaultShoes: Shoe[] = [
     image: "/images/jordanian-side-view.jpg",
     slug: "jordanian-flag-af1",
     sizes: allSizes,
+    inStockSizes: allSizes,
     description: "Jordanian flag design with traditional colors and patterns.",
     details: [
       "Hand-painted Jordanian flag design",
@@ -161,6 +166,7 @@ const defaultShoes: Shoe[] = [
     image: "/images/geometric-checkered-side.jpg",
     slug: "geometric-checkered",
     sizes: allSizes,
+    inStockSizes: allSizes,
     description: "Clean geometric checkered pattern in black and white.",
     details: [
       "Hand-painted checkered pattern",
@@ -176,6 +182,7 @@ const defaultShoes: Shoe[] = [
     image: "/images/chinese-side-sunset.png",
     slug: "chinese-flag-af1",
     sizes: allSizes,
+    inStockSizes: allSizes,
     description: "Chinese flag design featuring the iconic red and gold color scheme.",
     details: [
       "Hand-painted Chinese flag design",
@@ -191,6 +198,7 @@ const defaultShoes: Shoe[] = [
     image: "/images/checkered-drip-sunset.png",
     slug: "checkered-drip-af1",
     sizes: allSizes,
+    inStockSizes: allSizes,
     description: "Bold checkered pattern with artistic paint drip design.",
     details: ["Hand-painted checkered swoosh", "Artistic paint drip effect", "Street art aesthetic"],
     isFeatured: false,
@@ -202,6 +210,7 @@ const defaultShoes: Shoe[] = [
     image: "/images/palestine-map-side.jpg",
     slug: "map-of-palestine-af1",
     sizes: allSizes,
+    inStockSizes: allSizes,
     description: "Hand-painted map of Palestine in traditional flag colors.",
     details: [
       "Hand-painted map of Palestine",
@@ -217,6 +226,7 @@ const defaultShoes: Shoe[] = [
     image: "/images/lebanese-side-view.jpg",
     slug: "lebanese-cedar-af1",
     sizes: allSizes,
+    inStockSizes: allSizes,
     description: "Lebanese flag design featuring the iconic cedar tree symbol.",
     details: [
       "Hand-painted Lebanese cedar tree",
@@ -232,6 +242,7 @@ const defaultShoes: Shoe[] = [
     image: "/images/filipino-side-view.jpg",
     slug: "filipino-sun-af1",
     sizes: allSizes,
+    inStockSizes: allSizes,
     description: "Filipino flag design featuring the golden sun symbol.",
     details: [
       "Hand-painted Filipino golden sun",
@@ -245,6 +256,7 @@ const defaultShoes: Shoe[] = [
 export function AdminPanel() {
   const [shoes, setShoes] = useState<Shoe[]>([])
   const [showAddForm, setShowAddForm] = useState(false)
+  const [editingInventory, setEditingInventory] = useState<number | null>(null)
   const [newShoe, setNewShoe] = useState({
     name: "",
     price: "",
@@ -256,19 +268,20 @@ export function AdminPanel() {
 
   // Load shoes from localStorage on mount
   useEffect(() => {
-    const savedShoes = localStorage.getItem("sp_shoes")
+    const savedShoes = localStorage.getItem("sp_shoes_global")
     if (savedShoes) {
       setShoes(JSON.parse(savedShoes))
     } else {
       // Initialize with default shoes
       setShoes(defaultShoes)
-      localStorage.setItem("sp_shoes", JSON.stringify(defaultShoes))
+      localStorage.setItem("sp_shoes_global", JSON.stringify(defaultShoes))
     }
   }, [])
 
   const saveShoes = (updatedShoes: Shoe[]) => {
     setShoes(updatedShoes)
-    localStorage.setItem("sp_shoes", JSON.stringify(updatedShoes))
+    // Save to global storage that all users can access
+    localStorage.setItem("sp_shoes_global", JSON.stringify(updatedShoes))
   }
 
   const handleAddShoe = () => {
@@ -284,6 +297,7 @@ export function AdminPanel() {
         .replace(/\s+/g, "-")
         .replace(/[^a-z0-9-]/g, ""),
       sizes: newShoe.sizes.length > 0 ? newShoe.sizes : allSizes,
+      inStockSizes: newShoe.sizes.length > 0 ? newShoe.sizes : allSizes, // Initially all available sizes are in stock
       description: newShoe.description,
       details: newShoe.details ? newShoe.details.split("\n").filter((d) => d.trim()) : [],
       isFeatured: false,
@@ -334,6 +348,19 @@ export function AdminPanel() {
       : [...newShoe.sizes, size]
 
     setNewShoe({ ...newShoe, sizes: updatedSizes })
+  }
+
+  const toggleSizeStock = (shoeId: number, size: string) => {
+    const updatedShoes = shoes.map((shoe) => {
+      if (shoe.id === shoeId) {
+        const inStockSizes = shoe.inStockSizes.includes(size)
+          ? shoe.inStockSizes.filter((s) => s !== size)
+          : [...shoe.inStockSizes, size]
+        return { ...shoe, inStockSizes }
+      }
+      return shoe
+    })
+    saveShoes(updatedShoes)
   }
 
   const selectAllSizes = () => {
@@ -449,6 +476,9 @@ export function AdminPanel() {
                 </div>
                 <h3 className="text-white font-semibold">{shoe.name}</h3>
                 <p className="text-neutral-400">${shoe.price}</p>
+                <p className="text-xs text-neutral-500 mt-1">
+                  {shoe.inStockSizes.length}/{shoe.sizes.length} sizes in stock
+                </p>
               </div>
             ))}
             {Array.from({ length: 3 - featuredShoes.length }).map((_, i) => (
@@ -725,7 +755,7 @@ export function AdminPanel() {
         <CardHeader>
           <CardTitle className="text-white">All Shoes ({shoes.length})</CardTitle>
           <p className="text-neutral-400 text-sm">
-            Click the star to feature/unfeature shoes. Only 3 can be featured at a time.
+            Manage featured status and inventory. Click the package icon to manage size availability.
           </p>
         </CardHeader>
         <CardContent>
@@ -747,7 +777,47 @@ export function AdminPanel() {
                   )}
                 </div>
                 <h3 className="text-white font-semibold mb-1">{shoe.name}</h3>
-                <p className="text-neutral-400 mb-3">${shoe.price}</p>
+                <p className="text-neutral-400 mb-1">${shoe.price}</p>
+                <p className="text-xs text-neutral-500 mb-3">
+                  {shoe.inStockSizes.length}/{shoe.sizes.length} sizes in stock
+                </p>
+
+                {/* Inventory Management */}
+                {editingInventory === shoe.id && (
+                  <div className="mb-4 p-3 bg-neutral-700 rounded-lg">
+                    <h4 className="text-white text-sm font-medium mb-2">Size Inventory</h4>
+                    <div className="grid grid-cols-4 gap-1 max-h-32 overflow-y-auto">
+                      {shoe.sizes.map((size) => (
+                        <button
+                          key={size}
+                          onClick={() => toggleSizeStock(shoe.id, size)}
+                          className={`p-1 rounded text-xs border ${
+                            shoe.inStockSizes.includes(size)
+                              ? "bg-green-600 text-white border-green-500"
+                              : "bg-red-600 text-white border-red-500"
+                          }`}
+                          title={shoe.inStockSizes.includes(size) ? "In Stock" : "Out of Stock"}
+                        >
+                          {size}
+                          {shoe.inStockSizes.includes(size) ? (
+                            <Check className="h-2 w-2 inline ml-1" />
+                          ) : (
+                            <X className="h-2 w-2 inline ml-1" />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                    <Button
+                      onClick={() => setEditingInventory(null)}
+                      size="sm"
+                      variant="outline"
+                      className="mt-2 w-full"
+                    >
+                      Done
+                    </Button>
+                  </div>
+                )}
+
                 <div className="flex gap-2">
                   <Button
                     onClick={() => toggleFeatured(shoe.id)}
@@ -757,6 +827,15 @@ export function AdminPanel() {
                     title={shoe.isFeatured ? "Remove from featured" : "Add to featured"}
                   >
                     {shoe.isFeatured ? <Star className="h-4 w-4" /> : <StarOff className="h-4 w-4" />}
+                  </Button>
+                  <Button
+                    onClick={() => setEditingInventory(editingInventory === shoe.id ? null : shoe.id)}
+                    size="sm"
+                    variant="outline"
+                    className="text-blue-400 border-blue-400 hover:bg-blue-400 hover:text-white"
+                    title="Manage inventory"
+                  >
+                    <Package className="h-4 w-4" />
                   </Button>
                   <Button
                     onClick={() => handleDeleteShoe(shoe.id)}
