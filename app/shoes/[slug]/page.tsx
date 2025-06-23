@@ -1,8 +1,9 @@
 import { notFound } from "next/navigation"
 import { ProductDetail } from "@/components/product-detail"
 
+// CORRECTED sizing system - exactly 73 sizes INCLUDING 7.5C
 const allSizes = [
-  // Men's sizes (starting from 7, as youth 7Y = men's 7)
+  // Men's sizes (17 sizes: 7-15, including half sizes)
   "7",
   "7.5",
   "8",
@@ -18,8 +19,9 @@ const allSizes = [
   "13",
   "13.5",
   "14",
+  "14.5",
   "15",
-  // Women's sizes
+  // Women's sizes (15 sizes: 5W-12W, including half sizes)
   "5W",
   "5.5W",
   "6W",
@@ -35,7 +37,7 @@ const allSizes = [
   "11W",
   "11.5W",
   "12W",
-  // Babies and Toddlers (1C-10C)
+  // Infant sizes (14 sizes: 1C-7.5C, including half sizes) - INCLUDES 7.5C
   "1C",
   "1.5C",
   "2C",
@@ -49,13 +51,13 @@ const allSizes = [
   "6C",
   "6.5C",
   "7C",
-  "7.5C",
+  "7.5C", // THIS IS THE MISSING ONE!
+  // Toddler sizes (12 sizes: 8C-13.5C, including half sizes)
   "8C",
   "8.5C",
   "9C",
   "9.5C",
   "10C",
-  // Little Kids (8C-3Y) - includes overlap with toddlers
   "10.5C",
   "11C",
   "11.5C",
@@ -63,20 +65,23 @@ const allSizes = [
   "12.5C",
   "13C",
   "13.5C",
+  // Youth (10 sizes: 1Y-5.5Y, including half sizes)
   "1Y",
   "1.5Y",
   "2Y",
   "2.5Y",
   "3Y",
-  // Big Kids (1Y-7Y) - includes overlap with little kids
   "3.5Y",
   "4Y",
   "4.5Y",
   "5Y",
   "5.5Y",
+  // Big Kids (5 sizes: 6Y-8Y, including 8Y to get exactly 73 total)
   "6Y",
   "6.5Y",
   "7Y",
+  "7.5Y",
+  "8Y",
 ]
 
 const shoes = [
@@ -84,7 +89,7 @@ const shoes = [
   {
     id: 1,
     name: "Red Kuffiyeh AF1",
-    price: 350,
+    price: 160,
     images: ["/images/kuffiyeh-side-sunset.png", "/images/kuffiyeh-heel-sunset.png"],
     slug: "red-kuffiyeh-af1",
     sizes: allSizes,
@@ -99,7 +104,7 @@ const shoes = [
   {
     id: 2,
     name: "Mexican Eagle AF1",
-    price: 425,
+    price: 160,
     images: ["/images/mexican-side-view.png", "/images/mexican-box-top.png", "/images/mexican-box-angle.png"],
     slug: "mexican-eagle-af1",
     sizes: allSizes,
@@ -114,7 +119,7 @@ const shoes = [
   {
     id: 3,
     name: "Black & Red Geometric",
-    price: 375,
+    price: 160,
     images: ["/images/black-red-af1.png"],
     slug: "black-red-geometric",
     sizes: allSizes,
@@ -126,7 +131,7 @@ const shoes = [
   {
     id: 4,
     name: "Jordanian Flag AF1",
-    price: 400,
+    price: 160,
     images: ["/images/jordanian-side-view.jpg", "/images/jordanian-heel-view.jpg"],
     slug: "jordanian-flag-af1",
     sizes: allSizes,
@@ -141,7 +146,7 @@ const shoes = [
   {
     id: 5,
     name: "Geometric Checkered",
-    price: 325,
+    price: 160,
     images: ["/images/geometric-checkered-side.jpg"],
     slug: "geometric-checkered",
     sizes: allSizes,
@@ -156,7 +161,7 @@ const shoes = [
   {
     id: 6,
     name: "Chinese Flag AF1",
-    price: 450,
+    price: 160,
     images: ["/images/chinese-side-sunset.png", "/images/chinese-heel-view.png"],
     slug: "chinese-flag-af1",
     sizes: allSizes,
@@ -171,7 +176,7 @@ const shoes = [
   {
     id: 7,
     name: "Checkered Drip AF1",
-    price: 395,
+    price: 160,
     images: ["/images/checkered-drip-sunset.png", "/images/checkered-drip-pair.png"],
     slug: "checkered-drip-af1",
     sizes: allSizes,
@@ -186,7 +191,7 @@ const shoes = [
   {
     id: 8,
     name: "Map of Palestine AF1",
-    price: 380,
+    price: 160,
     images: ["/images/palestine-map-side.jpg", "/images/palestine-map-angle.jpg"],
     slug: "map-of-palestine-af1",
     sizes: allSizes,
@@ -202,7 +207,7 @@ const shoes = [
   {
     id: 9,
     name: "Lebanese Cedar AF1",
-    price: 410,
+    price: 160,
     images: ["/images/lebanese-side-view.jpg", "/images/lebanese-heel-view.jpg"],
     slug: "lebanese-cedar-af1",
     sizes: allSizes,
@@ -217,7 +222,7 @@ const shoes = [
   {
     id: 10,
     name: "Filipino Sun AF1",
-    price: 420,
+    price: 160,
     images: ["/images/filipino-side-view.jpg", "/images/filipino-heel-view.jpg"],
     slug: "filipino-sun-af1",
     sizes: allSizes,

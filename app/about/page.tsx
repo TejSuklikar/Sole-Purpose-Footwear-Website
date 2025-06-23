@@ -13,8 +13,8 @@ export default function AboutPage() {
         <div className="text-center mb-16">
           <h1 className="font-playfair text-4xl md:text-5xl font-bold text-white mb-6">Our Story</h1>
           <p className="text-xl text-neutral-300 leading-relaxed">
-            Born from a passion for art and a love for sneakers, Sole Purpose Footwear bridges the gap between fashion
-            and personal expression.
+            Custom footwear designed to speak your truth. At SolePurpose, we craft one-of-a-kind kicks that blend
+            creativity, comfort, and culture — made for movement, made with meaning.
           </p>
         </div>
 
@@ -23,13 +23,16 @@ export default function AboutPage() {
             <div>
               <h2 className="font-playfair text-3xl font-bold text-white mb-4">The Beginning</h2>
               <p className="text-neutral-300 leading-relaxed">
-                Founded in 2020 by a collective of artists and sneaker enthusiasts, Sole Purpose Footwear emerged from a
-                simple belief: that footwear should be more than just functional—it should be a canvas for creativity
-                and self-expression.
+                Founded in 2024 by a collective of artists and sneaker enthusiasts, Sole Purpose Footwear was born from
+                a love of design and the belief that every step we take should say something. Each pair of custom shoes
+                is a wearable work of art — bold, expressive, and rooted in purpose. This isn't just fashion. It's
+                movement with meaning.
               </p>
               <p className="text-neutral-300 leading-relaxed mt-4">
-                What started as custom designs for friends and family has grown into a movement celebrating cultural
-                heritage, personal stories, and artistic excellence on every pair.
+                What started as a creative outlet turned into a passion — turning shoes into canvases that tell your
+                story. Every pair is custom-made with precision, personality, and purpose. Whether you're stepping into
+                something new or standing out from the crowd, we're here to help you do it with style that's uniquely
+                yours.
               </p>
             </div>
             <Image

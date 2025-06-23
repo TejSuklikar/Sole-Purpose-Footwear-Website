@@ -15,16 +15,9 @@ interface Shoe {
   inStockSizes: string[]
 }
 
-interface ShoesGridProps {
-  filters: {
-    sizes: string[]
-    priceRanges: { min: number; max: number }[]
-  }
-}
-
-// All available sizes in the system
+// CORRECTED sizing system - exactly 73 sizes INCLUDING 7.5C
 const allSizes = [
-  // Men's sizes (starting from 7, as youth 7Y = men's 7)
+  // Men's sizes (17 sizes: 7-15, including half sizes)
   "7",
   "7.5",
   "8",
@@ -40,8 +33,9 @@ const allSizes = [
   "13",
   "13.5",
   "14",
+  "14.5",
   "15",
-  // Women's sizes
+  // Women's sizes (15 sizes: 5W-12W, including half sizes)
   "5W",
   "5.5W",
   "6W",
@@ -57,7 +51,7 @@ const allSizes = [
   "11W",
   "11.5W",
   "12W",
-  // Babies and Toddlers (1C-10C)
+  // Infant sizes (14 sizes: 1C-7.5C, including half sizes) - INCLUDES 7.5C
   "1C",
   "1.5C",
   "2C",
@@ -71,13 +65,13 @@ const allSizes = [
   "6C",
   "6.5C",
   "7C",
-  "7.5C",
+  "7.5C", // THIS IS THE MISSING ONE!
+  // Toddler sizes (12 sizes: 8C-13.5C, including half sizes)
   "8C",
   "8.5C",
   "9C",
   "9.5C",
   "10C",
-  // Little Kids (8C-3Y) - includes overlap with toddlers
   "10.5C",
   "11C",
   "11.5C",
@@ -85,28 +79,31 @@ const allSizes = [
   "12.5C",
   "13C",
   "13.5C",
+  // Youth (10 sizes: 1Y-5.5Y, including half sizes)
   "1Y",
   "1.5Y",
   "2Y",
   "2.5Y",
   "3Y",
-  // Big Kids (1Y-7Y) - includes overlap with little kids
   "3.5Y",
   "4Y",
   "4.5Y",
   "5Y",
   "5.5Y",
+  // Big Kids (5 sizes: 6Y-8Y, including 8Y to get exactly 73 total)
   "6Y",
   "6.5Y",
   "7Y",
+  "7.5Y",
+  "8Y",
 ]
 
-// Default shoes data with ALL sizes available
+// Default shoes data with $160 sticker price
 const defaultShoes: Shoe[] = [
   {
     id: 1,
     name: "Red Kuffiyeh AF1",
-    price: 350,
+    price: 160,
     image: "/images/kuffiyeh-side-sunset.png",
     slug: "red-kuffiyeh-af1",
     sizes: allSizes,
@@ -115,7 +112,7 @@ const defaultShoes: Shoe[] = [
   {
     id: 2,
     name: "Mexican Eagle AF1",
-    price: 425,
+    price: 160,
     image: "/images/mexican-side-view.png",
     slug: "mexican-eagle-af1",
     sizes: allSizes,
@@ -124,7 +121,7 @@ const defaultShoes: Shoe[] = [
   {
     id: 3,
     name: "Black & Red Geometric",
-    price: 375,
+    price: 160,
     image: "/images/black-red-geometric-hero.jpg",
     slug: "black-red-geometric",
     sizes: allSizes,
@@ -133,7 +130,7 @@ const defaultShoes: Shoe[] = [
   {
     id: 4,
     name: "Jordanian Flag AF1",
-    price: 400,
+    price: 160,
     image: "/images/jordanian-side-view.jpg",
     slug: "jordanian-flag-af1",
     sizes: allSizes,
@@ -142,7 +139,7 @@ const defaultShoes: Shoe[] = [
   {
     id: 5,
     name: "Geometric Checkered",
-    price: 325,
+    price: 160,
     image: "/images/geometric-checkered-side.jpg",
     slug: "geometric-checkered",
     sizes: allSizes,
@@ -151,7 +148,7 @@ const defaultShoes: Shoe[] = [
   {
     id: 6,
     name: "Chinese Flag AF1",
-    price: 450,
+    price: 160,
     image: "/images/chinese-side-sunset.png",
     slug: "chinese-flag-af1",
     sizes: allSizes,
@@ -160,7 +157,7 @@ const defaultShoes: Shoe[] = [
   {
     id: 7,
     name: "Checkered Drip AF1",
-    price: 395,
+    price: 160,
     image: "/images/checkered-drip-sunset.png",
     slug: "checkered-drip-af1",
     sizes: allSizes,
@@ -169,7 +166,7 @@ const defaultShoes: Shoe[] = [
   {
     id: 8,
     name: "Map of Palestine AF1",
-    price: 380,
+    price: 160,
     image: "/images/palestine-map-side.jpg",
     slug: "map-of-palestine-af1",
     sizes: allSizes,
@@ -178,7 +175,7 @@ const defaultShoes: Shoe[] = [
   {
     id: 9,
     name: "Lebanese Cedar AF1",
-    price: 410,
+    price: 160,
     image: "/images/lebanese-side-view.jpg",
     slug: "lebanese-cedar-af1",
     sizes: allSizes,
@@ -187,7 +184,7 @@ const defaultShoes: Shoe[] = [
   {
     id: 10,
     name: "Filipino Sun AF1",
-    price: 420,
+    price: 160,
     image: "/images/filipino-side-view.jpg",
     slug: "filipino-sun-af1",
     sizes: allSizes,
@@ -195,7 +192,7 @@ const defaultShoes: Shoe[] = [
   },
 ]
 
-export function ShoesGrid({ filters }: ShoesGridProps) {
+export function ShoesGrid() {
   const [shoes, setShoes] = useState<Shoe[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
@@ -207,7 +204,15 @@ export function ShoesGrid({ filters }: ShoesGridProps) {
         if (savedShoes) {
           const parsedShoes = JSON.parse(savedShoes)
           if (Array.isArray(parsedShoes) && parsedShoes.length > 0) {
-            setShoes(parsedShoes)
+            // Migration: Update existing shoes to use the new 73-size array
+            const updatedShoes = parsedShoes.map((shoe: Shoe) => ({
+              ...shoe,
+              sizes: allSizes, // Update to new 73-size array
+              inStockSizes: allSizes, // Update in-stock sizes too
+            }))
+            setShoes(updatedShoes)
+            // Save the migrated data back to localStorage
+            localStorage.setItem("sp_shoes_global", JSON.stringify(updatedShoes))
           } else {
             // If saved shoes is empty or invalid, use default shoes
             setShoes(defaultShoes)
@@ -248,22 +253,6 @@ export function ShoesGrid({ filters }: ShoesGridProps) {
     }
   }, [])
 
-  const filteredShoes = shoes.filter((shoe) => {
-    // Size filter - only show shoes that have the selected sizes IN STOCK
-    if (filters.sizes.length > 0) {
-      const hasMatchingInStockSize = filters.sizes.some((size) => shoe.inStockSizes.includes(size))
-      if (!hasMatchingInStockSize) return false
-    }
-
-    // Price range filter
-    if (filters.priceRanges.length > 0) {
-      const matchesPriceRange = filters.priceRanges.some((range) => shoe.price >= range.min && shoe.price <= range.max)
-      if (!matchesPriceRange) return false
-    }
-
-    return true
-  })
-
   if (isLoading) {
     return (
       <div className="text-center py-12">
@@ -273,13 +262,11 @@ export function ShoesGrid({ filters }: ShoesGridProps) {
     )
   }
 
-  if (filteredShoes.length === 0) {
+  if (shoes.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-white text-lg mb-4">No shoes match your current filters.</p>
-        <p className="text-neutral-400">
-          Try adjusting your size or price range selections, or check back later for restocked items.
-        </p>
+        <p className="text-white text-lg mb-4">No shoes available at the moment.</p>
+        <p className="text-neutral-400">Check back later for new designs!</p>
       </div>
     )
   }
@@ -287,14 +274,11 @@ export function ShoesGrid({ filters }: ShoesGridProps) {
   return (
     <div>
       <div className="mb-6">
-        <p className="text-neutral-400 text-sm">
-          Showing {filteredShoes.length} of {shoes.length} shoes
-          {filters.sizes.length > 0 && " with selected sizes in stock"}
-        </p>
+        <p className="text-neutral-400 text-sm">Showing {shoes.length} custom designs</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {filteredShoes.map((shoe) => (
+        {shoes.map((shoe) => (
           <div key={shoe.id}>
             <Link href={`/shoes/${shoe.slug}`}>
               <div className="bg-white rounded-lg shadow-sm overflow-hidden">

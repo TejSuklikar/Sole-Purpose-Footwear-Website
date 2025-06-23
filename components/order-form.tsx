@@ -6,9 +6,18 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  SelectLabel,
+  SelectGroup,
+} from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Send, ShoppingCart } from "lucide-react"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Send, ShoppingCart, Truck, MapPin } from "lucide-react"
 import { useCart } from "./cart-provider"
 
 const shoeModels = [
@@ -21,10 +30,7 @@ const shoeModels = [
 ]
 
 const allSizes = [
-  // Men's sizes (starting from 7, as youth 7Y = men's 7)
-  <h4 key="men-sizes-header" className="text-neutral-900 text-sm font-medium mb-2">
-    Men's Sizes (7-15)
-  </h4>,
+  // Men's sizes (7-15, including 14.5)
   "7",
   "7.5",
   "8",
@@ -40,11 +46,9 @@ const allSizes = [
   "13",
   "13.5",
   "14",
+  "14.5",
   "15",
   // Women's sizes
-  <h4 key="women-sizes-header" className="text-neutral-900 text-sm font-medium mb-2">
-    Women's Sizes
-  </h4>,
   "5W",
   "5.5W",
   "6W",
@@ -60,10 +64,7 @@ const allSizes = [
   "11W",
   "11.5W",
   "12W",
-  // Babies and Toddlers (1C-10C)
-  <h4 key="babies-toddlers-header" className="text-neutral-900 text-sm font-medium mb-2">
-    Babies and Toddlers
-  </h4>,
+  // Infant sizes (1C-7.5C)
   "1C",
   "1.5C",
   "2C",
@@ -78,15 +79,12 @@ const allSizes = [
   "6.5C",
   "7C",
   "7.5C",
+  // Toddler sizes (8C-13.5C)
   "8C",
   "8.5C",
   "9C",
   "9.5C",
   "10C",
-  // Little Kids (8C-3Y) - includes overlap with toddlers
-  <h4 key="little-kids-header" className="text-neutral-900 text-sm font-medium mb-2">
-    Little Kids
-  </h4>,
   "10.5C",
   "11C",
   "11.5C",
@@ -94,27 +92,68 @@ const allSizes = [
   "12.5C",
   "13C",
   "13.5C",
+  // Youth (1Y-5.5Y)
   "1Y",
   "1.5Y",
   "2Y",
   "2.5Y",
   "3Y",
-  // Big Kids (1Y-7Y) - includes overlap with little kids
-  <h4 key="big-kids-header" className="text-neutral-900 text-sm font-medium mb-2">
-    Big Kids
-  </h4>,
   "3.5Y",
   "4Y",
   "4.5Y",
   "5Y",
   "5.5Y",
+  // Big Kids (6Y-8Y)
   "6Y",
   "6.5Y",
   "7Y",
+  "7.5Y",
+  "8Y",
 ]
+
+// Base pricing function (before shipping) - UPDATED
+const getBasePriceForSize = (size: string): number => {
+  // Infant sizes (1C-7.5C): $120
+  if (size.includes("C")) {
+    const num = Number.parseFloat(size)
+    if (num >= 1 && num <= 7.5) {
+      return 120
+    }
+    // Toddler sizes (8C-13.5C): $130
+    if (num >= 8 && num <= 13.5) {
+      return 130
+    }
+  }
+
+  // Youth and Big Kids (1Y-8Y)
+  if (size.includes("Y")) {
+    const num = Number.parseFloat(size)
+    // Youth (1Y-5.5Y): $130
+    if (num >= 1 && num <= 5.5) {
+      return 130
+    }
+    // Big Kids (6Y-8Y): $160
+    if (num >= 6 && num <= 8) {
+      return 160
+    }
+  }
+
+  // Women's and Men's: $210
+  return 210
+}
+
+const getShippingForSize = (size: string): number => {
+  // Kids and toddlers: $15 shipping
+  if (size.includes("C") || size.includes("Y")) {
+    return 15
+  }
+  // Adults: $20 shipping
+  return 20
+}
 
 export function OrderForm() {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isBayArea, setIsBayArea] = useState(false)
   const { state } = useCart()
   const [formData, setFormData] = useState({
     firstName: "",
@@ -135,10 +174,18 @@ export function OrderForm() {
     e.preventDefault()
     setIsSubmitting(true)
 
+    // Calculate base price and shipping based on selected size
+    const basePrice = formData.size ? getBasePriceForSize(formData.size) : 160
+    const shipping = isBayArea ? 0 : formData.size ? getShippingForSize(formData.size) : 15
+    const totalPrice = basePrice + shipping
+
     // Create custom order data
     const customOrderData = {
       ...formData,
-      price: 350,
+      basePrice,
+      shipping,
+      price: totalPrice,
+      isBayArea,
       orderId: `SP-CUSTOM-${Date.now()}`,
       timestamp: new Date().toISOString(),
       type: "custom_order",
@@ -169,6 +216,9 @@ export function OrderForm() {
     formData.address
 
   const cartTotal = state.items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  const selectedBasePrice = formData.size ? getBasePriceForSize(formData.size) : null
+  const selectedShipping = isBayArea ? 0 : formData.size ? getShippingForSize(formData.size) : null
+  const selectedTotal = selectedBasePrice && selectedShipping !== null ? selectedBasePrice + selectedShipping : null
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -203,14 +253,91 @@ export function OrderForm() {
       <Card>
         <CardHeader className="p-4 sm:p-6">
           <CardTitle className="font-playfair text-xl sm:text-2xl text-white">Custom Order Details</CardTitle>
+
+          {/* Pricing Display */}
           <div className="bg-neutral-50 p-3 sm:p-4 rounded-lg">
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
-              <span className="text-base sm:text-lg font-semibold text-neutral-600">Custom Design Price:</span>
-              <span className="text-xl sm:text-2xl font-bold text-neutral-900">$350</span>
+            <div className="space-y-3">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+                <span className="text-base sm:text-lg font-semibold text-neutral-600">Custom Design Price:</span>
+                <span className="text-xl sm:text-2xl font-bold text-neutral-900">
+                  {selectedTotal ? `$${selectedTotal}` : "Starting at $135"}
+                </span>
+              </div>
+
+              {formData.size && selectedBasePrice && selectedShipping !== null && (
+                <div className="bg-white p-3 rounded border">
+                  <h4 className="font-semibold text-neutral-800 mb-2">Price Breakdown for {formData.size}</h4>
+                  <div className="space-y-1 text-sm text-neutral-600">
+                    <div className="flex justify-between">
+                      <span>Base Price:</span>
+                      <span>${selectedBasePrice}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Shipping:</span>
+                      <span className={isBayArea ? "text-green-600 font-medium" : ""}>
+                        ${selectedShipping} {isBayArea && "(FREE!)"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between font-semibold text-neutral-900 border-t pt-1">
+                      <span>Total:</span>
+                      <span>${selectedTotal}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Bay Area Option */}
+              <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                <div className="flex items-center space-x-2 mb-2">
+                  <Checkbox
+                    id="bayAreaCustom"
+                    checked={isBayArea}
+                    onCheckedChange={(checked) => setIsBayArea(checked as boolean)}
+                  />
+                  <Label htmlFor="bayAreaCustom" className="text-sm font-medium cursor-pointer">
+                    <div className="flex items-center space-x-2">
+                      <MapPin className="w-4 h-4 text-green-600" />
+                      <span className="text-green-800">Yes, I'm in the Bay Area (Free pickup/dropoff)</span>
+                    </div>
+                  </Label>
+                </div>
+                {isBayArea && (
+                  <p className="text-xs text-green-700 ml-6">
+                    We'll contact you to arrange free pickup or dropoff in the Bay Area!
+                  </p>
+                )}
+              </div>
             </div>
             <p className="text-xs sm:text-sm text-neutral-600 mt-2">
-              All custom designs are hand-painted and made to order
+              All custom designs are hand-painted and made to order. Price includes shipping unless Bay Area pickup is
+              selected.
             </p>
+          </div>
+
+          {/* Shipping Info */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4">
+            <div className="flex items-start space-x-3">
+              <Truck className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+              <div>
+                <h3 className="font-semibold text-blue-900 mb-2">Shipping Options</h3>
+                <div className="space-y-2 text-sm text-blue-800">
+                  <div className="flex items-center space-x-2">
+                    <MapPin className="w-4 h-4 text-green-600" />
+                    <span>
+                      <strong className="text-green-700">Bay Area Special:</strong> Free pickup/dropoff available
+                    </span>
+                  </div>
+                  <div>
+                    <strong>Standard Shipping:</strong>
+                    <ul className="ml-4 mt-1 space-y-1">
+                      <li>• Kids & Toddlers: $15</li>
+                      <li>• Adults: $20</li>
+                      <li>• Processing time: 2-4 weeks</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </CardHeader>
         <CardContent className="p-4 sm:p-6">
@@ -312,11 +439,85 @@ export function OrderForm() {
                   <SelectValue placeholder="Select your size" />
                 </SelectTrigger>
                 <SelectContent>
-                  {allSizes.map((size) => (
-                    <SelectItem key={size} value={size} className="text-sm sm:text-base">
-                      {size}
-                    </SelectItem>
-                  ))}
+                  {/* MEN */}
+                  <SelectGroup>
+                    <SelectLabel>Men&apos;s Sizes – $210 + shipping</SelectLabel>
+                    {allSizes
+                      .filter((size) => !size.includes("W") && !size.includes("C") && !size.includes("Y"))
+                      .map((size) => (
+                        <SelectItem key={size} value={size} className="text-sm sm:text-base pl-4">
+                          {size} - $210
+                        </SelectItem>
+                      ))}
+                  </SelectGroup>
+
+                  {/* WOMEN */}
+                  <SelectGroup>
+                    <SelectLabel>Women&apos;s Sizes – $210 + shipping</SelectLabel>
+                    {allSizes
+                      .filter((size) => size.includes("W"))
+                      .map((size) => (
+                        <SelectItem key={size} value={size} className="text-sm sm:text-base pl-4">
+                          {size} - $210
+                        </SelectItem>
+                      ))}
+                  </SelectGroup>
+
+                  {/* BIG KIDS */}
+                  <SelectGroup>
+                    <SelectLabel>Big Kids (6Y-8Y) – $160 + shipping</SelectLabel>
+                    {allSizes
+                      .filter(
+                        (size) => size.includes("Y") && Number.parseFloat(size) >= 6 && Number.parseFloat(size) <= 8,
+                      )
+                      .map((size) => (
+                        <SelectItem key={size} value={size} className="text-sm sm:text-base pl-4">
+                          {size} - $160
+                        </SelectItem>
+                      ))}
+                  </SelectGroup>
+
+                  {/* YOUTH */}
+                  <SelectGroup>
+                    <SelectLabel>Youth (1Y-5.5Y) – $130 + shipping</SelectLabel>
+                    {allSizes
+                      .filter(
+                        (size) => size.includes("Y") && Number.parseFloat(size) >= 1 && Number.parseFloat(size) <= 5.5,
+                      )
+                      .map((size) => (
+                        <SelectItem key={size} value={size} className="text-sm sm:text-base pl-4">
+                          {size} - $130
+                        </SelectItem>
+                      ))}
+                  </SelectGroup>
+
+                  {/* TODDLER */}
+                  <SelectGroup>
+                    <SelectLabel>Toddler (8C-13.5C) – $130 + shipping</SelectLabel>
+                    {allSizes
+                      .filter(
+                        (size) => size.includes("C") && Number.parseFloat(size) >= 8 && Number.parseFloat(size) <= 13.5,
+                      )
+                      .map((size) => (
+                        <SelectItem key={size} value={size} className="text-sm sm:text-base pl-4">
+                          {size} - $130
+                        </SelectItem>
+                      ))}
+                  </SelectGroup>
+
+                  {/* INFANT */}
+                  <SelectGroup>
+                    <SelectLabel>Infant (1C-7.5C) – $120 + shipping</SelectLabel>
+                    {allSizes
+                      .filter(
+                        (size) => size.includes("C") && Number.parseFloat(size) >= 1 && Number.parseFloat(size) <= 7.5,
+                      )
+                      .map((size) => (
+                        <SelectItem key={size} value={size} className="text-sm sm:text-base pl-4">
+                          {size} - $120
+                        </SelectItem>
+                      ))}
+                  </SelectGroup>
                 </SelectContent>
               </Select>
             </div>
@@ -339,12 +540,16 @@ export function OrderForm() {
 
             <div>
               <Label htmlFor="address" className="text-neutral-900 text-sm sm:text-base font-medium">
-                Shipping Address
+                {isBayArea ? "Address for Pickup/Dropoff Coordination" : "Shipping Address"}
               </Label>
               <Textarea
                 id="address"
                 name="address"
-                placeholder="Full shipping address including postal code"
+                placeholder={
+                  isBayArea
+                    ? "Address for pickup/dropoff coordination in the Bay Area"
+                    : "Full shipping address including postal code"
+                }
                 rows={3}
                 value={formData.address}
                 onChange={(e) => handleInputChange("address", e.target.value)}
@@ -361,6 +566,9 @@ export function OrderForm() {
                 <li>• Our team will contact you to discuss details and timeline</li>
                 <li>• Creation takes 2-4 weeks depending on complexity</li>
                 <li>• We'll send progress photos throughout the process</li>
+                {isBayArea && (
+                  <li className="text-green-600 font-medium">• Free Bay Area pickup/dropoff will be arranged</li>
+                )}
                 {state.items.length > 0 && (
                   <li className="text-blue-600 font-medium">
                     • Your cart items will remain saved for separate checkout
@@ -384,7 +592,7 @@ export function OrderForm() {
                 ) : (
                   <>
                     <Send className="mr-2 h-4 w-4" />
-                    Proceed to Custom Order Payment
+                    Proceed to Payment - {selectedTotal ? `$${selectedTotal}` : "Select Size"}
                   </>
                 )}
               </Button>

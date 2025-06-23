@@ -1,25 +1,8 @@
 "use client"
 
-import { useState } from "react"
 import { ShoesGrid } from "@/components/shoes-grid"
-import { ShoesFilters } from "@/components/shoes-filters"
-
-// Note: Since we're using client component, we can't export metadata
-// The metadata would need to be in a parent server component or layout
 
 export default function ShoesPage() {
-  const [filters, setFilters] = useState<{
-    sizes: string[]
-    priceRanges: { min: number; max: number }[]
-  }>({
-    sizes: [],
-    priceRanges: [],
-  })
-
-  const handleFiltersChange = (newFilters: { sizes: string[]; priceRanges: { min: number; max: number }[] }) => {
-    setFilters(newFilters)
-  }
-
   return (
     <div className="py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -30,14 +13,9 @@ export default function ShoesPage() {
           </p>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-8">
-          <aside className="lg:w-64 flex-shrink-0">
-            <ShoesFilters onFiltersChange={handleFiltersChange} />
-          </aside>
-          <main className="flex-1">
-            <ShoesGrid filters={filters} />
-          </main>
-        </div>
+        <main>
+          <ShoesGrid />
+        </main>
       </div>
     </div>
   )

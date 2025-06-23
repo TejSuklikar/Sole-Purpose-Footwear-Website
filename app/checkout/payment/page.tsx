@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Copy, Check, Send, ExternalLink, Upload, AlertCircle } from "lucide-react"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Copy, Check, Send, ExternalLink, Upload, AlertCircle, MapPin } from "lucide-react"
 import Link from "next/link"
 
 interface OrderItem {
@@ -21,6 +22,8 @@ interface OrderItem {
 
 interface OrderData {
   items: OrderItem[]
+  subtotal: number
+  shipping: number
   total: number
   timestamp: string
   orderId: string
@@ -28,6 +31,7 @@ interface OrderData {
 
 export default function PaymentPage() {
   const [orderData, setOrderData] = useState<OrderData | null>(null)
+  const [isBayArea, setIsBayArea] = useState(false)
   const [customerInfo, setCustomerInfo] = useState({
     name: "",
     email: "",
@@ -57,6 +61,10 @@ export default function PaymentPage() {
       setOrderData(JSON.parse(stored))
     }
   }, [])
+
+  // Calculate final totals based on Bay Area selection
+  const finalShipping = isBayArea ? 0 : orderData?.shipping || 0
+  const finalTotal = (orderData?.subtotal || 0) + finalShipping
 
   const copyToClipboard = async (text: string, field: string) => {
     try {
@@ -106,7 +114,9 @@ Thank you for your order with Sole Purpose Footwear! 🎨
 📋 ORDER CONFIRMATION:
 • Order ID: ${orderData.orderId}
 • Date: ${new Date(orderData.timestamp).toLocaleString()}
-• Total: $${orderData.total}
+• Subtotal: $${orderData.subtotal}
+• Shipping: $${finalShipping} ${isBayArea ? "(Bay Area - FREE!)" : ""}
+• Total: $${finalTotal}
 
 👟 YOUR ORDER:
 ${orderData.items.map((item) => `• ${item.name} (Size ${item.size}) x${item.quantity} - $${item.price * item.quantity}`).join("\n")}
@@ -121,6 +131,7 @@ ${orderData.items.map((item) => `• ${item.name} (Size ${item.size}) x${item.qu
 2. Your order will be prepared and shipped to:
    ${customerInfo.address}
 3. You'll receive tracking information once shipped
+${isBayArea ? "4. Bay Area pickup/dropoff will be arranged if selected" : ""}
 
 📞 QUESTIONS?
 Email: solepurposefootwear813@gmail.com
@@ -136,7 +147,7 @@ Custom sneaker artistry that tells your story
     formData.append("Customer_Message", customerMessage)
     formData.append("Order_ID", orderData.orderId)
     formData.append("Customer_Name", customerInfo.name)
-    formData.append("Total_Amount", `$${orderData.total}`)
+    formData.append("Total_Amount", `$${finalTotal}`)
 
     return fetch(`https://formsubmit.co/${customerInfo.email}`, {
       method: "POST",
@@ -186,7 +197,10 @@ Custom sneaker artistry that tells your story
     // Order details
     formData.append("Order_ID", orderData.orderId)
     formData.append("Order_Items", JSON.stringify(orderData.items, null, 2))
-    formData.append("Total_Amount", `$${orderData.total}`)
+    formData.append("Subtotal_Amount", `$${orderData.subtotal}`)
+    formData.append("Shipping_Amount", `$${finalShipping}`)
+    formData.append("Total_Amount", `$${finalTotal}`)
+    formData.append("Bay_Area_Customer", isBayArea ? "YES - Free pickup/dropoff" : "NO")
     formData.append("Customer_Info", JSON.stringify(customerInfo, null, 2))
     formData.append("Payment_Method", paymentProof.method.toUpperCase())
     formData.append("Transaction_ID", paymentProof.transactionId)
@@ -308,9 +322,45 @@ Custom sneaker artistry that tells your story
                     <p className="font-semibold">${item.price * item.quantity}</p>
                   </div>
                 ))}
-                <div className="flex justify-between items-center text-lg font-bold pt-2">
-                  <span>Total:</span>
-                  <span>${orderData.total}</span>
+
+                {/* Bay Area Option */}
+                <div className="border-t pt-4">
+                  <div className="flex items-center space-x-2 mb-3">
+                    <Checkbox
+                      id="bayArea"
+                      checked={isBayArea}
+                      onCheckedChange={(checked) => setIsBayArea(checked as boolean)}
+                    />
+                    <Label htmlFor="bayArea" className="text-sm font-medium cursor-pointer">
+                      <div className="flex items-center space-x-2">
+                        <MapPin className="w-4 h-4 text-green-600" />
+                        <span>Yes, I'm in the Bay Area (Free pickup/dropoff)</span>
+                      </div>
+                    </Label>
+                  </div>
+                  {isBayArea && (
+                    <p className="text-xs text-green-600 ml-6">
+                      We'll contact you to arrange free pickup or dropoff in the Bay Area!
+                    </p>
+                  )}
+                </div>
+
+                {/* Order Totals */}
+                <div className="border-t pt-4 space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span>Subtotal:</span>
+                    <span>${orderData.subtotal}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span>Shipping:</span>
+                    <span className={isBayArea ? "text-green-600 font-medium" : ""}>
+                      ${finalShipping} {isBayArea && "(FREE!)"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center text-lg font-bold pt-2 border-t">
+                    <span>Total:</span>
+                    <span>${finalTotal}</span>
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -333,6 +383,15 @@ Custom sneaker artistry that tells your story
                     </p>
                   </div>
                 </div>
+              </div>
+
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <h3 className="font-semibold text-green-800 mb-2">Payment Amount: ${finalTotal}</h3>
+                <p className="text-sm text-green-700">
+                  {isBayArea
+                    ? "Bay Area special pricing - no shipping charges!"
+                    : `Includes $${finalShipping} shipping`}
+                </p>
               </div>
 
               {/* Payment Methods */}
@@ -504,6 +563,11 @@ Custom sneaker artistry that tells your story
                           value={customerInfo.address}
                           onChange={(e) => setCustomerInfo({ ...customerInfo, address: e.target.value })}
                           required
+                          placeholder={
+                            isBayArea
+                              ? "Address for pickup/dropoff coordination"
+                              : "Full shipping address including postal code"
+                          }
                         />
                       </div>
                     </div>

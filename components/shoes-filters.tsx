@@ -12,7 +12,7 @@ export function ShoesFilters({ onFiltersChange }: FiltersProps) {
   const [selectedPriceRanges, setSelectedPriceRanges] = useState<string[]>([])
 
   const sizes = [
-    // Men's sizes (starting from 7, as youth 7Y = men's 7)
+    // Men's sizes (7-15, including 14.5)
     "7",
     "7.5",
     "8",
@@ -28,6 +28,7 @@ export function ShoesFilters({ onFiltersChange }: FiltersProps) {
     "13",
     "13.5",
     "14",
+    "14.5",
     "15",
     // Women's sizes
     "5W",
@@ -45,7 +46,7 @@ export function ShoesFilters({ onFiltersChange }: FiltersProps) {
     "11W",
     "11.5W",
     "12W",
-    // Babies and Toddlers (1C-10C)
+    // Youth sizes (1C-7C)
     "1C",
     "1.5C",
     "2C",
@@ -59,13 +60,13 @@ export function ShoesFilters({ onFiltersChange }: FiltersProps) {
     "6C",
     "6.5C",
     "7C",
+    // Toddler sizes (8C-13.5C)
     "7.5C",
     "8C",
     "8.5C",
     "9C",
     "9.5C",
     "10C",
-    // Little Kids (8C-3Y) - includes overlap with toddlers
     "10.5C",
     "11C",
     "11.5C",
@@ -73,12 +74,12 @@ export function ShoesFilters({ onFiltersChange }: FiltersProps) {
     "12.5C",
     "13C",
     "13.5C",
+    // Big Kids (1Y-8Y)
     "1Y",
     "1.5Y",
     "2Y",
     "2.5Y",
     "3Y",
-    // Big Kids (1Y-7Y) - includes overlap with little kids
     "3.5Y",
     "4Y",
     "4.5Y",
@@ -87,7 +88,10 @@ export function ShoesFilters({ onFiltersChange }: FiltersProps) {
     "6Y",
     "6.5Y",
     "7Y",
+    "7.5Y",
+    "8Y",
   ]
+
   const priceRanges = [
     { label: "Under $300", min: 0, max: 300 },
     { label: "$300 - $400", min: 300, max: 400 },

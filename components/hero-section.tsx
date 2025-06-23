@@ -20,7 +20,7 @@ const defaultFeaturedShoes = [
   {
     id: 1,
     name: "Red Kuffiyeh AF1",
-    price: 350,
+    price: 160,
     image: "/images/kuffiyeh-side-sunset.png",
     slug: "red-kuffiyeh-af1",
     description: "Traditional Kuffiyeh patterns hand-painted in bold red on premium white canvas.",
@@ -29,7 +29,7 @@ const defaultFeaturedShoes = [
   {
     id: 2,
     name: "Mexican Eagle AF1",
-    price: 425,
+    price: 160,
     image: "/images/mexican-side-view.png",
     slug: "mexican-eagle-af1",
     description: "Detailed Mexican flag design featuring the iconic eagle and serpent coat of arms.",
@@ -38,7 +38,7 @@ const defaultFeaturedShoes = [
   {
     id: 3,
     name: "Black & Red Geometric",
-    price: 375,
+    price: 160,
     image: "/images/black-red-geometric-hero.jpg",
     slug: "black-red-geometric",
     description: "Sleek black forces with striking red geometric patterns.",
