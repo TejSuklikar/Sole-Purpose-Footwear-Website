@@ -66,7 +66,7 @@ const allSizes = [
   "11W",
   "11.5W",
   "12W",
-  // Babies and Toddlers (1C-10C)
+  // Babies and Toddlers (1C-7C)
   "1C",
   "1.5C",
   "2C",
@@ -80,13 +80,13 @@ const allSizes = [
   "6C",
   "6.5C",
   "7C",
+  // Little Kids (8C-13.5C)
   "7.5C",
   "8C",
   "8.5C",
   "9C",
   "9.5C",
   "10C",
-  // Little Kids (8C-3Y) - includes overlap with toddlers
   "10.5C",
   "11C",
   "11.5C",
@@ -94,12 +94,12 @@ const allSizes = [
   "12.5C",
   "13C",
   "13.5C",
+  // Big Kids (1Y-8Y)
   "1Y",
   "1.5Y",
   "2Y",
   "2.5Y",
   "3Y",
-  // Big Kids (1Y-7Y) - includes overlap with little kids
   "3.5Y",
   "4Y",
   "4.5Y",
@@ -108,14 +108,16 @@ const allSizes = [
   "6Y",
   "6.5Y",
   "7Y",
+  "7.5Y",
+  "8Y",
 ]
 
-// All available shoes in the system
+// All available shoes in the system - Updated with $160 sticker price
 const defaultShoes: Shoe[] = [
   {
     id: 1,
     name: "Red Kuffiyeh AF1",
-    price: 350,
+    price: 160,
     image: "/images/kuffiyeh-side-sunset.png",
     slug: "red-kuffiyeh-af1",
     sizes: allSizes,
@@ -125,37 +127,48 @@ const defaultShoes: Shoe[] = [
       "Hand-painted with premium acrylic paints",
       "Sealed with protective coating",
       "Based on Nike Air Force 1",
+      "Size-based pricing: Kids $135-175, Adults $230 (includes shipping)",
     ],
     isFeatured: true,
   },
   {
     id: 2,
     name: "Mexican Eagle AF1",
-    price: 425,
+    price: 160,
     image: "/images/mexican-side-view.png",
     slug: "mexican-eagle-af1",
     sizes: allSizes,
     inStockSizes: allSizes,
     description: "Detailed Mexican flag design featuring the iconic eagle and serpent coat of arms.",
-    details: ["Hand-painted Mexican coat of arms", "Mexican flag colors on swoosh", "Premium white leather base"],
+    details: [
+      "Hand-painted Mexican coat of arms",
+      "Mexican flag colors on swoosh",
+      "Premium white leather base",
+      "Size-based pricing: Kids $135-175, Adults $230 (includes shipping)",
+    ],
     isFeatured: true,
   },
   {
     id: 3,
     name: "Black & Red Geometric",
-    price: 375,
+    price: 160,
     image: "/images/black-red-geometric-hero.jpg",
     slug: "black-red-geometric",
     sizes: allSizes,
     inStockSizes: allSizes,
     description: "Sleek black forces with striking red geometric patterns.",
-    details: ["All-black leather base", "Hand-painted red geometric patterns", "Matte finish"],
+    details: [
+      "All-black leather base",
+      "Hand-painted red geometric patterns",
+      "Matte finish",
+      "Size-based pricing: Kids $135-175, Adults $230 (includes shipping)",
+    ],
     isFeatured: true,
   },
   {
     id: 4,
     name: "Jordanian Flag AF1",
-    price: 400,
+    price: 160,
     image: "/images/jordanian-side-view.jpg",
     slug: "jordanian-flag-af1",
     sizes: allSizes,
@@ -165,13 +178,14 @@ const defaultShoes: Shoe[] = [
       "Hand-painted Jordanian flag design",
       "Traditional red, black, white, and green colors",
       "Kuffiyeh pattern details",
+      "Size-based pricing: Kids $135-175, Adults $230 (includes shipping)",
     ],
     isFeatured: false,
   },
   {
     id: 5,
     name: "Geometric Checkered",
-    price: 325,
+    price: 160,
     image: "/images/geometric-checkered-side.jpg",
     slug: "geometric-checkered",
     sizes: allSizes,
@@ -181,13 +195,14 @@ const defaultShoes: Shoe[] = [
       "Hand-painted checkered pattern",
       "Black and white minimalist design",
       "Palestinian flag colors on branding",
+      "Size-based pricing: Kids $135-175, Adults $230 (includes shipping)",
     ],
     isFeatured: false,
   },
   {
     id: 6,
     name: "Chinese Flag AF1",
-    price: 450,
+    price: 160,
     image: "/images/chinese-side-sunset.png",
     slug: "chinese-flag-af1",
     sizes: allSizes,
@@ -197,25 +212,31 @@ const defaultShoes: Shoe[] = [
       "Hand-painted Chinese flag design",
       "Authentic red and gold colors",
       "Flag elements integrated into swoosh",
+      "Size-based pricing: Kids $135-175, Adults $230 (includes shipping)",
     ],
     isFeatured: false,
   },
   {
     id: 7,
     name: "Checkered Drip AF1",
-    price: 395,
+    price: 160,
     image: "/images/checkered-drip-sunset.png",
     slug: "checkered-drip-af1",
     sizes: allSizes,
     inStockSizes: allSizes,
     description: "Bold checkered pattern with artistic paint drip design.",
-    details: ["Hand-painted checkered swoosh", "Artistic paint drip effect", "Street art aesthetic"],
+    details: [
+      "Hand-painted checkered swoosh",
+      "Artistic paint drip effect",
+      "Street art aesthetic",
+      "Size-based pricing: Kids $135-175, Adults $230 (includes shipping)",
+    ],
     isFeatured: false,
   },
   {
     id: 8,
     name: "Map of Palestine AF1",
-    price: 380,
+    price: 160,
     image: "/images/palestine-map-side.jpg",
     slug: "map-of-palestine-af1",
     sizes: allSizes,
@@ -225,13 +246,14 @@ const defaultShoes: Shoe[] = [
       "Hand-painted map of Palestine",
       "Traditional Kuffiyeh geometric patterns",
       "Palestinian flag colors throughout",
+      "Size-based pricing: Kids $135-175, Adults $230 (includes shipping)",
     ],
     isFeatured: false,
   },
   {
     id: 9,
     name: "Lebanese Cedar AF1",
-    price: 410,
+    price: 160,
     image: "/images/lebanese-side-view.jpg",
     slug: "lebanese-cedar-af1",
     sizes: allSizes,
@@ -241,13 +263,14 @@ const defaultShoes: Shoe[] = [
       "Hand-painted Lebanese cedar tree",
       "Traditional red and white flag stripes",
       "Lebanese flag colors on branding",
+      "Size-based pricing: Kids $135-175, Adults $230 (includes shipping)",
     ],
     isFeatured: false,
   },
   {
     id: 10,
     name: "Filipino Sun AF1",
-    price: 420,
+    price: 160,
     image: "/images/filipino-side-view.jpg",
     slug: "filipino-sun-af1",
     sizes: allSizes,
@@ -257,6 +280,7 @@ const defaultShoes: Shoe[] = [
       "Hand-painted Filipino golden sun",
       "Authentic blue, red, and yellow colors",
       "Traditional eight-rayed sun design",
+      "Size-based pricing: Kids $135-175, Adults $230 (includes shipping)",
     ],
     isFeatured: false,
   },
@@ -299,7 +323,7 @@ export function AdminPanel() {
   const [editingEvent, setEditingEvent] = useState<number | null>(null)
   const [newShoe, setNewShoe] = useState({
     name: "",
-    price: "",
+    price: "160", // Default to $160 sticker price
     image: "",
     description: "",
     details: "",
@@ -371,7 +395,7 @@ export function AdminPanel() {
     // Reset form
     setNewShoe({
       name: "",
-      price: "",
+      price: "160", // Reset to default sticker price
       image: "",
       description: "",
       details: "",
@@ -483,17 +507,13 @@ export function AdminPanel() {
       categorySizes = allSizes.filter((size) => {
         if (!size.includes("C")) return false
         const num = Number.parseFloat(size)
-        return num >= 1 && num <= 10
+        return num >= 1 && num <= 7
       })
     } else if (category === "little-kids") {
       categorySizes = allSizes.filter((size) => {
         if (size.includes("C")) {
           const num = Number.parseFloat(size)
-          return num >= 8 && num <= 13.5
-        }
-        if (size.includes("Y")) {
-          const num = Number.parseFloat(size)
-          return num >= 1 && num <= 3
+          return num >= 7.5 && num <= 13.5
         }
         return false
       })
@@ -501,7 +521,7 @@ export function AdminPanel() {
       categorySizes = allSizes.filter((size) => {
         if (size.includes("Y")) {
           const num = Number.parseFloat(size)
-          return num >= 1 && num <= 7
+          return num >= 1 && num <= 8
         }
         return false
       })
@@ -520,23 +540,19 @@ export function AdminPanel() {
   const babiesToddlerSizes = allSizes.filter((size) => {
     if (!size.includes("C")) return false
     const num = Number.parseFloat(size)
-    return num >= 1 && num <= 10
+    return num >= 1 && num <= 7
   })
   const littleKidsSizes = allSizes.filter((size) => {
     if (size.includes("C")) {
       const num = Number.parseFloat(size)
-      return num >= 8 && num <= 13.5
-    }
-    if (size.includes("Y")) {
-      const num = Number.parseFloat(size)
-      return num >= 1 && num <= 3
+      return num >= 7.5 && num <= 13.5
     }
     return false
   })
   const bigKidsSizes = allSizes.filter((size) => {
     if (size.includes("Y")) {
       const num = Number.parseFloat(size)
-      return num >= 1 && num <= 7
+      return num >= 1 && num <= 8
     }
     return false
   })
@@ -556,6 +572,44 @@ export function AdminPanel() {
           </Button>
         </div>
       </div>
+
+      {/* Pricing Info Card */}
+      <Card className="bg-blue-900/20 border-blue-800">
+        <CardHeader>
+          <CardTitle className="text-white flex items-center">💰 Current Pricing Structure</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+            <div className="bg-neutral-800 p-3 rounded">
+              <h4 className="text-white font-semibold mb-2">Babies/Toddlers (1C-7C)</h4>
+              <p className="text-neutral-300">$120 + $15 shipping = $135 total</p>
+            </div>
+            <div className="bg-neutral-800 p-3 rounded">
+              <h4 className="text-white font-semibold mb-2">Little Kids (8C-13.5C)</h4>
+              <p className="text-neutral-300">$130 + $15 shipping = $145 total</p>
+            </div>
+            <div className="bg-neutral-800 p-3 rounded">
+              <h4 className="text-white font-semibold mb-2">Big Kids (1Y-5.5Y)</h4>
+              <p className="text-neutral-300">$130 + $15 shipping = $145 total</p>
+            </div>
+            <div className="bg-neutral-800 p-3 rounded">
+              <h4 className="text-white font-semibold mb-2">Big Kids (6Y-8Y)</h4>
+              <p className="text-neutral-300">$160 + $15 shipping = $175 total</p>
+            </div>
+            <div className="bg-neutral-800 p-3 rounded">
+              <h4 className="text-white font-semibold mb-2">Women's & Men's</h4>
+              <p className="text-neutral-300">$210 + $20 shipping = $230 total</p>
+            </div>
+            <div className="bg-green-800 p-3 rounded">
+              <h4 className="text-white font-semibold mb-2">Bay Area Special</h4>
+              <p className="text-neutral-300">Free pickup/dropoff available</p>
+            </div>
+          </div>
+          <p className="text-neutral-400 text-xs mt-3">
+            * All shoes display $160 sticker price. Actual pricing calculated at checkout based on size selection.
+          </p>
+        </CardContent>
+      </Card>
 
       {/* Events Management Section */}
       <Card className="bg-neutral-900 border-neutral-800">
@@ -760,7 +814,7 @@ export function AdminPanel() {
                   />
                 </div>
                 <h3 className="text-white font-semibold">{shoe.name}</h3>
-                <p className="text-neutral-400">${shoe.price}</p>
+                <p className="text-neutral-400">${shoe.price} (sticker price)</p>
                 <p className="text-xs text-neutral-500 mt-1">
                   {shoe.inStockSizes.length}/{shoe.sizes.length} sizes in stock
                 </p>
@@ -802,15 +856,18 @@ export function AdminPanel() {
               </div>
               <div>
                 <Label htmlFor="price" className="text-white">
-                  Price ($)
+                  Sticker Price ($)
                 </Label>
                 <Input
                   id="price"
                   type="number"
                   value={newShoe.price}
                   onChange={(e) => setNewShoe({ ...newShoe, price: e.target.value })}
-                  placeholder="350"
+                  placeholder="160"
                 />
+                <p className="text-xs text-neutral-400 mt-1">
+                  Display price only. Actual pricing calculated by size at checkout.
+                </p>
               </div>
             </div>
 
@@ -847,8 +904,8 @@ export function AdminPanel() {
                 id="details"
                 value={newShoe.details}
                 onChange={(e) => setNewShoe({ ...newShoe, details: e.target.value })}
-                placeholder="Hand-painted with premium paints&#10;Sealed with protective coating&#10;Based on Nike Air Force 1"
-                rows={3}
+                placeholder="Hand-painted with premium paints&#10;Sealed with protective coating&#10;Based on Nike Air Force 1&#10;Size-based pricing: Kids $135-175, Adults $230 (includes shipping)"
+                rows={4}
               />
             </div>
 
@@ -912,7 +969,7 @@ export function AdminPanel() {
 
               {/* Men's Sizes */}
               <div className="mb-4">
-                <h4 className="text-white text-sm font-medium mb-2">Men's Sizes (7-15)</h4>
+                <h4 className="text-white text-sm font-medium mb-2">Men's Sizes (7-15) - $230 total</h4>
                 <div className="grid grid-cols-6 gap-2">
                   {mensSizes.map((size) => (
                     <button
@@ -933,7 +990,7 @@ export function AdminPanel() {
 
               {/* Women's Sizes */}
               <div className="mb-4">
-                <h4 className="text-white text-sm font-medium mb-2">Women's Sizes</h4>
+                <h4 className="text-white text-sm font-medium mb-2">Women's Sizes - $230 total</h4>
                 <div className="grid grid-cols-6 gap-2">
                   {womensSizes.map((size) => (
                     <button
@@ -954,7 +1011,7 @@ export function AdminPanel() {
 
               {/* Babies and Toddlers */}
               <div className="mb-4">
-                <h4 className="text-white text-sm font-medium mb-2">Babies and Toddlers (1C-10C)</h4>
+                <h4 className="text-white text-sm font-medium mb-2">Babies and Toddlers (1C-7C) - $135 total</h4>
                 <div className="grid grid-cols-6 gap-2">
                   {babiesToddlerSizes.map((size) => (
                     <button
@@ -975,7 +1032,7 @@ export function AdminPanel() {
 
               {/* Little Kids */}
               <div className="mb-4">
-                <h4 className="text-white text-sm font-medium mb-2">Little Kids (8C-3Y)</h4>
+                <h4 className="text-white text-sm font-medium mb-2">Little Kids (8C-13.5C) - $145 total</h4>
                 <div className="grid grid-cols-6 gap-2">
                   {littleKidsSizes.map((size) => (
                     <button
@@ -996,10 +1053,8 @@ export function AdminPanel() {
 
               {/* Big Kids */}
               <div className="mb-4">
-                <h4 className="text-white text-sm font-medium mb-2">Big Kids (1Y-7Y)</h4>
-                <p className="text-xs text-neutral-400 mb-2">
-                  Note: Big Kids 7Y = Men's 7 (same size, different construction)
-                </p>
+                <h4 className="text-white text-sm font-medium mb-2">Big Kids (1Y-8Y) - $145-175 total</h4>
+                <p className="text-xs text-neutral-400 mb-2">1Y-5.5Y: $145 total | 6Y-8Y: $175 total</p>
                 <div className="grid grid-cols-6 gap-2">
                   {bigKidsSizes.map((size) => (
                     <button
@@ -1062,7 +1117,7 @@ export function AdminPanel() {
                   )}
                 </div>
                 <h3 className="text-white font-semibold mb-1">{shoe.name}</h3>
-                <p className="text-neutral-400 mb-1">${shoe.price}</p>
+                <p className="text-neutral-400 mb-1">${shoe.price} (sticker price)</p>
                 <p className="text-xs text-neutral-500 mb-3">
                   {shoe.inStockSizes.length}/{shoe.sizes.length} sizes in stock
                 </p>
