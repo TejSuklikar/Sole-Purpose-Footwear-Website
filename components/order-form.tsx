@@ -6,7 +6,15 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectLabel } from "@/components/ui/select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  SelectLabel,
+  SelectGroup,
+} from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Send, ShoppingCart, Truck, MapPin } from "lucide-react"
@@ -431,75 +439,85 @@ export function OrderForm() {
                   <SelectValue placeholder="Select your size" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectLabel>Men's Sizes - $210 + shipping</SelectLabel>
-                  {allSizes
-                    .filter((size) => !size.includes("W") && !size.includes("C") && !size.includes("Y"))
-                    .map((size) => (
-                      <SelectItem key={size} value={size} className="text-sm sm:text-base pl-4">
-                        {size} - $210
-                      </SelectItem>
-                    ))}
+                  {/* MEN */}
+                  <SelectGroup>
+                    <SelectLabel>Men&apos;s Sizes – $210 + shipping</SelectLabel>
+                    {allSizes
+                      .filter((size) => !size.includes("W") && !size.includes("C") && !size.includes("Y"))
+                      .map((size) => (
+                        <SelectItem key={size} value={size} className="text-sm sm:text-base pl-4">
+                          {size} - $210
+                        </SelectItem>
+                      ))}
+                  </SelectGroup>
 
-                  <SelectLabel>Women's Sizes - $210 + shipping</SelectLabel>
-                  {allSizes
-                    .filter((size) => size.includes("W"))
-                    .map((size) => (
-                      <SelectItem key={size} value={size} className="text-sm sm:text-base pl-4">
-                        {size} - $210
-                      </SelectItem>
-                    ))}
+                  {/* WOMEN */}
+                  <SelectGroup>
+                    <SelectLabel>Women&apos;s Sizes – $210 + shipping</SelectLabel>
+                    {allSizes
+                      .filter((size) => size.includes("W"))
+                      .map((size) => (
+                        <SelectItem key={size} value={size} className="text-sm sm:text-base pl-4">
+                          {size} - $210
+                        </SelectItem>
+                      ))}
+                  </SelectGroup>
 
-                  <SelectLabel>Big Kids (6Y-8Y) - $160 + shipping</SelectLabel>
-                  {allSizes
-                    .filter((size) => {
-                      if (!size.includes("Y")) return false
-                      const num = Number.parseFloat(size)
-                      return num >= 6 && num <= 8
-                    })
-                    .map((size) => (
-                      <SelectItem key={size} value={size} className="text-sm sm:text-base pl-4">
-                        {size} - $160
-                      </SelectItem>
-                    ))}
+                  {/* BIG KIDS */}
+                  <SelectGroup>
+                    <SelectLabel>Big Kids (6Y-8Y) – $160 + shipping</SelectLabel>
+                    {allSizes
+                      .filter(
+                        (size) => size.includes("Y") && Number.parseFloat(size) >= 6 && Number.parseFloat(size) <= 8,
+                      )
+                      .map((size) => (
+                        <SelectItem key={size} value={size} className="text-sm sm:text-base pl-4">
+                          {size} - $160
+                        </SelectItem>
+                      ))}
+                  </SelectGroup>
 
-                  <SelectLabel>Youth (1Y-5.5Y) - $130 + shipping</SelectLabel>
-                  {allSizes
-                    .filter((size) => {
-                      if (!size.includes("Y")) return false
-                      const num = Number.parseFloat(size)
-                      return num >= 1 && num <= 5.5
-                    })
-                    .map((size) => (
-                      <SelectItem key={size} value={size} className="text-sm sm:text-base pl-4">
-                        {size} - $130
-                      </SelectItem>
-                    ))}
+                  {/* YOUTH */}
+                  <SelectGroup>
+                    <SelectLabel>Youth (1Y-5.5Y) – $130 + shipping</SelectLabel>
+                    {allSizes
+                      .filter(
+                        (size) => size.includes("Y") && Number.parseFloat(size) >= 1 && Number.parseFloat(size) <= 5.5,
+                      )
+                      .map((size) => (
+                        <SelectItem key={size} value={size} className="text-sm sm:text-base pl-4">
+                          {size} - $130
+                        </SelectItem>
+                      ))}
+                  </SelectGroup>
 
-                  <SelectLabel>Toddler (8C-13.5C) - $130 + shipping</SelectLabel>
-                  {allSizes
-                    .filter((size) => {
-                      if (!size.includes("C")) return false
-                      const num = Number.parseFloat(size)
-                      return num >= 8 && num <= 13.5
-                    })
-                    .map((size) => (
-                      <SelectItem key={size} value={size} className="text-sm sm:text-base pl-4">
-                        {size} - $130
-                      </SelectItem>
-                    ))}
+                  {/* TODDLER */}
+                  <SelectGroup>
+                    <SelectLabel>Toddler (8C-13.5C) – $130 + shipping</SelectLabel>
+                    {allSizes
+                      .filter(
+                        (size) => size.includes("C") && Number.parseFloat(size) >= 8 && Number.parseFloat(size) <= 13.5,
+                      )
+                      .map((size) => (
+                        <SelectItem key={size} value={size} className="text-sm sm:text-base pl-4">
+                          {size} - $130
+                        </SelectItem>
+                      ))}
+                  </SelectGroup>
 
-                  <SelectLabel>Infant (1C-7.5C) - $120 + shipping</SelectLabel>
-                  {allSizes
-                    .filter((size) => {
-                      if (!size.includes("C")) return false
-                      const num = Number.parseFloat(size)
-                      return num >= 1 && num <= 7.5
-                    })
-                    .map((size) => (
-                      <SelectItem key={size} value={size} className="text-sm sm:text-base pl-4">
-                        {size} - $120
-                      </SelectItem>
-                    ))}
+                  {/* INFANT */}
+                  <SelectGroup>
+                    <SelectLabel>Infant (1C-7.5C) – $120 + shipping</SelectLabel>
+                    {allSizes
+                      .filter(
+                        (size) => size.includes("C") && Number.parseFloat(size) >= 1 && Number.parseFloat(size) <= 7.5,
+                      )
+                      .map((size) => (
+                        <SelectItem key={size} value={size} className="text-sm sm:text-base pl-4">
+                          {size} - $120
+                        </SelectItem>
+                      ))}
+                  </SelectGroup>
                 </SelectContent>
               </Select>
             </div>
