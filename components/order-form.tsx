@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectLabel } from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Send, ShoppingCart, Truck, MapPin } from "lucide-react"
@@ -431,9 +431,7 @@ export function OrderForm() {
                   <SelectValue placeholder="Select your size" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="" disabled className="text-neutral-500 font-semibold">
-                    Men's Sizes - $210 + shipping
-                  </SelectItem>
+                  <SelectLabel>Men's Sizes - $210 + shipping</SelectLabel>
                   {allSizes
                     .filter((size) => !size.includes("W") && !size.includes("C") && !size.includes("Y"))
                     .map((size) => (
@@ -442,9 +440,7 @@ export function OrderForm() {
                       </SelectItem>
                     ))}
 
-                  <SelectItem value="" disabled className="text-neutral-500 font-semibold">
-                    Women's Sizes - $210 + shipping
-                  </SelectItem>
+                  <SelectLabel>Women's Sizes - $210 + shipping</SelectLabel>
                   {allSizes
                     .filter((size) => size.includes("W"))
                     .map((size) => (
@@ -453,9 +449,7 @@ export function OrderForm() {
                       </SelectItem>
                     ))}
 
-                  <SelectItem value="" disabled className="text-neutral-500 font-semibold">
-                    Big Kids (6Y-8Y) - $160 + shipping
-                  </SelectItem>
+                  <SelectLabel>Big Kids (6Y-8Y) - $160 + shipping</SelectLabel>
                   {allSizes
                     .filter((size) => {
                       if (!size.includes("Y")) return false
@@ -468,9 +462,7 @@ export function OrderForm() {
                       </SelectItem>
                     ))}
 
-                  <SelectItem value="" disabled className="text-neutral-500 font-semibold">
-                    Youth (1Y-5.5Y) - $130 + shipping
-                  </SelectItem>
+                  <SelectLabel>Youth (1Y-5.5Y) - $130 + shipping</SelectLabel>
                   {allSizes
                     .filter((size) => {
                       if (!size.includes("Y")) return false
@@ -483,9 +475,7 @@ export function OrderForm() {
                       </SelectItem>
                     ))}
 
-                  <SelectItem value="" disabled className="text-neutral-500 font-semibold">
-                    Toddler (8C-13.5C) - $130 + shipping
-                  </SelectItem>
+                  <SelectLabel>Toddler (8C-13.5C) - $130 + shipping</SelectLabel>
                   {allSizes
                     .filter((size) => {
                       if (!size.includes("C")) return false
@@ -498,9 +488,7 @@ export function OrderForm() {
                       </SelectItem>
                     ))}
 
-                  <SelectItem value="" disabled className="text-neutral-500 font-semibold">
-                    Infant (1C-7.5C) - $120 + shipping
-                  </SelectItem>
+                  <SelectLabel>Infant (1C-7.5C) - $120 + shipping</SelectLabel>
                   {allSizes
                     .filter((size) => {
                       if (!size.includes("C")) return false
