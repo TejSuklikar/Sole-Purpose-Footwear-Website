@@ -2,7 +2,7 @@ import { notFound } from "next/navigation"
 import { ProductDetail } from "@/components/product-detail"
 
 const allSizes = [
-  // Men's sizes (starting from 7, as youth 7Y = men's 7)
+  // Men's sizes (7-15, including 14.5)
   "7",
   "7.5",
   "8",
@@ -18,6 +18,7 @@ const allSizes = [
   "13",
   "13.5",
   "14",
+  "14.5",
   "15",
   // Women's sizes
   "5W",
@@ -35,7 +36,7 @@ const allSizes = [
   "11W",
   "11.5W",
   "12W",
-  // Babies and Toddlers (1C-10C)
+  // Youth sizes (1C-7C)
   "1C",
   "1.5C",
   "2C",
@@ -49,13 +50,13 @@ const allSizes = [
   "6C",
   "6.5C",
   "7C",
+  // Toddler sizes (8C-13.5C)
   "7.5C",
   "8C",
   "8.5C",
   "9C",
   "9.5C",
   "10C",
-  // Little Kids (8C-3Y) - includes overlap with toddlers
   "10.5C",
   "11C",
   "11.5C",
@@ -63,12 +64,12 @@ const allSizes = [
   "12.5C",
   "13C",
   "13.5C",
+  // Big Kids (1Y-8Y)
   "1Y",
   "1.5Y",
   "2Y",
   "2.5Y",
   "3Y",
-  // Big Kids (1Y-7Y) - includes overlap with little kids
   "3.5Y",
   "4Y",
   "4.5Y",
@@ -77,6 +78,8 @@ const allSizes = [
   "6Y",
   "6.5Y",
   "7Y",
+  "7.5Y",
+  "8Y",
 ]
 
 const shoes = [

@@ -22,9 +22,9 @@ interface ShoesGridProps {
   }
 }
 
-// All available sizes in the system
+// All available sizes in the system - CORRECTED
 const allSizes = [
-  // Men's sizes (starting from 7, as youth 7Y = men's 7)
+  // Men's sizes (7-15, including 14.5)
   "7",
   "7.5",
   "8",
@@ -40,6 +40,7 @@ const allSizes = [
   "13",
   "13.5",
   "14",
+  "14.5",
   "15",
   // Women's sizes
   "5W",
@@ -57,7 +58,7 @@ const allSizes = [
   "11W",
   "11.5W",
   "12W",
-  // Babies and Toddlers (1C-7C)
+  // Youth sizes (1C-7C)
   "1C",
   "1.5C",
   "2C",
@@ -71,7 +72,7 @@ const allSizes = [
   "6C",
   "6.5C",
   "7C",
-  // Little Kids (8C-13.5C)
+  // Toddler sizes (8C-13.5C)
   "7.5C",
   "8C",
   "8.5C",

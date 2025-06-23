@@ -18,15 +18,15 @@ interface Shoe {
   details: string[]
 }
 
-// Base pricing function (before shipping)
+// Base pricing function (before shipping) - CORRECTED
 const getBasePriceForSize = (size: string): number => {
-  // Babies/Toddlers (1C-7C): $120
+  // Youth sizes (1C-7C): $120
   if (size.includes("C")) {
     const num = Number.parseFloat(size)
     if (num >= 1 && num <= 7) {
       return 120
     }
-    // Little Kids (8C-13.5C): $130
+    // Toddler sizes (8C-13.5C): $130
     if (num >= 7.5 && num <= 13.5) {
       return 130
     }
@@ -129,15 +129,15 @@ export function ProductDetail({ shoe: initialShoe }: { shoe: Shoe }) {
 
   const inStockSizes = shoe.inStockSizes || shoe.sizes
 
-  // Group sizes by category for better display
+  // Group sizes by category for better display - CORRECTED
   const mensSizes = shoe.sizes.filter((size) => !size.includes("W") && !size.includes("C") && !size.includes("Y"))
   const womensSizes = shoe.sizes.filter((size) => size.includes("W"))
-  const babiesToddlerSizes = shoe.sizes.filter((size) => {
+  const youthSizes = shoe.sizes.filter((size) => {
     if (!size.includes("C")) return false
     const num = Number.parseFloat(size)
     return num >= 1 && num <= 7
   })
-  const littleKidsSizes = shoe.sizes.filter((size) => {
+  const toddlerSizes = shoe.sizes.filter((size) => {
     if (size.includes("C")) {
       const num = Number.parseFloat(size)
       return num >= 7.5 && num <= 13.5
@@ -390,8 +390,8 @@ export function ProductDetail({ shoe: initialShoe }: { shoe: Shoe }) {
                 }),
                 "$130",
               )}
-              {renderSizeCategory("Little Kids (8C-13.5C)", littleKidsSizes, "$130")}
-              {renderSizeCategory("Babies & Toddlers (1C-7C)", babiesToddlerSizes, "$120")}
+              {renderSizeCategory("Toddler (8C-13.5C)", toddlerSizes, "$130")}
+              {renderSizeCategory("Youth (1C-7C)", youthSizes, "$120")}
             </div>
 
             {/* Add to Cart */}

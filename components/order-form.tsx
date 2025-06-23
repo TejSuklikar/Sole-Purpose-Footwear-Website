@@ -22,7 +22,7 @@ const shoeModels = [
 ]
 
 const allSizes = [
-  // Men's sizes (starting from 7, as youth 7Y = men's 7)
+  // Men's sizes (7-15, including 14.5)
   "7",
   "7.5",
   "8",
@@ -38,6 +38,7 @@ const allSizes = [
   "13",
   "13.5",
   "14",
+  "14.5",
   "15",
   // Women's sizes
   "5W",
@@ -55,7 +56,7 @@ const allSizes = [
   "11W",
   "11.5W",
   "12W",
-  // Babies and Toddlers (1C-7C)
+  // Youth sizes (1C-7C)
   "1C",
   "1.5C",
   "2C",
@@ -69,7 +70,7 @@ const allSizes = [
   "6C",
   "6.5C",
   "7C",
-  // Little Kids (8C-13.5C)
+  // Toddler sizes (8C-13.5C)
   "7.5C",
   "8C",
   "8.5C",
@@ -101,15 +102,15 @@ const allSizes = [
   "8Y",
 ]
 
-// Base pricing function (before shipping)
+// Base pricing function (before shipping) - CORRECTED
 const getBasePriceForSize = (size: string): number => {
-  // Babies/Toddlers (1C-7C): $120
+  // Youth sizes (1C-7C): $120
   if (size.includes("C")) {
     const num = Number.parseFloat(size)
     if (num >= 1 && num <= 7) {
       return 120
     }
-    // Little Kids (8C-13.5C): $130
+    // Toddler sizes (8C-13.5C): $130
     if (num >= 7.5 && num <= 13.5) {
       return 130
     }
@@ -250,7 +251,7 @@ export function OrderForm() {
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
                 <span className="text-base sm:text-lg font-semibold text-neutral-600">Custom Design Price:</span>
                 <span className="text-xl sm:text-2xl font-bold text-neutral-900">
-                  {selectedTotal ? `$${selectedTotal}` : "Starting at $120"}
+                  {selectedTotal ? `$${selectedTotal}` : "Starting at $135"}
                 </span>
               </div>
 
@@ -482,7 +483,7 @@ export function OrderForm() {
                     ))}
 
                   <SelectItem value="" disabled className="text-neutral-500 font-semibold">
-                    Little Kids (8C-13.5C) - $130 + shipping
+                    Toddler (8C-13.5C) - $130 + shipping
                   </SelectItem>
                   {allSizes
                     .filter((size) => {
@@ -497,7 +498,7 @@ export function OrderForm() {
                     ))}
 
                   <SelectItem value="" disabled className="text-neutral-500 font-semibold">
-                    Babies & Toddlers (1C-7C) - $120 + shipping
+                    Youth (1C-7C) - $120 + shipping
                   </SelectItem>
                   {allSizes
                     .filter((size) => {

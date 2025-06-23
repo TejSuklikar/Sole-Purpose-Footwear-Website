@@ -31,9 +31,9 @@ interface Event {
   description: string
 }
 
-// Nike-style sizing system
+// CORRECTED sizing system
 const allSizes = [
-  // Men's sizes (starting from 7, as youth 7Y = men's 7)
+  // Men's sizes (7-15, including 14.5)
   "7",
   "7.5",
   "8",
@@ -49,6 +49,7 @@ const allSizes = [
   "13",
   "13.5",
   "14",
+  "14.5",
   "15",
   // Women's sizes
   "5W",
@@ -66,7 +67,7 @@ const allSizes = [
   "11W",
   "11.5W",
   "12W",
-  // Babies and Toddlers (1C-7C)
+  // Youth sizes (1C-7C)
   "1C",
   "1.5C",
   "2C",
@@ -80,7 +81,7 @@ const allSizes = [
   "6C",
   "6.5C",
   "7C",
-  // Little Kids (8C-13.5C)
+  // Toddler sizes (8C-13.5C)
   "7.5C",
   "8C",
   "8.5C",
@@ -127,7 +128,7 @@ const defaultShoes: Shoe[] = [
       "Hand-painted with premium acrylic paints",
       "Sealed with protective coating",
       "Based on Nike Air Force 1",
-      "Size-based pricing: Kids $135-175, Adults $230 (includes shipping)",
+      "Youth (1C-7C): $135 total | Toddler (8C-13.5C): $145 total | Big Kids: $145-175 total | Adults: $230 total",
     ],
     isFeatured: true,
   },
@@ -144,7 +145,7 @@ const defaultShoes: Shoe[] = [
       "Hand-painted Mexican coat of arms",
       "Mexican flag colors on swoosh",
       "Premium white leather base",
-      "Size-based pricing: Kids $135-175, Adults $230 (includes shipping)",
+      "Youth (1C-7C): $135 total | Toddler (8C-13.5C): $145 total | Big Kids: $145-175 total | Adults: $230 total",
     ],
     isFeatured: true,
   },
@@ -161,7 +162,7 @@ const defaultShoes: Shoe[] = [
       "All-black leather base",
       "Hand-painted red geometric patterns",
       "Matte finish",
-      "Size-based pricing: Kids $135-175, Adults $230 (includes shipping)",
+      "Youth (1C-7C): $135 total | Toddler (8C-13.5C): $145 total | Big Kids: $145-175 total | Adults: $230 total",
     ],
     isFeatured: true,
   },
@@ -178,7 +179,7 @@ const defaultShoes: Shoe[] = [
       "Hand-painted Jordanian flag design",
       "Traditional red, black, white, and green colors",
       "Kuffiyeh pattern details",
-      "Size-based pricing: Kids $135-175, Adults $230 (includes shipping)",
+      "Youth (1C-7C): $135 total | Toddler (8C-13.5C): $145 total | Big Kids: $145-175 total | Adults: $230 total",
     ],
     isFeatured: false,
   },
@@ -195,7 +196,7 @@ const defaultShoes: Shoe[] = [
       "Hand-painted checkered pattern",
       "Black and white minimalist design",
       "Palestinian flag colors on branding",
-      "Size-based pricing: Kids $135-175, Adults $230 (includes shipping)",
+      "Youth (1C-7C): $135 total | Toddler (8C-13.5C): $145 total | Big Kids: $145-175 total | Adults: $230 total",
     ],
     isFeatured: false,
   },
@@ -212,7 +213,7 @@ const defaultShoes: Shoe[] = [
       "Hand-painted Chinese flag design",
       "Authentic red and gold colors",
       "Flag elements integrated into swoosh",
-      "Size-based pricing: Kids $135-175, Adults $230 (includes shipping)",
+      "Youth (1C-7C): $135 total | Toddler (8C-13.5C): $145 total | Big Kids: $145-175 total | Adults: $230 total",
     ],
     isFeatured: false,
   },
@@ -229,7 +230,7 @@ const defaultShoes: Shoe[] = [
       "Hand-painted checkered swoosh",
       "Artistic paint drip effect",
       "Street art aesthetic",
-      "Size-based pricing: Kids $135-175, Adults $230 (includes shipping)",
+      "Youth (1C-7C): $135 total | Toddler (8C-13.5C): $145 total | Big Kids: $145-175 total | Adults: $230 total",
     ],
     isFeatured: false,
   },
@@ -246,7 +247,7 @@ const defaultShoes: Shoe[] = [
       "Hand-painted map of Palestine",
       "Traditional Kuffiyeh geometric patterns",
       "Palestinian flag colors throughout",
-      "Size-based pricing: Kids $135-175, Adults $230 (includes shipping)",
+      "Youth (1C-7C): $135 total | Toddler (8C-13.5C): $145 total | Big Kids: $145-175 total | Adults: $230 total",
     ],
     isFeatured: false,
   },
@@ -263,7 +264,7 @@ const defaultShoes: Shoe[] = [
       "Hand-painted Lebanese cedar tree",
       "Traditional red and white flag stripes",
       "Lebanese flag colors on branding",
-      "Size-based pricing: Kids $135-175, Adults $230 (includes shipping)",
+      "Youth (1C-7C): $135 total | Toddler (8C-13.5C): $145 total | Big Kids: $145-175 total | Adults: $230 total",
     ],
     isFeatured: false,
   },
@@ -280,7 +281,7 @@ const defaultShoes: Shoe[] = [
       "Hand-painted Filipino golden sun",
       "Authentic blue, red, and yellow colors",
       "Traditional eight-rayed sun design",
-      "Size-based pricing: Kids $135-175, Adults $230 (includes shipping)",
+      "Youth (1C-7C): $135 total | Toddler (8C-13.5C): $145 total | Big Kids: $145-175 total | Adults: $230 total",
     ],
     isFeatured: false,
   },
@@ -496,20 +497,20 @@ export function AdminPanel() {
     setNewShoe({ ...newShoe, sizes: [] })
   }
 
-  const selectSizeCategory = (category: "men" | "women" | "babies-toddlers" | "little-kids" | "big-kids") => {
+  const selectSizeCategory = (category: "men" | "women" | "youth" | "toddler" | "big-kids") => {
     let categorySizes: string[] = []
 
     if (category === "men") {
       categorySizes = allSizes.filter((size) => !size.includes("W") && !size.includes("C") && !size.includes("Y"))
     } else if (category === "women") {
       categorySizes = allSizes.filter((size) => size.includes("W"))
-    } else if (category === "babies-toddlers") {
+    } else if (category === "youth") {
       categorySizes = allSizes.filter((size) => {
         if (!size.includes("C")) return false
         const num = Number.parseFloat(size)
         return num >= 1 && num <= 7
       })
-    } else if (category === "little-kids") {
+    } else if (category === "toddler") {
       categorySizes = allSizes.filter((size) => {
         if (size.includes("C")) {
           const num = Number.parseFloat(size)
@@ -534,15 +535,15 @@ export function AdminPanel() {
 
   const featuredShoes = shoes.filter((shoe) => shoe.isFeatured)
 
-  // Group sizes for better display
+  // Group sizes for better display - CORRECTED
   const mensSizes = allSizes.filter((size) => !size.includes("W") && !size.includes("C") && !size.includes("Y"))
   const womensSizes = allSizes.filter((size) => size.includes("W"))
-  const babiesToddlerSizes = allSizes.filter((size) => {
+  const youthSizes = allSizes.filter((size) => {
     if (!size.includes("C")) return false
     const num = Number.parseFloat(size)
     return num >= 1 && num <= 7
   })
-  const littleKidsSizes = allSizes.filter((size) => {
+  const toddlerSizes = allSizes.filter((size) => {
     if (size.includes("C")) {
       const num = Number.parseFloat(size)
       return num >= 7.5 && num <= 13.5
@@ -581,11 +582,11 @@ export function AdminPanel() {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
             <div className="bg-neutral-800 p-3 rounded">
-              <h4 className="text-white font-semibold mb-2">Babies/Toddlers (1C-7C)</h4>
+              <h4 className="text-white font-semibold mb-2">Youth (1C-7C)</h4>
               <p className="text-neutral-300">$120 + $15 shipping = $135 total</p>
             </div>
             <div className="bg-neutral-800 p-3 rounded">
-              <h4 className="text-white font-semibold mb-2">Little Kids (8C-13.5C)</h4>
+              <h4 className="text-white font-semibold mb-2">Toddler (8C-13.5C)</h4>
               <p className="text-neutral-300">$130 + $15 shipping = $145 total</p>
             </div>
             <div className="bg-neutral-800 p-3 rounded">
@@ -904,13 +905,13 @@ export function AdminPanel() {
                 id="details"
                 value={newShoe.details}
                 onChange={(e) => setNewShoe({ ...newShoe, details: e.target.value })}
-                placeholder="Hand-painted with premium paints&#10;Sealed with protective coating&#10;Based on Nike Air Force 1&#10;Size-based pricing: Kids $135-175, Adults $230 (includes shipping)"
+                placeholder="Hand-painted with premium paints&#10;Sealed with protective coating&#10;Based on Nike Air Force 1&#10;Youth (1C-7C): $135 total | Toddler (8C-13.5C): $145 total | Big Kids: $145-175 total | Adults: $230 total"
                 rows={4}
               />
             </div>
 
             <div>
-              <Label className="text-white">Available Sizes (Nike Sizing System)</Label>
+              <Label className="text-white">Available Sizes (Corrected Sizing System)</Label>
 
               {/* Size Selection Controls */}
               <div className="flex flex-wrap gap-2 mt-2 mb-4">
@@ -940,21 +941,21 @@ export function AdminPanel() {
                 </Button>
                 <Button
                   type="button"
-                  onClick={() => selectSizeCategory("babies-toddlers")}
+                  onClick={() => selectSizeCategory("youth")}
                   size="sm"
                   variant="outline"
                   className="text-xs"
                 >
-                  + Babies/Toddlers ({babiesToddlerSizes.length})
+                  + Youth ({youthSizes.length})
                 </Button>
                 <Button
                   type="button"
-                  onClick={() => selectSizeCategory("little-kids")}
+                  onClick={() => selectSizeCategory("toddler")}
                   size="sm"
                   variant="outline"
                   className="text-xs"
                 >
-                  + Little Kids ({littleKidsSizes.length})
+                  + Toddler ({toddlerSizes.length})
                 </Button>
                 <Button
                   type="button"
@@ -1009,11 +1010,63 @@ export function AdminPanel() {
                 </div>
               </div>
 
-              {/* Babies and Toddlers */}
+              {/* Big Kids (6Y-8Y) */}
               <div className="mb-4">
-                <h4 className="text-white text-sm font-medium mb-2">Babies and Toddlers (1C-7C) - $135 total</h4>
+                <h4 className="text-white text-sm font-medium mb-2">Big Kids (6Y-8Y) - $175 total</h4>
                 <div className="grid grid-cols-6 gap-2">
-                  {babiesToddlerSizes.map((size) => (
+                  {bigKidsSizes
+                    .filter((size) => {
+                      const num = Number.parseFloat(size)
+                      return num >= 6 && num <= 8
+                    })
+                    .map((size) => (
+                      <button
+                        key={size}
+                        type="button"
+                        onClick={() => handleSizeToggle(size)}
+                        className={`p-2 rounded border text-sm ${
+                          newShoe.sizes.includes(size)
+                            ? "bg-white text-black border-white"
+                            : "bg-neutral-800 text-white border-neutral-600"
+                        }`}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                </div>
+              </div>
+
+              {/* Big Kids (1Y-5.5Y) */}
+              <div className="mb-4">
+                <h4 className="text-white text-sm font-medium mb-2">Big Kids (1Y-5.5Y) - $145 total</h4>
+                <div className="grid grid-cols-6 gap-2">
+                  {bigKidsSizes
+                    .filter((size) => {
+                      const num = Number.parseFloat(size)
+                      return num >= 1 && num <= 5.5
+                    })
+                    .map((size) => (
+                      <button
+                        key={size}
+                        type="button"
+                        onClick={() => handleSizeToggle(size)}
+                        className={`p-2 rounded border text-sm ${
+                          newShoe.sizes.includes(size)
+                            ? "bg-white text-black border-white"
+                            : "bg-neutral-800 text-white border-neutral-600"
+                        }`}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                </div>
+              </div>
+
+              {/* Toddler Sizes */}
+              <div className="mb-4">
+                <h4 className="text-white text-sm font-medium mb-2">Toddler (8C-13.5C) - $145 total</h4>
+                <div className="grid grid-cols-6 gap-2">
+                  {toddlerSizes.map((size) => (
                     <button
                       key={size}
                       type="button"
@@ -1030,33 +1083,11 @@ export function AdminPanel() {
                 </div>
               </div>
 
-              {/* Little Kids */}
+              {/* Youth Sizes */}
               <div className="mb-4">
-                <h4 className="text-white text-sm font-medium mb-2">Little Kids (8C-13.5C) - $145 total</h4>
+                <h4 className="text-white text-sm font-medium mb-2">Youth (1C-7C) - $135 total</h4>
                 <div className="grid grid-cols-6 gap-2">
-                  {littleKidsSizes.map((size) => (
-                    <button
-                      key={size}
-                      type="button"
-                      onClick={() => handleSizeToggle(size)}
-                      className={`p-2 rounded border text-sm ${
-                        newShoe.sizes.includes(size)
-                          ? "bg-white text-black border-white"
-                          : "bg-neutral-800 text-white border-neutral-600"
-                      }`}
-                    >
-                      {size}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Big Kids */}
-              <div className="mb-4">
-                <h4 className="text-white text-sm font-medium mb-2">Big Kids (1Y-8Y) - $145-175 total</h4>
-                <p className="text-xs text-neutral-400 mb-2">1Y-5.5Y: $145 total | 6Y-8Y: $175 total</p>
-                <div className="grid grid-cols-6 gap-2">
-                  {bigKidsSizes.map((size) => (
+                  {youthSizes.map((size) => (
                     <button
                       key={size}
                       type="button"
