@@ -31,7 +31,7 @@ interface Event {
   description: string
 }
 
-// CORRECTED sizing system - exactly 72 sizes
+// CORRECTED sizing system - exactly 73 sizes
 const allSizes = [
   // Men's sizes (17 sizes: 7-15, including half sizes)
   "7",
@@ -106,11 +106,12 @@ const allSizes = [
   "4.5Y",
   "5Y",
   "5.5Y",
-  // Big Kids (4 sizes: 6Y-7.5Y, removing 8Y to get exactly 72)
+  // Big Kids (5 sizes: 6Y-8Y, including 8Y to get exactly 73 total)
   "6Y",
   "6.5Y",
   "7Y",
   "7.5Y",
+  "8Y", // Add this back
 ]
 
 // All available shoes in the system - Updated with $160 sticker price
