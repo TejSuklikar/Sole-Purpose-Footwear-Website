@@ -56,7 +56,7 @@ const allSizes = [
   "11W",
   "11.5W",
   "12W",
-  // Youth sizes (1C-7C)
+  // Infant sizes (1C-7.5C)
   "1C",
   "1.5C",
   "2C",
@@ -70,8 +70,8 @@ const allSizes = [
   "6C",
   "6.5C",
   "7C",
-  // Toddler sizes (8C-13.5C)
   "7.5C",
+  // Toddler sizes (8C-13.5C)
   "8C",
   "8.5C",
   "9C",
@@ -84,7 +84,7 @@ const allSizes = [
   "12.5C",
   "13C",
   "13.5C",
-  // Big Kids (1Y-8Y)
+  // Youth (1Y-5.5Y)
   "1Y",
   "1.5Y",
   "2Y",
@@ -95,6 +95,7 @@ const allSizes = [
   "4.5Y",
   "5Y",
   "5.5Y",
+  // Big Kids (6Y-8Y)
   "6Y",
   "6.5Y",
   "7Y",
@@ -102,28 +103,28 @@ const allSizes = [
   "8Y",
 ]
 
-// Base pricing function (before shipping) - CORRECTED
+// Base pricing function (before shipping) - UPDATED
 const getBasePriceForSize = (size: string): number => {
-  // Youth sizes (1C-7C): $120
+  // Infant sizes (1C-7.5C): $120
   if (size.includes("C")) {
     const num = Number.parseFloat(size)
-    if (num >= 1 && num <= 7) {
+    if (num >= 1 && num <= 7.5) {
       return 120
     }
     // Toddler sizes (8C-13.5C): $130
-    if (num >= 7.5 && num <= 13.5) {
+    if (num >= 8 && num <= 13.5) {
       return 130
     }
   }
 
-  // Big Kids (1Y-8Y)
+  // Youth and Big Kids (1Y-8Y)
   if (size.includes("Y")) {
     const num = Number.parseFloat(size)
-    // 1Y-5.5Y: $130
+    // Youth (1Y-5.5Y): $130
     if (num >= 1 && num <= 5.5) {
       return 130
     }
-    // 6Y-8Y: $160
+    // Big Kids (6Y-8Y): $160
     if (num >= 6 && num <= 8) {
       return 160
     }
@@ -468,7 +469,7 @@ export function OrderForm() {
                     ))}
 
                   <SelectItem value="" disabled className="text-neutral-500 font-semibold">
-                    Big Kids (1Y-5.5Y) - $130 + shipping
+                    Youth (1Y-5.5Y) - $130 + shipping
                   </SelectItem>
                   {allSizes
                     .filter((size) => {
@@ -489,7 +490,7 @@ export function OrderForm() {
                     .filter((size) => {
                       if (!size.includes("C")) return false
                       const num = Number.parseFloat(size)
-                      return num >= 7.5 && num <= 13.5
+                      return num >= 8 && num <= 13.5
                     })
                     .map((size) => (
                       <SelectItem key={size} value={size} className="text-sm sm:text-base pl-4">
@@ -498,13 +499,13 @@ export function OrderForm() {
                     ))}
 
                   <SelectItem value="" disabled className="text-neutral-500 font-semibold">
-                    Youth (1C-7C) - $120 + shipping
+                    Infant (1C-7.5C) - $120 + shipping
                   </SelectItem>
                   {allSizes
                     .filter((size) => {
                       if (!size.includes("C")) return false
                       const num = Number.parseFloat(size)
-                      return num >= 1 && num <= 7
+                      return num >= 1 && num <= 7.5
                     })
                     .map((size) => (
                       <SelectItem key={size} value={size} className="text-sm sm:text-base pl-4">

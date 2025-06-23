@@ -15,14 +15,7 @@ interface Shoe {
   inStockSizes: string[]
 }
 
-interface ShoesGridProps {
-  filters: {
-    sizes: string[]
-    priceRanges: { min: number; max: number }[]
-  }
-}
-
-// All available sizes in the system - CORRECTED
+// All available sizes in the system - UPDATED
 const allSizes = [
   // Men's sizes (7-15, including 14.5)
   "7",
@@ -58,7 +51,7 @@ const allSizes = [
   "11W",
   "11.5W",
   "12W",
-  // Youth sizes (1C-7C)
+  // Infant sizes (1C-7.5C)
   "1C",
   "1.5C",
   "2C",
@@ -72,8 +65,8 @@ const allSizes = [
   "6C",
   "6.5C",
   "7C",
-  // Toddler sizes (8C-13.5C)
   "7.5C",
+  // Toddler sizes (8C-13.5C)
   "8C",
   "8.5C",
   "9C",
@@ -86,7 +79,7 @@ const allSizes = [
   "12.5C",
   "13C",
   "13.5C",
-  // Big Kids (1Y-8Y)
+  // Youth (1Y-5.5Y)
   "1Y",
   "1.5Y",
   "2Y",
@@ -97,6 +90,7 @@ const allSizes = [
   "4.5Y",
   "5Y",
   "5.5Y",
+  // Big Kids (6Y-8Y)
   "6Y",
   "6.5Y",
   "7Y",
@@ -198,7 +192,7 @@ const defaultShoes: Shoe[] = [
   },
 ]
 
-export function ShoesGrid({ filters }: ShoesGridProps) {
+export function ShoesGrid() {
   const [shoes, setShoes] = useState<Shoe[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
@@ -251,22 +245,6 @@ export function ShoesGrid({ filters }: ShoesGridProps) {
     }
   }, [])
 
-  const filteredShoes = shoes.filter((shoe) => {
-    // Size filter - only show shoes that have the selected sizes IN STOCK
-    if (filters.sizes.length > 0) {
-      const hasMatchingInStockSize = filters.sizes.some((size) => shoe.inStockSizes.includes(size))
-      if (!hasMatchingInStockSize) return false
-    }
-
-    // Price range filter
-    if (filters.priceRanges.length > 0) {
-      const matchesPriceRange = filters.priceRanges.some((range) => shoe.price >= range.min && shoe.price <= range.max)
-      if (!matchesPriceRange) return false
-    }
-
-    return true
-  })
-
   if (isLoading) {
     return (
       <div className="text-center py-12">
@@ -276,13 +254,11 @@ export function ShoesGrid({ filters }: ShoesGridProps) {
     )
   }
 
-  if (filteredShoes.length === 0) {
+  if (shoes.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-white text-lg mb-4">No shoes match your current filters.</p>
-        <p className="text-neutral-400">
-          Try adjusting your size or price range selections, or check back later for restocked items.
-        </p>
+        <p className="text-white text-lg mb-4">No shoes available at the moment.</p>
+        <p className="text-neutral-400">Check back later for new designs!</p>
       </div>
     )
   }
@@ -290,14 +266,11 @@ export function ShoesGrid({ filters }: ShoesGridProps) {
   return (
     <div>
       <div className="mb-6">
-        <p className="text-neutral-400 text-sm">
-          Showing {filteredShoes.length} of {shoes.length} shoes
-          {filters.sizes.length > 0 && " with selected sizes in stock"}
-        </p>
+        <p className="text-neutral-400 text-sm">Showing {shoes.length} custom designs</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {filteredShoes.map((shoe) => (
+        {shoes.map((shoe) => (
           <div key={shoe.id}>
             <Link href={`/shoes/${shoe.slug}`}>
               <div className="bg-white rounded-lg shadow-sm overflow-hidden">
