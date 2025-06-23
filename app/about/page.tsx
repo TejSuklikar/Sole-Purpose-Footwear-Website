@@ -13,8 +13,7 @@ export default function AboutPage() {
         <div className="text-center mb-16">
           <h1 className="font-playfair text-4xl md:text-5xl font-bold text-white mb-6">Our Story</h1>
           <p className="text-xl text-neutral-300 leading-relaxed">
-            Born from a passion for art and a love for sneakers, Sole Purpose Footwear bridges the gap between fashion
-            and personal expression.
+            Custom footwear designed to speak your truth. At SolePurpose, we craft one-of-a-kind kicks that blend creativity, comfort, and culture — made for movement, made with meaning.
           </p>
         </div>
 
