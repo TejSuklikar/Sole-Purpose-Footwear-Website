@@ -343,7 +343,16 @@ export function AdminPanel() {
   useEffect(() => {
     const savedShoes = localStorage.getItem("sp_shoes_global")
     if (savedShoes) {
-      setShoes(JSON.parse(savedShoes))
+      const parsedShoes = JSON.parse(savedShoes)
+      // Migration: Update existing shoes to use the new 73-size array
+      const updatedShoes = parsedShoes.map((shoe: Shoe) => ({
+        ...shoe,
+        sizes: allSizes, // Update to new 73-size array
+        inStockSizes: allSizes, // Update in-stock sizes too
+      }))
+      setShoes(updatedShoes)
+      // Save the migrated data back to localStorage
+      localStorage.setItem("sp_shoes_global", JSON.stringify(updatedShoes))
     } else {
       // Initialize with default shoes
       setShoes(defaultShoes)
