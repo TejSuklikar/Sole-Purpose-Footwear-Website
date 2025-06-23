@@ -36,7 +36,7 @@ const allSizes = [
   "11W",
   "11.5W",
   "12W",
-  // Youth sizes (1C-7C)
+  // Infant sizes (1C-7C)
   "1C",
   "1.5C",
   "2C",
@@ -51,7 +51,6 @@ const allSizes = [
   "6.5C",
   "7C",
   // Toddler sizes (8C-13.5C)
-  "7.5C",
   "8C",
   "8.5C",
   "9C",
@@ -64,7 +63,7 @@ const allSizes = [
   "12.5C",
   "13C",
   "13.5C",
-  // Big Kids (1Y-8Y)
+  // Kids (1Y-8Y)
   "1Y",
   "1.5Y",
   "2Y",
