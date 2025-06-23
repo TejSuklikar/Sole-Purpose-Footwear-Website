@@ -13,7 +13,8 @@ export default function AboutPage() {
         <div className="text-center mb-16">
           <h1 className="font-playfair text-4xl md:text-5xl font-bold text-white mb-6">Our Story</h1>
           <p className="text-xl text-neutral-300 leading-relaxed">
-            Custom footwear designed to speak your truth. At SolePurpose, we craft one-of-a-kind kicks that blend creativity, comfort, and culture — made for movement, made with meaning.
+            Custom footwear designed to speak your truth. At SolePurpose, we craft one-of-a-kind kicks that blend
+            creativity, comfort, and culture — made for movement, made with meaning.
           </p>
         </div>
 
@@ -28,8 +29,10 @@ export default function AboutPage() {
                 movement with meaning.
               </p>
               <p className="text-neutral-300 leading-relaxed mt-4">
-                What started as custom designs for friends and family has grown into a movement celebrating cultural
-                heritage, personal stories, and artistic excellence on every pair.
+                What started as a creative outlet turned into a passion — turning shoes into canvases that tell your
+                story. Every pair is custom-made with precision, personality, and purpose. Whether you're stepping into
+                something new or standing out from the crowd, we're here to help you do it with style that's uniquely
+                yours.
               </p>
             </div>
             <Image
