@@ -129,13 +129,13 @@ export function ProductDetail({ shoe: initialShoe }: { shoe: Shoe }) {
 
   const inStockSizes = shoe.inStockSizes || shoe.sizes
 
-  // Group sizes by category for better display - UPDATED
+  // Group sizes by category for better display - UPDATED WITH 7.5C
   const mensSizes = shoe.sizes.filter((size) => !size.includes("W") && !size.includes("C") && !size.includes("Y"))
   const womensSizes = shoe.sizes.filter((size) => size.includes("W"))
   const infantSizes = shoe.sizes.filter((size) => {
     if (!size.includes("C")) return false
     const num = Number.parseFloat(size)
-    return num >= 1 && num <= 7.5
+    return num >= 1 && num <= 7.5 // INCLUDES 7.5C
   })
   const toddlerSizes = shoe.sizes.filter((size) => {
     if (size.includes("C")) {

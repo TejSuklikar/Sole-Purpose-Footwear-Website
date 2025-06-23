@@ -1,8 +1,9 @@
 import { notFound } from "next/navigation"
 import { ProductDetail } from "@/components/product-detail"
 
+// CORRECTED sizing system - exactly 73 sizes INCLUDING 7.5C
 const allSizes = [
-  // Men's sizes (7-15, including 14.5)
+  // Men's sizes (17 sizes: 7-15, including half sizes)
   "7",
   "7.5",
   "8",
@@ -20,7 +21,7 @@ const allSizes = [
   "14",
   "14.5",
   "15",
-  // Women's sizes
+  // Women's sizes (15 sizes: 5W-12W, including half sizes)
   "5W",
   "5.5W",
   "6W",
@@ -36,7 +37,7 @@ const allSizes = [
   "11W",
   "11.5W",
   "12W",
-  // Infant sizes (1C-7C)
+  // Infant sizes (14 sizes: 1C-7.5C, including half sizes) - INCLUDES 7.5C
   "1C",
   "1.5C",
   "2C",
@@ -50,7 +51,8 @@ const allSizes = [
   "6C",
   "6.5C",
   "7C",
-  // Toddler sizes (8C-13.5C)
+  "7.5C", // THIS IS THE MISSING ONE!
+  // Toddler sizes (12 sizes: 8C-13.5C, including half sizes)
   "8C",
   "8.5C",
   "9C",
@@ -63,7 +65,7 @@ const allSizes = [
   "12.5C",
   "13C",
   "13.5C",
-  // Kids (1Y-8Y)
+  // Youth (10 sizes: 1Y-5.5Y, including half sizes)
   "1Y",
   "1.5Y",
   "2Y",
@@ -74,6 +76,7 @@ const allSizes = [
   "4.5Y",
   "5Y",
   "5.5Y",
+  // Big Kids (5 sizes: 6Y-8Y, including 8Y to get exactly 73 total)
   "6Y",
   "6.5Y",
   "7Y",
