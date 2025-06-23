@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Send, ShoppingCart, Truck, MapPin } from "lucide-react"
 import { useCart } from "./cart-provider"
 
@@ -100,37 +101,7 @@ const allSizes = [
   "8Y",
 ]
 
-// Pricing function based on size
-const getPriceForSize = (size: string): number => {
-  // Babies/Toddlers (1C-7C): $120 + $15 shipping = $135
-  if (size.includes("C")) {
-    const num = Number.parseFloat(size)
-    if (num >= 1 && num <= 7) {
-      return 135
-    }
-    // Little Kids (8C-13.5C): $130 + $15 shipping = $145
-    if (num >= 7.5 && num <= 13.5) {
-      return 145
-    }
-  }
-
-  // Big Kids (1Y-8Y)
-  if (size.includes("Y")) {
-    const num = Number.parseFloat(size)
-    // 1Y-5.5Y: $130 + $15 shipping = $145
-    if (num >= 1 && num <= 5.5) {
-      return 145
-    }
-    // 6Y-8Y: $160 + $15 shipping = $175
-    if (num >= 6 && num <= 8) {
-      return 175
-    }
-  }
-
-  // Women's and Men's: $210 + $20 shipping = $230
-  return 230
-}
-
+// Base pricing function (before shipping)
 const getBasePriceForSize = (size: string): number => {
   // Babies/Toddlers (1C-7C): $120
   if (size.includes("C")) {
@@ -172,6 +143,7 @@ const getShippingForSize = (size: string): number => {
 
 export function OrderForm() {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isBayArea, setIsBayArea] = useState(false)
   const { state } = useCart()
   const [formData, setFormData] = useState({
     firstName: "",
@@ -192,13 +164,18 @@ export function OrderForm() {
     e.preventDefault()
     setIsSubmitting(true)
 
-    // Calculate price based on selected size
-    const customPrice = formData.size ? getPriceForSize(formData.size) : 160
+    // Calculate base price and shipping based on selected size
+    const basePrice = formData.size ? getBasePriceForSize(formData.size) : 160
+    const shipping = isBayArea ? 0 : formData.size ? getShippingForSize(formData.size) : 15
+    const totalPrice = basePrice + shipping
 
     // Create custom order data
     const customOrderData = {
       ...formData,
-      price: customPrice,
+      basePrice,
+      shipping,
+      price: totalPrice,
+      isBayArea,
       orderId: `SP-CUSTOM-${Date.now()}`,
       timestamp: new Date().toISOString(),
       type: "custom_order",
@@ -229,9 +206,9 @@ export function OrderForm() {
     formData.address
 
   const cartTotal = state.items.reduce((sum, item) => sum + item.price * item.quantity, 0)
-  const selectedPrice = formData.size ? getPriceForSize(formData.size) : null
   const selectedBasePrice = formData.size ? getBasePriceForSize(formData.size) : null
-  const selectedShipping = formData.size ? getShippingForSize(formData.size) : null
+  const selectedShipping = isBayArea ? 0 : formData.size ? getShippingForSize(formData.size) : null
+  const selectedTotal = selectedBasePrice && selectedShipping !== null ? selectedBasePrice + selectedShipping : null
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -273,11 +250,11 @@ export function OrderForm() {
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
                 <span className="text-base sm:text-lg font-semibold text-neutral-600">Custom Design Price:</span>
                 <span className="text-xl sm:text-2xl font-bold text-neutral-900">
-                  {selectedPrice ? `$${selectedPrice}` : "Starting at $135"}
+                  {selectedTotal ? `$${selectedTotal}` : "Starting at $120"}
                 </span>
               </div>
 
-              {formData.size && selectedPrice && (
+              {formData.size && selectedBasePrice && selectedShipping !== null && (
                 <div className="bg-white p-3 rounded border">
                   <h4 className="font-semibold text-neutral-800 mb-2">Price Breakdown for {formData.size}</h4>
                   <div className="space-y-1 text-sm text-neutral-600">
@@ -287,18 +264,43 @@ export function OrderForm() {
                     </div>
                     <div className="flex justify-between">
                       <span>Shipping:</span>
-                      <span>${selectedShipping}</span>
+                      <span className={isBayArea ? "text-green-600 font-medium" : ""}>
+                        ${selectedShipping} {isBayArea && "(FREE!)"}
+                      </span>
                     </div>
                     <div className="flex justify-between font-semibold text-neutral-900 border-t pt-1">
                       <span>Total:</span>
-                      <span>${selectedPrice}</span>
+                      <span>${selectedTotal}</span>
                     </div>
                   </div>
                 </div>
               )}
+
+              {/* Bay Area Option */}
+              <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                <div className="flex items-center space-x-2 mb-2">
+                  <Checkbox
+                    id="bayAreaCustom"
+                    checked={isBayArea}
+                    onCheckedChange={(checked) => setIsBayArea(checked as boolean)}
+                  />
+                  <Label htmlFor="bayAreaCustom" className="text-sm font-medium cursor-pointer">
+                    <div className="flex items-center space-x-2">
+                      <MapPin className="w-4 h-4 text-green-600" />
+                      <span className="text-green-800">Yes, I'm in the Bay Area (Free pickup/dropoff)</span>
+                    </div>
+                  </Label>
+                </div>
+                {isBayArea && (
+                  <p className="text-xs text-green-700 ml-6">
+                    We'll contact you to arrange free pickup or dropoff in the Bay Area!
+                  </p>
+                )}
+              </div>
             </div>
             <p className="text-xs sm:text-sm text-neutral-600 mt-2">
-              All custom designs are hand-painted and made to order. Price includes shipping.
+              All custom designs are hand-painted and made to order. Price includes shipping unless Bay Area pickup is
+              selected.
             </p>
           </div>
 
@@ -428,29 +430,29 @@ export function OrderForm() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="" disabled className="text-neutral-500 font-semibold">
-                    Men's Sizes - $230
+                    Men's Sizes - $210 + shipping
                   </SelectItem>
                   {allSizes
                     .filter((size) => !size.includes("W") && !size.includes("C") && !size.includes("Y"))
                     .map((size) => (
                       <SelectItem key={size} value={size} className="text-sm sm:text-base pl-4">
-                        {size} - $230
+                        {size} - $210
                       </SelectItem>
                     ))}
 
                   <SelectItem value="" disabled className="text-neutral-500 font-semibold">
-                    Women's Sizes - $230
+                    Women's Sizes - $210 + shipping
                   </SelectItem>
                   {allSizes
                     .filter((size) => size.includes("W"))
                     .map((size) => (
                       <SelectItem key={size} value={size} className="text-sm sm:text-base pl-4">
-                        {size} - $230
+                        {size} - $210
                       </SelectItem>
                     ))}
 
                   <SelectItem value="" disabled className="text-neutral-500 font-semibold">
-                    Big Kids (6Y-8Y) - $175
+                    Big Kids (6Y-8Y) - $160 + shipping
                   </SelectItem>
                   {allSizes
                     .filter((size) => {
@@ -460,12 +462,12 @@ export function OrderForm() {
                     })
                     .map((size) => (
                       <SelectItem key={size} value={size} className="text-sm sm:text-base pl-4">
-                        {size} - $175
+                        {size} - $160
                       </SelectItem>
                     ))}
 
                   <SelectItem value="" disabled className="text-neutral-500 font-semibold">
-                    Big Kids (1Y-5.5Y) - $145
+                    Big Kids (1Y-5.5Y) - $130 + shipping
                   </SelectItem>
                   {allSizes
                     .filter((size) => {
@@ -475,12 +477,12 @@ export function OrderForm() {
                     })
                     .map((size) => (
                       <SelectItem key={size} value={size} className="text-sm sm:text-base pl-4">
-                        {size} - $145
+                        {size} - $130
                       </SelectItem>
                     ))}
 
                   <SelectItem value="" disabled className="text-neutral-500 font-semibold">
-                    Little Kids (8C-13.5C) - $145
+                    Little Kids (8C-13.5C) - $130 + shipping
                   </SelectItem>
                   {allSizes
                     .filter((size) => {
@@ -490,12 +492,12 @@ export function OrderForm() {
                     })
                     .map((size) => (
                       <SelectItem key={size} value={size} className="text-sm sm:text-base pl-4">
-                        {size} - $145
+                        {size} - $130
                       </SelectItem>
                     ))}
 
                   <SelectItem value="" disabled className="text-neutral-500 font-semibold">
-                    Babies & Toddlers (1C-7C) - $135
+                    Babies & Toddlers (1C-7C) - $120 + shipping
                   </SelectItem>
                   {allSizes
                     .filter((size) => {
@@ -505,7 +507,7 @@ export function OrderForm() {
                     })
                     .map((size) => (
                       <SelectItem key={size} value={size} className="text-sm sm:text-base pl-4">
-                        {size} - $135
+                        {size} - $120
                       </SelectItem>
                     ))}
                 </SelectContent>
@@ -530,12 +532,16 @@ export function OrderForm() {
 
             <div>
               <Label htmlFor="address" className="text-neutral-900 text-sm sm:text-base font-medium">
-                Shipping Address
+                {isBayArea ? "Address for Pickup/Dropoff Coordination" : "Shipping Address"}
               </Label>
               <Textarea
                 id="address"
                 name="address"
-                placeholder="Full shipping address including postal code"
+                placeholder={
+                  isBayArea
+                    ? "Address for pickup/dropoff coordination in the Bay Area"
+                    : "Full shipping address including postal code"
+                }
                 rows={3}
                 value={formData.address}
                 onChange={(e) => handleInputChange("address", e.target.value)}
@@ -552,6 +558,9 @@ export function OrderForm() {
                 <li>• Our team will contact you to discuss details and timeline</li>
                 <li>• Creation takes 2-4 weeks depending on complexity</li>
                 <li>• We'll send progress photos throughout the process</li>
+                {isBayArea && (
+                  <li className="text-green-600 font-medium">• Free Bay Area pickup/dropoff will be arranged</li>
+                )}
                 {state.items.length > 0 && (
                   <li className="text-blue-600 font-medium">
                     • Your cart items will remain saved for separate checkout
@@ -575,7 +584,7 @@ export function OrderForm() {
                 ) : (
                   <>
                     <Send className="mr-2 h-4 w-4" />
-                    Proceed to Payment - {selectedPrice ? `$${selectedPrice}` : "Select Size"}
+                    Proceed to Payment - {selectedTotal ? `$${selectedTotal}` : "Select Size"}
                   </>
                 )}
               </Button>

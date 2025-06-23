@@ -6,11 +6,29 @@ import { Button } from "@/components/ui/button"
 import { X, Minus, Plus, ShoppingBag, Send } from "lucide-react"
 import Image from "next/image"
 
+// Shipping calculation function
+const getShippingForSize = (size: string): number => {
+  // Kids and toddlers: $15 shipping
+  if (size.includes("C") || size.includes("Y")) {
+    return 15
+  }
+  // Adults: $20 shipping
+  return 20
+}
+
 export function CartSidebar() {
   const { state, dispatch } = useCart()
   const [isProcessing, setIsProcessing] = useState(false)
 
-  const total = state.items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  // Calculate subtotal (base prices only)
+  const subtotal = state.items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+
+  // Calculate shipping based on items in cart
+  const shipping = state.items.reduce((sum, item) => {
+    return sum + getShippingForSize(item.size) * item.quantity
+  }, 0)
+
+  const total = subtotal + shipping
 
   const handleCheckout = async () => {
     setIsProcessing(true)
@@ -21,6 +39,8 @@ export function CartSidebar() {
     // Store order in localStorage for the checkout page
     const orderData = {
       items: state.items,
+      subtotal,
+      shipping,
       total,
       timestamp: new Date().toISOString(),
       orderId: `SP-${Date.now()}`,
@@ -74,6 +94,7 @@ export function CartSidebar() {
                       <h3 className="font-medium text-sm sm:text-base text-black truncate">{item.name}</h3>
                       <p className="text-xs sm:text-sm text-black">Size: {item.size}</p>
                       <p className="font-semibold text-sm sm:text-base text-black">${item.price}</p>
+                      <p className="text-xs text-neutral-600">+ ${getShippingForSize(item.size)} shipping</p>
                     </div>
                     <div className="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
                       <Button
@@ -112,8 +133,19 @@ export function CartSidebar() {
 
           {state.items.length > 0 && (
             <div className="border-t p-3 sm:p-4">
-              <div className="flex justify-between items-center mb-3 sm:mb-4">
-                <span className="text-base sm:text-lg font-semibold text-black">Total: ${total}</span>
+              <div className="space-y-2 mb-3 sm:mb-4">
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-neutral-600">Subtotal:</span>
+                  <span className="text-black">${subtotal}</span>
+                </div>
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-neutral-600">Shipping:</span>
+                  <span className="text-black">${shipping}</span>
+                </div>
+                <div className="flex justify-between items-center text-base sm:text-lg font-semibold border-t pt-2">
+                  <span className="text-black">Total:</span>
+                  <span className="text-black">${total}</span>
+                </div>
               </div>
               <Button
                 className="w-full bg-neutral-900 hover:bg-neutral-800 text-white border border-neutral-700"

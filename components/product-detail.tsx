@@ -18,46 +18,7 @@ interface Shoe {
   details: string[]
 }
 
-// Pricing function based on size
-const getPriceForSize = (size: string): number => {
-  // Babies/Toddlers (1C-7C): $120 + $15 shipping = $135
-  if (size.includes("C")) {
-    const num = Number.parseFloat(size)
-    if (num >= 1 && num <= 7) {
-      return 135
-    }
-    // Little Kids (8C-13.5C): $130 + $15 shipping = $145
-    if (num >= 7.5 && num <= 13.5) {
-      return 145
-    }
-  }
-
-  // Big Kids (1Y-8Y)
-  if (size.includes("Y")) {
-    const num = Number.parseFloat(size)
-    // 1Y-5.5Y: $130 + $15 shipping = $145
-    if (num >= 1 && num <= 5.5) {
-      return 145
-    }
-    // 6Y-8Y: $160 + $15 shipping = $175
-    if (num >= 6 && num <= 8) {
-      return 175
-    }
-  }
-
-  // Women's and Men's: $210 + $20 shipping = $230
-  return 230
-}
-
-const getShippingForSize = (size: string): number => {
-  // Kids and toddlers: $15 shipping
-  if (size.includes("C") || size.includes("Y")) {
-    return 15
-  }
-  // Adults: $20 shipping
-  return 20
-}
-
+// Base pricing function (before shipping)
 const getBasePriceForSize = (size: string): number => {
   // Babies/Toddlers (1C-7C): $120
   if (size.includes("C")) {
@@ -86,6 +47,15 @@ const getBasePriceForSize = (size: string): number => {
 
   // Women's and Men's: $210
   return 210
+}
+
+const getShippingForSize = (size: string): number => {
+  // Kids and toddlers: $15 shipping
+  if (size.includes("C") || size.includes("Y")) {
+    return 15
+  }
+  // Adults: $20 shipping
+  return 20
 }
 
 export function ProductDetail({ shoe: initialShoe }: { shoe: Shoe }) {
@@ -131,14 +101,15 @@ export function ProductDetail({ shoe: initialShoe }: { shoe: Shoe }) {
   const handleAddToCart = () => {
     if (!selectedSize) return
 
-    const actualPrice = getPriceForSize(selectedSize)
+    // Store base price in cart (shipping calculated at checkout)
+    const basePrice = getBasePriceForSize(selectedSize)
 
     dispatch({
       type: "ADD_ITEM",
       payload: {
         id: `${shoe.id}-${selectedSize}`,
         name: shoe.name,
-        price: actualPrice,
+        price: basePrice, // Store base price only
         size: selectedSize,
         image: shoe.images[0],
       },
@@ -193,7 +164,7 @@ export function ProductDetail({ shoe: initialShoe }: { shoe: Shoe }) {
           {categorySizes.map((size) => {
             const isInStock = inStockSizes.includes(size)
             const isSelected = selectedSize === size
-            const sizePrice = getPriceForSize(size)
+            const sizePrice = getBasePriceForSize(size)
 
             return (
               <button
@@ -207,7 +178,7 @@ export function ProductDetail({ shoe: initialShoe }: { shoe: Shoe }) {
                       ? "border-neutral-600 text-white hover:border-neutral-400"
                       : "border-neutral-700 text-neutral-500 cursor-not-allowed"
                 }`}
-                title={isInStock ? `${size} - $${sizePrice}` : "Out of stock"}
+                title={isInStock ? `${size} - $${sizePrice} + shipping` : "Out of stock"}
               >
                 <div className="text-sm font-medium">{size}</div>
                 {isInStock && <div className="text-xs opacity-75">${sizePrice}</div>}
@@ -225,7 +196,6 @@ export function ProductDetail({ shoe: initialShoe }: { shoe: Shoe }) {
   }
 
   const canAddToCart = selectedSize && inStockSizes.includes(selectedSize)
-  const selectedPrice = selectedSize ? getPriceForSize(selectedSize) : null
   const selectedBasePrice = selectedSize ? getBasePriceForSize(selectedSize) : null
   const selectedShipping = selectedSize ? getShippingForSize(selectedSize) : null
 
@@ -324,10 +294,12 @@ export function ProductDetail({ shoe: initialShoe }: { shoe: Shoe }) {
               <h1 className="font-playfair text-3xl md:text-4xl font-bold text-white mb-2">{shoe.name}</h1>
               <div className="space-y-2">
                 <p className="text-2xl font-bold text-white">
-                  Starting at $135
-                  {selectedPrice && <span className="ml-2 text-lg text-neutral-300">(Selected: ${selectedPrice})</span>}
+                  Starting at $120
+                  {selectedBasePrice && (
+                    <span className="ml-2 text-lg text-neutral-300">(Selected: ${selectedBasePrice})</span>
+                  )}
                 </p>
-                <p className="text-sm text-neutral-400">Price varies by size • Shipping included</p>
+                <p className="text-sm text-neutral-400">Price before shipping • Shipping calculated at checkout</p>
               </div>
             </div>
 
@@ -336,19 +308,16 @@ export function ProductDetail({ shoe: initialShoe }: { shoe: Shoe }) {
             {/* Pricing Breakdown */}
             {selectedSize && (
               <div className="bg-neutral-800 rounded-lg p-4">
-                <h3 className="text-white font-semibold mb-2">Price Breakdown for {selectedSize}</h3>
+                <h3 className="text-white font-semibold mb-2">Price for {selectedSize}</h3>
                 <div className="space-y-1 text-sm">
-                  <div className="flex justify-between text-neutral-300">
+                  <div className="flex justify-between text-white font-semibold">
                     <span>Base Price:</span>
                     <span>${selectedBasePrice}</span>
                   </div>
-                  <div className="flex justify-between text-neutral-300">
-                    <span>Shipping:</span>
-                    <span>${selectedShipping}</span>
-                  </div>
-                  <div className="flex justify-between text-white font-semibold border-t border-neutral-600 pt-1 mt-1">
-                    <span>Total:</span>
-                    <span>${selectedPrice}</span>
+                  <div className="text-xs text-neutral-400 mt-2">
+                    + ${selectedShipping} shipping (calculated at checkout)
+                    <br />
+                    Bay Area customers: Free pickup/dropoff available
                   </div>
                 </div>
               </div>
@@ -375,7 +344,7 @@ export function ProductDetail({ shoe: initialShoe }: { shoe: Shoe }) {
                   <Truck className="w-5 h-5 text-blue-400 mt-0.5" />
                 </div>
                 <div>
-                  <h3 className="text-white font-semibold mb-2">Shipping Options</h3>
+                  <h3 className="text-white font-semibold mb-2">Shipping Information</h3>
                   <div className="space-y-2 text-sm text-neutral-300">
                     <div className="flex items-center space-x-2">
                       <MapPin className="w-4 h-4 text-green-400" />
@@ -399,17 +368,19 @@ export function ProductDetail({ shoe: initialShoe }: { shoe: Shoe }) {
             {/* Size Selection */}
             <div>
               <h3 className="text-lg font-semibold mb-3 text-white">Select Size</h3>
-              <p className="text-sm text-neutral-400 mb-4">Sizes marked "Out" are currently unavailable</p>
+              <p className="text-sm text-neutral-400 mb-4">
+                Prices shown before shipping • Sizes marked "Out" are currently unavailable
+              </p>
 
-              {renderSizeCategory("Men's", mensSizes, "$230")}
-              {renderSizeCategory("Women's", womensSizes, "$230")}
+              {renderSizeCategory("Men's", mensSizes, "$210")}
+              {renderSizeCategory("Women's", womensSizes, "$210")}
               {renderSizeCategory(
                 "Big Kids (6Y-8Y)",
                 bigKidsSizes.filter((size) => {
                   const num = Number.parseFloat(size)
                   return num >= 6 && num <= 8
                 }),
-                "$175",
+                "$160",
               )}
               {renderSizeCategory(
                 "Big Kids (1Y-5.5Y)",
@@ -417,10 +388,10 @@ export function ProductDetail({ shoe: initialShoe }: { shoe: Shoe }) {
                   const num = Number.parseFloat(size)
                   return num >= 1 && num <= 5.5
                 }),
-                "$145",
+                "$130",
               )}
-              {renderSizeCategory("Little Kids (8C-13.5C)", littleKidsSizes, "$145")}
-              {renderSizeCategory("Babies & Toddlers (1C-7C)", babiesToddlerSizes, "$135")}
+              {renderSizeCategory("Little Kids (8C-13.5C)", littleKidsSizes, "$130")}
+              {renderSizeCategory("Babies & Toddlers (1C-7C)", babiesToddlerSizes, "$120")}
             </div>
 
             {/* Add to Cart */}
@@ -435,7 +406,7 @@ export function ProductDetail({ shoe: initialShoe }: { shoe: Shoe }) {
               ) : !inStockSizes.includes(selectedSize) ? (
                 "Size Out of Stock"
               ) : (
-                `Add to Cart - $${selectedPrice}`
+                `Add to Cart - $${selectedBasePrice}`
               )}
             </Button>
 
