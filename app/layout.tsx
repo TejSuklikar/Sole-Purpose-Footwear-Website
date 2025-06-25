@@ -24,16 +24,16 @@ export const metadata: Metadata = {
   generator: "v0.dev",
   icons: {
     icon: [
-      { url: "/placeholder-logo.png", sizes: "32x32", type: "image/png" },
-      { url: "/placeholder-logo.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon.png", sizes: "16x16", type: "image/png" },
     ],
-    shortcut: "/placeholder-logo.png",
-    apple: "/placeholder-logo.png",
+    shortcut: "/favicon.png",
+    apple: "/favicon.png",
     other: [
       {
         rel: "icon",
-        url: "/placeholder-logo.svg",
-        type: "image/svg+xml",
+        url: "/favicon.ico",
+        type: "image/x-icon",
       },
     ],
   },
