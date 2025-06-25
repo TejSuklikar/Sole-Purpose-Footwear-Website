@@ -6,8 +6,23 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Plus, Star, Trash2, StarOff, Package, Check, X, Calendar, MapPin, Clock, Edit } from "lucide-react"
+import {
+  Plus,
+  Star,
+  Trash2,
+  StarOff,
+  Package,
+  Check,
+  X,
+  Calendar,
+  MapPin,
+  Clock,
+  Edit,
+  Cloud,
+  CloudOff,
+} from "lucide-react"
 import Image from "next/image"
+import { syncShoesToRepo, syncEventsToRepo } from "@/lib/github-sync"
 
 interface Shoe {
   id: number
@@ -323,6 +338,8 @@ export function AdminPanel() {
   const [showAddEventForm, setShowAddEventForm] = useState(false)
   const [editingInventory, setEditingInventory] = useState<number | null>(null)
   const [editingEvent, setEditingEvent] = useState<number | null>(null)
+  const [syncStatus, setSyncStatus] = useState<"idle" | "syncing" | "success" | "error">("idle")
+  const [lastSyncTime, setLastSyncTime] = useState<string | null>(null)
   const [newShoe, setNewShoe] = useState({
     name: "",
     price: "160", // Default to $160 sticker price
@@ -370,21 +387,59 @@ export function AdminPanel() {
       setEvents(defaultEvents)
       localStorage.setItem("sp_events_global", JSON.stringify(defaultEvents))
     }
+
+    // Load last sync time
+    const lastSync = localStorage.getItem("sp_last_sync")
+    if (lastSync) {
+      setLastSyncTime(lastSync)
+    }
   }, [])
 
-  const saveShoes = (updatedShoes: Shoe[]) => {
+  const saveShoes = async (updatedShoes: Shoe[]) => {
     setShoes(updatedShoes)
-    // Save to global storage that all users can access
+    // Save to local storage immediately
     localStorage.setItem("sp_shoes_global", JSON.stringify(updatedShoes))
+
+    // Sync to repository
+    await syncToRepository("shoes", updatedShoes)
   }
 
-  const saveEvents = (updatedEvents: Event[]) => {
+  const saveEvents = async (updatedEvents: Event[]) => {
     setEvents(updatedEvents)
-    // Save to global storage that all users can access
+    // Save to local storage immediately
     localStorage.setItem("sp_events_global", JSON.stringify(updatedEvents))
+
+    // Sync to repository
+    await syncToRepository("events", updatedEvents)
   }
 
-  const handleAddShoe = () => {
+  const syncToRepository = async (type: "shoes" | "events", data: any[]) => {
+    try {
+      setSyncStatus("syncing")
+
+      if (type === "shoes") {
+        await syncShoesToRepo(data)
+      } else {
+        await syncEventsToRepo(data)
+      }
+
+      setSyncStatus("success")
+      const now = new Date().toLocaleString()
+      setLastSyncTime(now)
+      localStorage.setItem("sp_last_sync", now)
+
+      // Reset status after 3 seconds
+      setTimeout(() => setSyncStatus("idle"), 3000)
+    } catch (error) {
+      console.error("Sync failed:", error)
+      setSyncStatus("error")
+
+      // Reset status after 5 seconds
+      setTimeout(() => setSyncStatus("idle"), 5000)
+    }
+  }
+
+  const handleAddShoe = async () => {
     if (!newShoe.name || !newShoe.price || !newShoe.image) return
 
     const shoe: Shoe = {
@@ -404,7 +459,7 @@ export function AdminPanel() {
     }
 
     const updatedShoes = [...shoes, shoe]
-    saveShoes(updatedShoes)
+    await saveShoes(updatedShoes)
 
     // Reset form
     setNewShoe({
@@ -419,7 +474,7 @@ export function AdminPanel() {
   }
 
   // Update the Add Event form validation
-  const handleAddEvent = () => {
+  const handleAddEvent = async () => {
     // Validate required fields
     if (!newEvent.title.trim()) {
       alert("Please enter an event title")
@@ -448,7 +503,7 @@ export function AdminPanel() {
     }
 
     const updatedEvents = [...events, event]
-    saveEvents(updatedEvents)
+    await saveEvents(updatedEvents)
 
     // Reset form
     setNewEvent({
@@ -461,24 +516,24 @@ export function AdminPanel() {
     setShowAddEventForm(false)
   }
 
-  const handleDeleteShoe = (id: number) => {
+  const handleDeleteShoe = async (id: number) => {
     if (confirm("Are you sure you want to delete this shoe?")) {
       const updatedShoes = shoes.filter((shoe) => shoe.id !== id)
-      saveShoes(updatedShoes)
+      await saveShoes(updatedShoes)
     }
   }
 
-  const handleDeleteEvent = (id: number) => {
+  const handleDeleteEvent = async (id: number) => {
     if (confirm("Are you sure you want to delete this event?")) {
       const updatedEvents = events.filter((event) => event.id !== id)
-      saveEvents(updatedEvents)
+      await saveEvents(updatedEvents)
     }
   }
 
   // Update the handleUpdateEvent function
-  const handleUpdateEvent = (updatedEvent: Event) => {
+  const handleUpdateEvent = async (updatedEvent: Event) => {
     const updatedEvents = events.map((event) => (event.id === updatedEvent.id ? updatedEvent : event))
-    saveEvents(updatedEvents)
+    await saveEvents(updatedEvents)
     setEditingEvent(null)
     setEditingEventData(null)
   }
@@ -493,18 +548,18 @@ export function AdminPanel() {
     setEditingEventData(null)
   }
 
-  const toggleFeatured = (id: number) => {
+  const toggleFeatured = async (id: number) => {
     const featuredCount = shoes.filter((shoe) => shoe.isFeatured).length
     const shoe = shoes.find((s) => s.id === id)
 
     if (shoe?.isFeatured) {
       // Removing from featured
       const updatedShoes = shoes.map((s) => (s.id === id ? { ...s, isFeatured: false } : s))
-      saveShoes(updatedShoes)
+      await saveShoes(updatedShoes)
     } else if (featuredCount < 3) {
       // Adding to featured (max 3)
       const updatedShoes = shoes.map((s) => (s.id === id ? { ...s, isFeatured: true } : s))
-      saveShoes(updatedShoes)
+      await saveShoes(updatedShoes)
     } else {
       alert("You can only have 3 featured shoes. Remove one first.")
     }
@@ -518,7 +573,7 @@ export function AdminPanel() {
     setNewShoe({ ...newShoe, sizes: updatedSizes })
   }
 
-  const toggleSizeStock = (shoeId: number, size: string) => {
+  const toggleSizeStock = async (shoeId: number, size: string) => {
     const updatedShoes = shoes.map((shoe) => {
       if (shoe.id === shoeId) {
         const inStockSizes = shoe.inStockSizes.includes(size)
@@ -528,7 +583,7 @@ export function AdminPanel() {
       }
       return shoe
     })
-    saveShoes(updatedShoes)
+    await saveShoes(updatedShoes)
   }
 
   const selectAllSizes = () => {
@@ -615,10 +670,42 @@ export function AdminPanel() {
     return false
   })
 
+  const getSyncStatusIcon = () => {
+    switch (syncStatus) {
+      case "syncing":
+        return <Cloud className="h-4 w-4 animate-spin text-blue-500" />
+      case "success":
+        return <Cloud className="h-4 w-4 text-green-500" />
+      case "error":
+        return <CloudOff className="h-4 w-4 text-red-500" />
+      default:
+        return <Cloud className="h-4 w-4 text-gray-500" />
+    }
+  }
+
+  const getSyncStatusText = () => {
+    switch (syncStatus) {
+      case "syncing":
+        return "Syncing to repository..."
+      case "success":
+        return "Successfully synced to repository"
+      case "error":
+        return "Failed to sync to repository"
+      default:
+        return lastSyncTime ? `Last synced: ${lastSyncTime}` : "Ready to sync"
+    }
+  }
+
   return (
     <div className="space-y-8">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-white">Admin Panel</h1>
+        <div>
+          <h1 className="text-3xl font-bold text-white">Admin Panel</h1>
+          <div className="flex items-center gap-2 mt-2">
+            {getSyncStatusIcon()}
+            <span className="text-sm text-neutral-400">{getSyncStatusText()}</span>
+          </div>
+        </div>
         <div className="flex gap-2">
           <Button onClick={() => setShowAddEventForm(true)} className="bg-blue-600 text-white hover:bg-blue-700">
             <Calendar className="mr-2 h-4 w-4" />
@@ -630,6 +717,29 @@ export function AdminPanel() {
           </Button>
         </div>
       </div>
+
+      {/* Sync Status Card */}
+      <Card className="bg-green-900/20 border-green-800">
+        <CardHeader>
+          <CardTitle className="text-white flex items-center">
+            <Cloud className="mr-2 h-5 w-5 text-green-500" />
+            Repository Sync Status
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-sm text-neutral-300">
+            <p className="mb-2">
+              ✅ <strong>Bidirectional Sync Enabled</strong>
+            </p>
+            <p className="mb-1">• Admin changes automatically commit to GitHub repository</p>
+            <p className="mb-1">• Triggers automatic deployment to solepurpose.shop</p>
+            <p className="mb-1">• Full version history and backup of all changes</p>
+            <p className="text-xs text-neutral-400 mt-3">
+              Changes typically appear on live site within 3-4 minutes after sync.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Pricing Info Card */}
       <Card className="bg-blue-900/20 border-blue-800">
@@ -677,7 +787,7 @@ export function AdminPanel() {
             Upcoming Events ({events.length})
           </CardTitle>
           <p className="text-neutral-400 text-sm">
-            Manage events that appear on the homepage. Changes are visible to all users immediately.
+            Manage events that appear on the homepage. Changes are automatically synced to repository and deployed.
           </p>
         </CardHeader>
         <CardContent>
