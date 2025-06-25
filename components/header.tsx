@@ -10,7 +10,8 @@ import { SPLogo } from "@/components/sp-logo"
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const { items, toggleCart } = useCart()
+  // Always fall back to an empty array / no-op function
+  const { items = [], toggleCart = () => {} } = useCart()
   const { user, logout } = useAuth()
 
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0)
