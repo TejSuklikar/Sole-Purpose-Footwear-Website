@@ -17,10 +17,10 @@ const defaultEvents: Event[] = [
   {
     id: 1,
     title: "Pop-Up Gallery Opening",
-    date: "July 3, 2025",
+    date: "July 2-5, 2025",
     time: "6:00 PM - 10:00 PM",
-    location: "2025 Ramallah Convention, San Francisco",
-    description: "Exclusive showcase of our latest custom designs",
+    location: "Hyatt Regency Burlingame, San Francisco, CA",
+    description: "Exclusive showcase of our latest custom designs at the 2025 Ramallah Convention",
   },
   {
     id: 2,
