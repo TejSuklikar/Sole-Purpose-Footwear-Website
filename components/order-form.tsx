@@ -344,7 +344,7 @@ export function OrderForm() {
           <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
-                <Label htmlFor="firstName" className="text-neutral-900 text-sm sm:text-base font-medium">
+                <Label htmlFor="firstName" className="text-white text-sm sm:text-base font-medium">
                   First Name
                 </Label>
                 <Input
@@ -357,7 +357,7 @@ export function OrderForm() {
                 />
               </div>
               <div>
-                <Label htmlFor="lastName" className="text-neutral-900 text-sm sm:text-base font-medium">
+                <Label htmlFor="lastName" className="text-white text-sm sm:text-base font-medium">
                   Last Name
                 </Label>
                 <Input
@@ -373,7 +373,7 @@ export function OrderForm() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
-                <Label htmlFor="email" className="text-neutral-900 text-sm sm:text-base font-medium">
+                <Label htmlFor="email" className="text-white text-sm sm:text-base font-medium">
                   Email Address
                 </Label>
                 <Input
@@ -387,7 +387,7 @@ export function OrderForm() {
                 />
               </div>
               <div>
-                <Label htmlFor="phone" className="text-neutral-900 text-sm sm:text-base font-medium">
+                <Label htmlFor="phone" className="text-white text-sm sm:text-base font-medium">
                   Phone Number
                 </Label>
                 <Input
@@ -403,7 +403,7 @@ export function OrderForm() {
             </div>
 
             <div>
-              <Label htmlFor="shoeModel" className="text-neutral-900 text-sm sm:text-base font-medium">
+              <Label htmlFor="shoeModel" className="text-white text-sm sm:text-base font-medium">
                 Shoe Model
               </Label>
               <Select
@@ -426,7 +426,7 @@ export function OrderForm() {
             </div>
 
             <div>
-              <Label htmlFor="size" className="text-neutral-900 text-sm sm:text-base font-medium">
+              <Label htmlFor="size" className="text-white text-sm sm:text-base font-medium">
                 Shoe Size
               </Label>
               <Select
@@ -523,7 +523,7 @@ export function OrderForm() {
             </div>
 
             <div>
-              <Label htmlFor="designDescription" className="text-neutral-900 text-sm sm:text-base font-medium">
+              <Label htmlFor="designDescription" className="text-white text-sm sm:text-base font-medium">
                 Design Description
               </Label>
               <Textarea
@@ -539,7 +539,7 @@ export function OrderForm() {
             </div>
 
             <div>
-              <Label htmlFor="address" className="text-neutral-900 text-sm sm:text-base font-medium">
+              <Label htmlFor="address" className="text-white text-sm sm:text-base font-medium">
                 {isBayArea ? "Address for Pickup/Dropoff Coordination" : "Shipping Address"}
               </Label>
               <Textarea
