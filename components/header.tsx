@@ -1,41 +1,95 @@
-import type React from "react"
+"use client"
+
 import Link from "next/link"
-import { useShoppingCart } from "use-shopping-cart"
+import { usePathname } from "next/navigation"
+import { cn } from "@/lib/utils"
+import { useCart } from "./cart-provider"
+import { useAuth } from "./auth-provider"
+import { ShoppingBag, LogOut, Shield, Users } from "lucide-react"
+import { Button } from "./ui/button"
 
-const Header: React.FC = () => {
-  const { cartCount, formattedTotalPrice, items } = useShoppingCart()
+export function Header() {
+  const pathname = usePathname()
+  const { state, dispatch } = useCart()
+  const { user, logout } = useAuth()
 
-  const itemCount = items?.reduce((sum, item) => sum + item.quantity, 0) || 0
+  const navigation = [
+    { name: "Home", href: "/" },
+    { name: "About", href: "/about" },
+    { name: "Shoes", href: "/shoes" },
+    { name: "Custom Order", href: "/order" },
+  ]
+
+  if (user?.isAdmin) {
+    navigation.push({ name: "Admin", href: "/admin" })
+  }
 
   return (
-    <header className="bg-white shadow-md py-4">
-      <div className="container mx-auto flex items-center justify-between">
-        <Link href="/" className="text-2xl font-bold text-gray-800">
-          My Store
-        </Link>
+    <header className="sticky top-0 z-50 bg-neutral-950/95 backdrop-blur-sm border-b border-neutral-800">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          <Link href="/" className="flex items-center space-x-2">
+            <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
+              <span className="text-black font-bold text-sm">SP</span>
+            </div>
+            <span className="font-playfair text-xl font-semibold text-white">Sole Purpose</span>
+          </Link>
 
-        <nav>
-          <ul className="flex space-x-6">
-            <li>
-              <Link href="/" className="text-gray-600 hover:text-gray-800">
-                Home
-              </Link>
-            </li>
-            <li>
-              <Link href="/products" className="text-gray-600 hover:text-gray-800">
-                Products
-              </Link>
-            </li>
-            <li>
-              <Link href="/cart" className="text-gray-600 hover:text-gray-800 flex items-center">
-                Cart ({itemCount})
-              </Link>
-            </li>
-          </ul>
-        </nav>
+          <div className="flex items-center space-x-2 sm:space-x-4">
+            <nav className="hidden md:flex space-x-4 lg:space-x-8">
+              {navigation.map((item) => (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={cn(
+                    "text-xs lg:text-sm font-medium transition-colors duration-200 px-2 py-1",
+                    pathname === item.href ? "text-white border-b-2 border-white" : "text-neutral-300 hover:text-white",
+                  )}
+                >
+                  {item.name}
+                </Link>
+              ))}
+            </nav>
+
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => dispatch({ type: "TOGGLE_CART" })}
+                className="relative p-2 text-neutral-300 hover:text-white transition-colors"
+              >
+                <ShoppingBag className="h-6 w-6" />
+                {state.items.length > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-white text-black text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    {state.items.reduce((sum, item) => sum + item.quantity, 0)}
+                  </span>
+                )}
+              </button>
+
+              {user && (
+                <div className="flex items-center space-x-1 sm:space-x-2">
+                  <div className="flex items-center space-x-1">
+                    {user.isAdmin ? (
+                      <Shield className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-500" />
+                    ) : (
+                      <Users className="h-3 w-3 sm:h-4 sm:w-4 text-blue-500" />
+                    )}
+                    <span className="text-neutral-300 text-xs sm:text-sm hidden sm:block">
+                      {user.isAdmin ? "Admin" : "Guest"}
+                    </span>
+                  </div>
+                  <Button
+                    onClick={logout}
+                    variant="ghost"
+                    size="sm"
+                    className="text-neutral-300 hover:text-white p-1 sm:p-2"
+                  >
+                    <LogOut className="h-3 w-3 sm:h-4 sm:w-4" />
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </header>
   )
 }
-
-export default Header

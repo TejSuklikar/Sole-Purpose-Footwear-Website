@@ -323,7 +323,6 @@ export function AdminPanel() {
   const [showAddEventForm, setShowAddEventForm] = useState(false)
   const [editingInventory, setEditingInventory] = useState<number | null>(null)
   const [editingEvent, setEditingEvent] = useState<number | null>(null)
-  const [editingEventData, setEditingEventData] = useState<Event | null>(null)
   const [newShoe, setNewShoe] = useState({
     name: "",
     price: "160", // Default to $160 sticker price
@@ -339,6 +338,9 @@ export function AdminPanel() {
     location: "",
     description: "",
   })
+
+  // Add this state for editing events
+  const [editingEventData, setEditingEventData] = useState<Event | null>(null)
 
   // Load shoes and events from localStorage on mount
   useEffect(() => {
@@ -416,16 +418,33 @@ export function AdminPanel() {
     setShowAddForm(false)
   }
 
+  // Update the Add Event form validation
   const handleAddEvent = () => {
-    if (!newEvent.title || !newEvent.date || !newEvent.time || !newEvent.location) return
+    // Validate required fields
+    if (!newEvent.title.trim()) {
+      alert("Please enter an event title")
+      return
+    }
+    if (!newEvent.date.trim()) {
+      alert("Please enter an event date")
+      return
+    }
+    if (!newEvent.time.trim()) {
+      alert("Please enter an event time")
+      return
+    }
+    if (!newEvent.location.trim()) {
+      alert("Please enter an event location")
+      return
+    }
 
     const event: Event = {
       id: Date.now(),
-      title: newEvent.title,
-      date: newEvent.date,
-      time: newEvent.time,
-      location: newEvent.location,
-      description: newEvent.description,
+      title: newEvent.title.trim(),
+      date: newEvent.date.trim(),
+      time: newEvent.time.trim(),
+      location: newEvent.location.trim(),
+      description: newEvent.description.trim(),
     }
 
     const updatedEvents = [...events, event]
@@ -456,22 +475,20 @@ export function AdminPanel() {
     }
   }
 
-  // Fixed event editing functions
-  const startEditingEvent = (event: Event) => {
-    setEditingEvent(event.id)
-    setEditingEventData({ ...event }) // Create a copy for local editing
-  }
-
-  const cancelEditingEvent = () => {
+  // Update the handleUpdateEvent function
+  const handleUpdateEvent = (updatedEvent: Event) => {
+    const updatedEvents = events.map((event) => (event.id === updatedEvent.id ? updatedEvent : event))
+    saveEvents(updatedEvents)
     setEditingEvent(null)
     setEditingEventData(null)
   }
 
-  const saveEditingEvent = () => {
-    if (!editingEventData) return
+  const startEditingEvent = (event: Event) => {
+    setEditingEvent(event.id)
+    setEditingEventData({ ...event }) // Create a copy for editing
+  }
 
-    const updatedEvents = events.map((event) => (event.id === editingEventData.id ? editingEventData : event))
-    saveEvents(updatedEvents)
+  const cancelEditingEvent = () => {
     setEditingEvent(null)
     setEditingEventData(null)
   }
@@ -717,7 +734,7 @@ export function AdminPanel() {
                     </div>
                     <div className="flex gap-2 pt-2">
                       <Button
-                        onClick={saveEditingEvent}
+                        onClick={() => handleUpdateEvent(editingEventData)}
                         size="sm"
                         className="bg-green-600 hover:bg-green-700 text-white flex-1"
                       >
@@ -785,56 +802,64 @@ export function AdminPanel() {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="eventTitle" className="text-white">
-                  Event Title
+                <Label htmlFor="eventTitle" className="text-white font-medium">
+                  Event Title *
                 </Label>
                 <Input
                   id="eventTitle"
                   value={newEvent.title}
                   onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
                   placeholder="e.g., Pop-Up Gallery Opening"
+                  className="mt-1"
+                  required
                 />
               </div>
               <div>
-                <Label htmlFor="eventDate" className="text-white">
-                  Date
+                <Label htmlFor="eventDate" className="text-white font-medium">
+                  Date *
                 </Label>
                 <Input
                   id="eventDate"
                   value={newEvent.date}
                   onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })}
                   placeholder="e.g., July 15, 2025"
+                  className="mt-1"
+                  required
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="eventTime" className="text-white">
-                  Time
+                <Label htmlFor="eventTime" className="text-white font-medium">
+                  Time *
                 </Label>
                 <Input
                   id="eventTime"
                   value={newEvent.time}
                   onChange={(e) => setNewEvent({ ...newEvent, time: e.target.value })}
                   placeholder="e.g., 6:00 PM - 10:00 PM"
+                  className="mt-1"
+                  required
                 />
               </div>
               <div>
-                <Label htmlFor="eventLocation" className="text-white">
-                  Location
+                <Label htmlFor="eventLocation" className="text-white font-medium">
+                  Location *
                 </Label>
                 <Input
                   id="eventLocation"
                   value={newEvent.location}
                   onChange={(e) => setNewEvent({ ...newEvent, location: e.target.value })}
                   placeholder="e.g., Mission District, San Francisco"
+                  className="mt-1"
+                  required
                 />
               </div>
             </div>
 
             <div>
-              <Label htmlFor="eventDescription" className="text-white">
+              <Label htmlFor="eventDescription" className="text-white font-medium">
                 Description
               </Label>
               <Textarea
@@ -843,14 +868,23 @@ export function AdminPanel() {
                 onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
                 placeholder="Brief description of the event..."
                 rows={3}
+                className="mt-1"
               />
+              <p className="text-xs text-neutral-400 mt-1">Optional - provide additional details about the event</p>
             </div>
 
-            <div className="flex gap-2">
-              <Button onClick={handleAddEvent} className="bg-blue-600 text-white hover:bg-blue-700">
+            <div className="flex gap-2 pt-2">
+              <Button
+                onClick={handleAddEvent}
+                className="bg-blue-600 text-white hover:bg-blue-700 flex-1"
+                disabled={
+                  !newEvent.title.trim() || !newEvent.date.trim() || !newEvent.time.trim() || !newEvent.location.trim()
+                }
+              >
+                <Plus className="h-4 w-4 mr-2" />
                 Add Event
               </Button>
-              <Button onClick={() => setShowAddEventForm(false)} variant="outline">
+              <Button onClick={() => setShowAddEventForm(false)} variant="outline" className="flex-1">
                 Cancel
               </Button>
             </div>
@@ -905,288 +939,286 @@ export function AdminPanel() {
       </Card>
 
       {/* Add Shoe Form */}
-      {showAddForm && (
-        <Card className="bg-neutral-900 border-neutral-800">
-          <CardHeader>
-            <CardTitle className="text-white">Add New Shoe</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="name" className="text-white">
-                  Shoe Name
-                </Label>
-                <Input
-                  id="name"
-                  value={newShoe.name}
-                  onChange={(e) => setNewShoe({ ...newShoe, name: e.target.value })}
-                  placeholder="e.g., Red Kuffiyeh AF1"
-                />
-              </div>
-              <div>
-                <Label htmlFor="price" className="text-white">
-                  Sticker Price ($)
-                </Label>
-                <Input
-                  id="price"
-                  type="number"
-                  value={newShoe.price}
-                  onChange={(e) => setNewShoe({ ...newShoe, price: e.target.value })}
-                  placeholder="160"
-                />
-                <p className="text-xs text-neutral-400 mt-1">
-                  Display price only. Actual pricing calculated by size at checkout.
-                </p>
-              </div>
-            </div>
-
+      <Card className="bg-neutral-900 border-neutral-800">
+        <CardHeader>
+          <CardTitle className="text-white">Add New Shoe</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="image" className="text-white">
-                Image URL
+              <Label htmlFor="name" className="text-white">
+                Shoe Name
               </Label>
               <Input
-                id="image"
-                value={newShoe.image}
-                onChange={(e) => setNewShoe({ ...newShoe, image: e.target.value })}
-                placeholder="/images/shoe-name.png"
+                id="name"
+                value={newShoe.name}
+                onChange={(e) => setNewShoe({ ...newShoe, name: e.target.value })}
+                placeholder="e.g., Red Kuffiyeh AF1"
               />
             </div>
-
             <div>
-              <Label htmlFor="description" className="text-white">
-                Description
+              <Label htmlFor="price" className="text-white">
+                Sticker Price ($)
               </Label>
-              <Textarea
-                id="description"
-                value={newShoe.description}
-                onChange={(e) => setNewShoe({ ...newShoe, description: e.target.value })}
-                placeholder="Describe the shoe design..."
-                rows={3}
+              <Input
+                id="price"
+                type="number"
+                value={newShoe.price}
+                onChange={(e) => setNewShoe({ ...newShoe, price: e.target.value })}
+                placeholder="160"
               />
-            </div>
-
-            <div>
-              <Label htmlFor="details" className="text-white">
-                Details (one per line)
-              </Label>
-              <Textarea
-                id="details"
-                value={newShoe.details}
-                onChange={(e) => setNewShoe({ ...newShoe, details: e.target.value })}
-                placeholder="Hand-painted with premium paints&#10;Sealed with protective coating&#10;Based on Nike Air Force 1&#10;Infant (1C-7.5C): $135 total | Toddler (8C-13.5C): $145 total | Youth: $145 total | Big Kids: $145-175 total | Adults: $230 total"
-                rows={4}
-              />
-            </div>
-
-            <div>
-              <Label className="text-white">Available Sizes (Updated Sizing System)</Label>
-
-              {/* Size Selection Controls */}
-              <div className="flex flex-wrap gap-2 mt-2 mb-4">
-                <Button type="button" onClick={selectAllSizes} size="sm" variant="outline" className="text-xs">
-                  Select All ({allSizes.length})
-                </Button>
-                <Button type="button" onClick={clearAllSizes} size="sm" variant="outline" className="text-xs">
-                  Clear All
-                </Button>
-                <Button
-                  type="button"
-                  onClick={() => selectSizeCategory("men")}
-                  size="sm"
-                  variant="outline"
-                  className="text-xs"
-                >
-                  + Men's ({mensSizes.length})
-                </Button>
-                <Button
-                  type="button"
-                  onClick={() => selectSizeCategory("women")}
-                  size="sm"
-                  variant="outline"
-                  className="text-xs"
-                >
-                  + Women's ({womensSizes.length})
-                </Button>
-                <Button
-                  type="button"
-                  onClick={() => selectSizeCategory("big-kids")}
-                  size="sm"
-                  variant="outline"
-                  className="text-xs"
-                >
-                  + Big Kids ({bigKidsSizes.length})
-                </Button>
-                <Button
-                  type="button"
-                  onClick={() => selectSizeCategory("youth")}
-                  size="sm"
-                  variant="outline"
-                  className="text-xs"
-                >
-                  + Youth ({youthSizes.length})
-                </Button>
-                <Button
-                  type="button"
-                  onClick={() => selectSizeCategory("toddler")}
-                  size="sm"
-                  variant="outline"
-                  className="text-xs"
-                >
-                  + Toddler ({toddlerSizes.length})
-                </Button>
-                <Button
-                  type="button"
-                  onClick={() => selectSizeCategory("infant")}
-                  size="sm"
-                  variant="outline"
-                  className="text-xs"
-                >
-                  + Infant ({infantSizes.length})
-                </Button>
-              </div>
-
-              {/* Men's Sizes */}
-              <div className="mb-4">
-                <h4 className="text-white text-sm font-medium mb-2">Men's Sizes (7-15) - $230 total</h4>
-                <div className="grid grid-cols-6 gap-2">
-                  {mensSizes.map((size) => (
-                    <button
-                      key={size}
-                      type="button"
-                      onClick={() => handleSizeToggle(size)}
-                      className={`p-2 rounded border text-sm ${
-                        newShoe.sizes.includes(size)
-                          ? "bg-white text-black border-white"
-                          : "bg-neutral-800 text-white border-neutral-600"
-                      }`}
-                    >
-                      {size}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Women's Sizes */}
-              <div className="mb-4">
-                <h4 className="text-white text-sm font-medium mb-2">Women's Sizes - $230 total</h4>
-                <div className="grid grid-cols-6 gap-2">
-                  {womensSizes.map((size) => (
-                    <button
-                      key={size}
-                      type="button"
-                      onClick={() => handleSizeToggle(size)}
-                      className={`p-2 rounded border text-sm ${
-                        newShoe.sizes.includes(size)
-                          ? "bg-white text-black border-white"
-                          : "bg-neutral-800 text-white border-neutral-600"
-                      }`}
-                    >
-                      {size}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Big Kids */}
-              <div className="mb-4">
-                <h4 className="text-white text-sm font-medium mb-2">Big Kids (6Y-8Y) - $175 total</h4>
-                <div className="grid grid-cols-6 gap-2">
-                  {bigKidsSizes.map((size) => (
-                    <button
-                      key={size}
-                      type="button"
-                      onClick={() => handleSizeToggle(size)}
-                      className={`p-2 rounded border text-sm ${
-                        newShoe.sizes.includes(size)
-                          ? "bg-white text-black border-white"
-                          : "bg-neutral-800 text-white border-neutral-600"
-                      }`}
-                    >
-                      {size}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Youth */}
-              <div className="mb-4">
-                <h4 className="text-white text-sm font-medium mb-2">Youth (1Y-5.5Y) - $145 total</h4>
-                <div className="grid grid-cols-6 gap-2">
-                  {youthSizes.map((size) => (
-                    <button
-                      key={size}
-                      type="button"
-                      onClick={() => handleSizeToggle(size)}
-                      className={`p-2 rounded border text-sm ${
-                        newShoe.sizes.includes(size)
-                          ? "bg-white text-black border-white"
-                          : "bg-neutral-800 text-white border-neutral-600"
-                      }`}
-                    >
-                      {size}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Toddler Sizes */}
-              <div className="mb-4">
-                <h4 className="text-white text-sm font-medium mb-2">Toddler (8C-13.5C) - $145 total</h4>
-                <div className="grid grid-cols-6 gap-2">
-                  {toddlerSizes.map((size) => (
-                    <button
-                      key={size}
-                      type="button"
-                      onClick={() => handleSizeToggle(size)}
-                      className={`p-2 rounded border text-sm ${
-                        newShoe.sizes.includes(size)
-                          ? "bg-white text-black border-white"
-                          : "bg-neutral-800 text-white border-neutral-600"
-                      }`}
-                    >
-                      {size}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Infant Sizes */}
-              <div className="mb-4">
-                <h4 className="text-white text-sm font-medium mb-2">Infant (1C-7.5C) - $135 total</h4>
-                <div className="grid grid-cols-6 gap-2">
-                  {infantSizes.map((size) => (
-                    <button
-                      key={size}
-                      type="button"
-                      onClick={() => handleSizeToggle(size)}
-                      className={`p-2 rounded border text-sm ${
-                        newShoe.sizes.includes(size)
-                          ? "bg-white text-black border-white"
-                          : "bg-neutral-800 text-white border-neutral-600"
-                      }`}
-                    >
-                      {size}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <p className="text-neutral-400 text-sm mt-1">
-                {newShoe.sizes.length === 0 ? "All sizes will be available" : `${newShoe.sizes.length} sizes selected`}
+              <p className="text-xs text-neutral-400 mt-1">
+                Display price only. Actual pricing calculated by size at checkout.
               </p>
             </div>
+          </div>
 
-            <div className="flex gap-2">
-              <Button onClick={handleAddShoe} className="bg-white text-black">
-                Add Shoe
+          <div>
+            <Label htmlFor="image" className="text-white">
+              Image URL
+            </Label>
+            <Input
+              id="image"
+              value={newShoe.image}
+              onChange={(e) => setNewShoe({ ...newShoe, image: e.target.value })}
+              placeholder="/images/shoe-name.png"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="description" className="text-white">
+              Description
+            </Label>
+            <Textarea
+              id="description"
+              value={newShoe.description}
+              onChange={(e) => setNewShoe({ ...newShoe, description: e.target.value })}
+              placeholder="Describe the shoe design..."
+              rows={3}
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="details" className="text-white">
+              Details (one per line)
+            </Label>
+            <Textarea
+              id="details"
+              value={newShoe.details}
+              onChange={(e) => setNewShoe({ ...newShoe, details: e.target.value })}
+              placeholder="Hand-painted with premium paints&#10;Sealed with protective coating&#10;Based on Nike Air Force 1&#10;Infant (1C-7.5C): $135 total | Toddler (8C-13.5C): $145 total | Youth: $145 total | Big Kids: $145-175 total | Adults: $230 total"
+              rows={4}
+            />
+          </div>
+
+          <div>
+            <Label className="text-white">Available Sizes (Updated Sizing System)</Label>
+
+            {/* Size Selection Controls */}
+            <div className="flex flex-wrap gap-2 mt-2 mb-4">
+              <Button type="button" onClick={selectAllSizes} size="sm" variant="outline" className="text-xs">
+                Select All ({allSizes.length})
               </Button>
-              <Button onClick={() => setShowAddForm(false)} variant="outline">
-                Cancel
+              <Button type="button" onClick={clearAllSizes} size="sm" variant="outline" className="text-xs">
+                Clear All
+              </Button>
+              <Button
+                type="button"
+                onClick={() => selectSizeCategory("men")}
+                size="sm"
+                variant="outline"
+                className="text-xs"
+              >
+                + Men's ({mensSizes.length})
+              </Button>
+              <Button
+                type="button"
+                onClick={() => selectSizeCategory("women")}
+                size="sm"
+                variant="outline"
+                className="text-xs"
+              >
+                + Women's ({womensSizes.length})
+              </Button>
+              <Button
+                type="button"
+                onClick={() => selectSizeCategory("big-kids")}
+                size="sm"
+                variant="outline"
+                className="text-xs"
+              >
+                + Big Kids ({bigKidsSizes.length})
+              </Button>
+              <Button
+                type="button"
+                onClick={() => selectSizeCategory("youth")}
+                size="sm"
+                variant="outline"
+                className="text-xs"
+              >
+                + Youth ({youthSizes.length})
+              </Button>
+              <Button
+                type="button"
+                onClick={() => selectSizeCategory("toddler")}
+                size="sm"
+                variant="outline"
+                className="text-xs"
+              >
+                + Toddler ({toddlerSizes.length})
+              </Button>
+              <Button
+                type="button"
+                onClick={() => selectSizeCategory("infant")}
+                size="sm"
+                variant="outline"
+                className="text-xs"
+              >
+                + Infant ({infantSizes.length})
               </Button>
             </div>
-          </CardContent>
-        </Card>
-      )}
+
+            {/* Men's Sizes */}
+            <div className="mb-4">
+              <h4 className="text-white text-sm font-medium mb-2">Men's Sizes (7-15) - $230 total</h4>
+              <div className="grid grid-cols-6 gap-2">
+                {mensSizes.map((size) => (
+                  <button
+                    key={size}
+                    type="button"
+                    onClick={() => handleSizeToggle(size)}
+                    className={`p-2 rounded border text-sm ${
+                      newShoe.sizes.includes(size)
+                        ? "bg-white text-black border-white"
+                        : "bg-neutral-800 text-white border-neutral-600"
+                    }`}
+                  >
+                    {size}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Women's Sizes */}
+            <div className="mb-4">
+              <h4 className="text-white text-sm font-medium mb-2">Women's Sizes - $230 total</h4>
+              <div className="grid grid-cols-6 gap-2">
+                {womensSizes.map((size) => (
+                  <button
+                    key={size}
+                    type="button"
+                    onClick={() => handleSizeToggle(size)}
+                    className={`p-2 rounded border text-sm ${
+                      newShoe.sizes.includes(size)
+                        ? "bg-white text-black border-white"
+                        : "bg-neutral-800 text-white border-neutral-600"
+                    }`}
+                  >
+                    {size}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Big Kids */}
+            <div className="mb-4">
+              <h4 className="text-white text-sm font-medium mb-2">Big Kids (6Y-8Y) - $175 total</h4>
+              <div className="grid grid-cols-6 gap-2">
+                {bigKidsSizes.map((size) => (
+                  <button
+                    key={size}
+                    type="button"
+                    onClick={() => handleSizeToggle(size)}
+                    className={`p-2 rounded border text-sm ${
+                      newShoe.sizes.includes(size)
+                        ? "bg-white text-black border-white"
+                        : "bg-neutral-800 text-white border-neutral-600"
+                    }`}
+                  >
+                    {size}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Youth */}
+            <div className="mb-4">
+              <h4 className="text-white text-sm font-medium mb-2">Youth (1Y-5.5Y) - $145 total</h4>
+              <div className="grid grid-cols-6 gap-2">
+                {youthSizes.map((size) => (
+                  <button
+                    key={size}
+                    type="button"
+                    onClick={() => handleSizeToggle(size)}
+                    className={`p-2 rounded border text-sm ${
+                      newShoe.sizes.includes(size)
+                        ? "bg-white text-black border-white"
+                        : "bg-neutral-800 text-white border-neutral-600"
+                    }`}
+                  >
+                    {size}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Toddler Sizes */}
+            <div className="mb-4">
+              <h4 className="text-white text-sm font-medium mb-2">Toddler (8C-13.5C) - $145 total</h4>
+              <div className="grid grid-cols-6 gap-2">
+                {toddlerSizes.map((size) => (
+                  <button
+                    key={size}
+                    type="button"
+                    onClick={() => handleSizeToggle(size)}
+                    className={`p-2 rounded border text-sm ${
+                      newShoe.sizes.includes(size)
+                        ? "bg-white text-black border-white"
+                        : "bg-neutral-800 text-white border-neutral-600"
+                    }`}
+                  >
+                    {size}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Infant Sizes */}
+            <div className="mb-4">
+              <h4 className="text-white text-sm font-medium mb-2">Infant (1C-7.5C) - $135 total</h4>
+              <div className="grid grid-cols-6 gap-2">
+                {infantSizes.map((size) => (
+                  <button
+                    key={size}
+                    type="button"
+                    onClick={() => handleSizeToggle(size)}
+                    className={`p-2 rounded border text-sm ${
+                      newShoe.sizes.includes(size)
+                        ? "bg-white text-black border-white"
+                        : "bg-neutral-800 text-white border-neutral-600"
+                    }`}
+                  >
+                    {size}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <p className="text-neutral-400 text-sm mt-1">
+              {newShoe.sizes.length === 0 ? "All sizes will be available" : `${newShoe.sizes.length} sizes selected`}
+            </p>
+          </div>
+
+          <div className="flex gap-2">
+            <Button onClick={handleAddShoe} className="bg-white text-black">
+              Add Shoe
+            </Button>
+            <Button onClick={() => setShowAddForm(false)} variant="outline">
+              Cancel
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* All Shoes List */}
       <Card className="bg-neutral-900 border-neutral-800">
