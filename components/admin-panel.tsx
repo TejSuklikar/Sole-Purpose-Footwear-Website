@@ -323,6 +323,7 @@ export function AdminPanel() {
   const [showAddEventForm, setShowAddEventForm] = useState(false)
   const [editingInventory, setEditingInventory] = useState<number | null>(null)
   const [editingEvent, setEditingEvent] = useState<number | null>(null)
+  const [editingEventData, setEditingEventData] = useState<Event | null>(null)
   const [newShoe, setNewShoe] = useState({
     name: "",
     price: "160", // Default to $160 sticker price
@@ -455,10 +456,24 @@ export function AdminPanel() {
     }
   }
 
-  const handleUpdateEvent = (id: number, updatedEvent: Partial<Event>) => {
-    const updatedEvents = events.map((event) => (event.id === id ? { ...event, ...updatedEvent } : event))
+  // Fixed event editing functions
+  const startEditingEvent = (event: Event) => {
+    setEditingEvent(event.id)
+    setEditingEventData({ ...event }) // Create a copy for local editing
+  }
+
+  const cancelEditingEvent = () => {
+    setEditingEvent(null)
+    setEditingEventData(null)
+  }
+
+  const saveEditingEvent = () => {
+    if (!editingEventData) return
+
+    const updatedEvents = events.map((event) => (event.id === editingEventData.id ? editingEventData : event))
     saveEvents(updatedEvents)
     setEditingEvent(null)
+    setEditingEventData(null)
   }
 
   const toggleFeatured = (id: number) => {
@@ -652,42 +667,68 @@ export function AdminPanel() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {events.map((event) => (
               <div key={event.id} className="bg-neutral-800 rounded-lg p-4">
-                {editingEvent === event.id ? (
+                {editingEvent === event.id && editingEventData ? (
                   <div className="space-y-3">
-                    <Input
-                      value={event.title}
-                      onChange={(e) => handleUpdateEvent(event.id, { title: e.target.value })}
-                      placeholder="Event title"
-                      className="text-sm"
-                    />
-                    <Input
-                      value={event.date}
-                      onChange={(e) => handleUpdateEvent(event.id, { date: e.target.value })}
-                      placeholder="Date"
-                      className="text-sm"
-                    />
-                    <Input
-                      value={event.time}
-                      onChange={(e) => handleUpdateEvent(event.id, { time: e.target.value })}
-                      placeholder="Time"
-                      className="text-sm"
-                    />
-                    <Input
-                      value={event.location}
-                      onChange={(e) => handleUpdateEvent(event.id, { location: e.target.value })}
-                      placeholder="Location"
-                      className="text-sm"
-                    />
-                    <Textarea
-                      value={event.description}
-                      onChange={(e) => handleUpdateEvent(event.id, { description: e.target.value })}
-                      placeholder="Description"
-                      rows={2}
-                      className="text-sm"
-                    />
-                    <Button onClick={() => setEditingEvent(null)} size="sm" className="w-full">
-                      Done
-                    </Button>
+                    <div>
+                      <Label className="text-white text-sm">Event Title</Label>
+                      <Input
+                        value={editingEventData.title}
+                        onChange={(e) => setEditingEventData({ ...editingEventData, title: e.target.value })}
+                        placeholder="Event title"
+                        className="text-sm mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-white text-sm">Date</Label>
+                      <Input
+                        value={editingEventData.date}
+                        onChange={(e) => setEditingEventData({ ...editingEventData, date: e.target.value })}
+                        placeholder="Date"
+                        className="text-sm mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-white text-sm">Time</Label>
+                      <Input
+                        value={editingEventData.time}
+                        onChange={(e) => setEditingEventData({ ...editingEventData, time: e.target.value })}
+                        placeholder="Time"
+                        className="text-sm mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-white text-sm">Location</Label>
+                      <Input
+                        value={editingEventData.location}
+                        onChange={(e) => setEditingEventData({ ...editingEventData, location: e.target.value })}
+                        placeholder="Location"
+                        className="text-sm mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-white text-sm">Description</Label>
+                      <Textarea
+                        value={editingEventData.description}
+                        onChange={(e) => setEditingEventData({ ...editingEventData, description: e.target.value })}
+                        placeholder="Description"
+                        rows={2}
+                        className="text-sm mt-1"
+                      />
+                    </div>
+                    <div className="flex gap-2 pt-2">
+                      <Button
+                        onClick={saveEditingEvent}
+                        size="sm"
+                        className="bg-green-600 hover:bg-green-700 text-white flex-1"
+                      >
+                        <Check className="h-3 w-3 mr-1" />
+                        Save
+                      </Button>
+                      <Button onClick={cancelEditingEvent} size="sm" variant="outline" className="flex-1">
+                        <X className="h-3 w-3 mr-1" />
+                        Cancel
+                      </Button>
+                    </div>
                   </div>
                 ) : (
                   <>
@@ -709,20 +750,22 @@ export function AdminPanel() {
                     </div>
                     <div className="flex gap-2">
                       <Button
-                        onClick={() => setEditingEvent(event.id)}
+                        onClick={() => startEditingEvent(event)}
                         size="sm"
                         variant="outline"
-                        className="text-blue-400 border-blue-400 hover:bg-blue-400 hover:text-white"
+                        className="text-blue-400 border-blue-400 hover:bg-blue-400 hover:text-white flex-1"
                       >
-                        <Edit className="h-3 w-3" />
+                        <Edit className="h-3 w-3 mr-1" />
+                        Edit
                       </Button>
                       <Button
                         onClick={() => handleDeleteEvent(event.id)}
                         size="sm"
                         variant="outline"
-                        className="text-red-400 border-red-400 hover:bg-red-400 hover:text-white"
+                        className="text-red-400 border-red-400 hover:bg-red-400 hover:text-white flex-1"
                       >
-                        <Trash2 className="h-3 w-3" />
+                        <Trash2 className="h-3 w-3 mr-1" />
+                        Delete
                       </Button>
                     </div>
                   </>

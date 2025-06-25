@@ -1,94 +1,159 @@
 "use client"
 
+import { useState } from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { cn } from "@/lib/utils"
-import { useCart } from "./cart-provider"
-import { useAuth } from "./auth-provider"
-import { ShoppingBag, LogOut, Shield, Users } from "lucide-react"
-import { Button } from "./ui/button"
+import { Button } from "@/components/ui/button"
+import { ShoppingCart, Menu, X, User } from "lucide-react"
+import { useCart } from "@/components/cart-provider"
+import { useAuth } from "@/components/auth-provider"
+import { SPLogo } from "@/components/sp-logo"
 
 export function Header() {
-  const pathname = usePathname()
-  const { state, dispatch } = useCart()
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const { items, toggleCart } = useCart()
   const { user, logout } = useAuth()
 
-  const navigation = [
-    { name: "Home", href: "/" },
-    { name: "About", href: "/about" },
-    { name: "Shoes", href: "/shoes" },
-    { name: "Custom Order", href: "/order" },
-  ]
+  const itemCount = items.reduce((sum, item) => sum + item.quantity, 0)
 
-  if (user?.isAdmin) {
-    navigation.push({ name: "Admin", href: "/admin" })
+  const handleLogout = () => {
+    logout()
+    setIsMenuOpen(false)
   }
 
   return (
-    <header className="sticky top-0 z-50 bg-neutral-950/95 backdrop-blur-sm border-b border-neutral-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-              <span className="text-black font-bold text-sm">SP</span>
+    <header className="bg-black text-white sticky top-0 z-50 border-b border-neutral-800">
+      <div className="container mx-auto px-4 py-4">
+        <div className="flex items-center justify-between">
+          {/* Logo */}
+          <Link href="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
+            <SPLogo size="md" />
+            <div>
+              <h1 className="text-xl font-bold font-playfair">Sole Purpose Footwear</h1>
+              <p className="text-xs text-neutral-400">Custom Sneaker Artistry</p>
             </div>
-            <span className="font-playfair text-xl font-semibold text-white">Sole Purpose</span>
           </Link>
 
-          <div className="flex items-center space-x-2 sm:space-x-4">
-            <nav className="hidden md:flex space-x-4 lg:space-x-8">
-              {navigation.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={cn(
-                    "text-xs lg:text-sm font-medium transition-colors duration-200 px-2 py-1",
-                    pathname === item.href ? "text-white border-b-2 border-white" : "text-neutral-300 hover:text-white",
-                  )}
-                >
-                  {item.name}
-                </Link>
-              ))}
-            </nav>
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center space-x-8">
+            <Link href="/" className="hover:text-red-400 transition-colors">
+              Home
+            </Link>
+            <Link href="/shoes" className="hover:text-red-400 transition-colors">
+              Shoes
+            </Link>
+            <Link href="/order" className="hover:text-red-400 transition-colors">
+              Custom Order
+            </Link>
+            <Link href="/about" className="hover:text-red-400 transition-colors">
+              About
+            </Link>
+          </nav>
 
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={() => dispatch({ type: "TOGGLE_CART" })}
-                className="relative p-2 text-neutral-300 hover:text-white transition-colors"
-              >
-                <ShoppingBag className="h-6 w-6" />
-                {state.items.length > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-white text-black text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                    {state.items.reduce((sum, item) => sum + item.quantity, 0)}
-                  </span>
+          {/* Desktop Actions */}
+          <div className="hidden md:flex items-center space-x-4">
+            {user ? (
+              <div className="flex items-center space-x-4">
+                {user.isAdmin && (
+                  <Link href="/admin">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-blue-400 border-blue-400 hover:bg-blue-400 hover:text-white"
+                    >
+                      Admin
+                    </Button>
+                  </Link>
                 )}
-              </button>
-
-              {user && (
-                <div className="flex items-center space-x-1 sm:space-x-2">
-                  <div className="flex items-center space-x-1">
-                    {user.isAdmin ? (
-                      <Shield className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-500" />
-                    ) : (
-                      <Users className="h-3 w-3 sm:h-4 sm:w-4 text-blue-500" />
-                    )}
-                    <span className="text-neutral-300 text-xs sm:text-sm hidden sm:block">
-                      {user.isAdmin ? "Admin" : "Guest"}
-                    </span>
-                  </div>
-                  <Button
-                    onClick={logout}
-                    variant="ghost"
-                    size="sm"
-                    className="text-neutral-300 hover:text-white p-1 sm:p-2"
-                  >
-                    <LogOut className="h-3 w-3 sm:h-4 sm:w-4" />
-                  </Button>
+                <div className="flex items-center space-x-2 text-sm">
+                  <User className="h-4 w-4" />
+                  <span>{user.email}</span>
                 </div>
+                <Button onClick={handleLogout} variant="outline" size="sm">
+                  Logout
+                </Button>
+              </div>
+            ) : (
+              <div className="text-sm text-neutral-400">Guest Mode</div>
+            )}
+            <Button onClick={toggleCart} variant="outline" size="sm" className="relative">
+              <ShoppingCart className="h-4 w-4" />
+              {itemCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {itemCount}
+                </span>
               )}
-            </div>
+            </Button>
           </div>
+
+          {/* Mobile Menu Button */}
+          <Button variant="ghost" size="sm" className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </Button>
         </div>
+
+        {/* Mobile Navigation */}
+        {isMenuOpen && (
+          <div className="md:hidden mt-4 pb-4 border-t border-neutral-800 pt-4">
+            <nav className="flex flex-col space-y-4">
+              <Link href="/" className="hover:text-red-400 transition-colors" onClick={() => setIsMenuOpen(false)}>
+                Home
+              </Link>
+              <Link href="/shoes" className="hover:text-red-400 transition-colors" onClick={() => setIsMenuOpen(false)}>
+                Shoes
+              </Link>
+              <Link href="/order" className="hover:text-red-400 transition-colors" onClick={() => setIsMenuOpen(false)}>
+                Custom Order
+              </Link>
+              <Link href="/about" className="hover:text-red-400 transition-colors" onClick={() => setIsMenuOpen(false)}>
+                About
+              </Link>
+
+              <div className="border-t border-neutral-800 pt-4 space-y-4">
+                {user ? (
+                  <>
+                    {user.isAdmin && (
+                      <Link href="/admin" onClick={() => setIsMenuOpen(false)}>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full text-blue-400 border-blue-400 hover:bg-blue-400 hover:text-white"
+                        >
+                          Admin Panel
+                        </Button>
+                      </Link>
+                    )}
+                    <div className="flex items-center space-x-2 text-sm">
+                      <User className="h-4 w-4" />
+                      <span>{user.email}</span>
+                    </div>
+                    <Button onClick={handleLogout} variant="outline" size="sm" className="w-full">
+                      Logout
+                    </Button>
+                  </>
+                ) : (
+                  <div className="text-sm text-neutral-400">Guest Mode</div>
+                )}
+                <Button
+                  onClick={() => {
+                    toggleCart()
+                    setIsMenuOpen(false)
+                  }}
+                  variant="outline"
+                  size="sm"
+                  className="w-full relative"
+                >
+                  <ShoppingCart className="h-4 w-4 mr-2" />
+                  Cart
+                  {itemCount > 0 && (
+                    <span className="ml-2 bg-red-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                      {itemCount}
+                    </span>
+                  )}
+                </Button>
+              </div>
+            </nav>
+          </div>
+        )}
       </div>
     </header>
   )
