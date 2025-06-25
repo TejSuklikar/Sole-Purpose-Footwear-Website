@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useState } from "react"
-import { MapPin } from "react-feather"
+import { MapPin } from "lucide-react"
 
 interface FormData {
   name: string
@@ -159,3 +159,4 @@ const OrderForm: React.FC = () => {
 }
 
 export default OrderForm
+export { OrderForm }
