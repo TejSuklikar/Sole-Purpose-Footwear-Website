@@ -19,7 +19,7 @@ const defaultEvents: Event[] = [
     title: "Pop-Up Gallery Opening",
     date: "July 15, 2025",
     time: "6:00 PM - 10:00 PM",
-    location: "Mission District, San Francisco",
+    location: "2025 Ramallah Convention, San Francisco",
     description: "Exclusive showcase of our latest custom designs",
   },
   {
