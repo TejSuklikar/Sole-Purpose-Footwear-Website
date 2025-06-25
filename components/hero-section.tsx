@@ -23,7 +23,7 @@ const defaultFeaturedShoes = [
     price: 160,
     image: "/images/kuffiyeh-side-sunset.png",
     slug: "red-kuffiyeh-af1",
-    description: "Traditiona Kuffiyeh patterns hand-painted in bold red on premium white canvas.",
+    description: "Traditional Kuffiyeh patterns hand-painted in bold red on premium white canvas.",
     isFeatured: true,
   },
   {
