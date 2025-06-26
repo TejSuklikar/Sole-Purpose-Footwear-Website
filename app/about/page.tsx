@@ -13,9 +13,20 @@ export default function AboutPage() {
         <div className="text-center mb-16">
           <h1 className="font-playfair text-4xl md:text-5xl font-bold text-white mb-6">Our Story</h1>
           <p className="text-xl text-neutral-300 leading-relaxed">
-            Custom footwear designed to speak your truth. At SolePurpose, we craft one-of-a-kind kicks that blend
-            creativity, comfort, and culture — made for movement, made with meaning.
+            At SolePurpose, we believe your shoes should speak louder than words. We create custom kicks that are all
+            about you, your culture, your vision, your vibe. Every pair is built with purpose, mixing bold design, real
+            comfort, and quality that holds up.
           </p>
+          <p className="text-xl text-neutral-300 leading-relaxed mt-4">
+            We represent all cultures and walks of life. Want your flag on the toe box? A personal quote? Something the
+            world's never seen? Say less, we got you. You bring the idea, we'll bring it to life with precision,
+            passion, and top-tier service.
+          </p>
+          <p className="text-xl text-neutral-300 leading-relaxed mt-4">
+            Because this isn't just about shoes, it's about making a statement, standing out, and putting your story on
+            the map.
+          </p>
+          <p className="text-xl text-white font-bold mt-6">Make your mark. Wear your purpose.</p>
         </div>
 
         <div className="prose prose-lg max-w-none">
@@ -23,16 +34,20 @@ export default function AboutPage() {
             <div>
               <h2 className="font-playfair text-3xl font-bold text-white mb-4">The Beginning</h2>
               <p className="text-neutral-300 leading-relaxed">
-                Founded in 2024 by a collective of artists and sneaker enthusiasts, Sole Purpose Footwear was born from
-                a love of design and the belief that every step we take should say something. Each pair of custom shoes
-                is a wearable work of art — bold, expressive, and rooted in purpose. This isn't just fashion. It's
-                movement with meaning.
+                SolePurpose started a few years back with one simple gift: a custom pair of shoes made for a close
+                friend. There was no business plan, just a real connection and a design that meant something. People saw
+                it, started asking for their own, and that one pair quickly sparked something bigger.
               </p>
               <p className="text-neutral-300 leading-relaxed mt-4">
-                What started as a creative outlet turned into a passion — turning shoes into canvases that tell your
-                story. Every pair is custom-made with precision, personality, and purpose. Whether you're stepping into
-                something new or standing out from the crowd, we're here to help you do it with style that's uniquely
-                yours.
+                What began as a personal gesture grew into a movement not just because of the shoes themselves, but
+                because of what they represent. At SolePurpose, it's never been about pumping out products. It's about
+                building something meaningful with our customers, together. Our artists don't just design, they
+                collaborate. Every pair is the result of genuine conversation, genuine inspiration, and genuine purpose.
+              </p>
+              <p className="text-neutral-300 leading-relaxed mt-4">
+                We take pride in making the process personal. From the first idea to the final details, we work side by
+                side with each customer to bring their vision to life. Whether it's your culture, your story, or your
+                message, we're here to help you express it, your way.
               </p>
             </div>
             <Image
