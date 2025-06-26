@@ -200,21 +200,25 @@ export function ShoesGrid() {
   useEffect(() => {
     const loadShoes = async () => {
       try {
-        // First, try to fetch from the live data source
-        const response = await fetch("/data/shoes.json", {
+        // First, try to fetch from the live data source with cache busting
+        const timestamp = new Date().getTime()
+        const response = await fetch(`/data/shoes.json?t=${timestamp}`, {
           cache: "no-store",
           headers: {
-            "Cache-Control": "no-cache",
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            Pragma: "no-cache",
+            Expires: "0",
           },
         })
 
         if (response.ok) {
           const liveShoes = await response.json()
           if (Array.isArray(liveShoes) && liveShoes.length > 0) {
+            console.log("✅ Loaded live shoes data:", liveShoes.length, "shoes")
             // Update shoes with live data
             const updatedShoes = liveShoes.map((shoe: Shoe) => ({
               ...shoe,
-              sizes: allSizes, // Ensure all sizes are available
+              sizes: shoe.sizes || allSizes, // Ensure all sizes are available
               inStockSizes: shoe.inStockSizes || allSizes,
             }))
             setShoes(updatedShoes)
@@ -223,9 +227,11 @@ export function ShoesGrid() {
             setIsLoading(false)
             return
           }
+        } else {
+          console.log("❌ Failed to fetch live shoes data:", response.status, response.statusText)
         }
       } catch (error) {
-        console.log("Live data not available, falling back to localStorage:", error)
+        console.log("⚠️ Live shoes data not available, falling back to localStorage:", error)
       }
 
       // Fallback to localStorage if live data fails
@@ -234,27 +240,30 @@ export function ShoesGrid() {
         if (savedShoes) {
           const parsedShoes = JSON.parse(savedShoes)
           if (Array.isArray(parsedShoes) && parsedShoes.length > 0) {
+            console.log("📦 Loaded shoes from localStorage:", parsedShoes.length, "shoes")
             // Migration: Update existing shoes to use the new 73-size array
             const updatedShoes = parsedShoes.map((shoe: Shoe) => ({
               ...shoe,
               sizes: allSizes, // Update to new 73-size array
-              inStockSizes: allSizes, // Update in-stock sizes too
+              inStockSizes: shoe.inStockSizes || allSizes, // Update in-stock sizes too
             }))
             setShoes(updatedShoes)
             // Save the migrated data back to localStorage
             localStorage.setItem("sp_shoes_global", JSON.stringify(updatedShoes))
           } else {
             // If saved shoes is empty or invalid, use default shoes
+            console.log("🔄 Using default shoes data")
             setShoes(defaultShoes)
             localStorage.setItem("sp_shoes_global", JSON.stringify(defaultShoes))
           }
         } else {
           // If no saved shoes, initialize with default shoes
+          console.log("🆕 Initializing with default shoes data")
           setShoes(defaultShoes)
           localStorage.setItem("sp_shoes_global", JSON.stringify(defaultShoes))
         }
       } catch (error) {
-        console.error("Error loading shoes:", error)
+        console.error("❌ Error loading shoes:", error)
         // Fallback to default shoes if there's an error
         setShoes(defaultShoes)
         localStorage.setItem("sp_shoes_global", JSON.stringify(defaultShoes))
@@ -268,6 +277,7 @@ export function ShoesGrid() {
     // Listen for storage changes to update when admin makes changes
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === "sp_shoes_global") {
+        console.log("🔄 Storage change detected, reloading shoes...")
         loadShoes()
       }
     }
@@ -275,7 +285,10 @@ export function ShoesGrid() {
     window.addEventListener("storage", handleStorageChange)
 
     // Also check for changes periodically (for same-tab updates and live data)
-    const interval = setInterval(loadShoes, 30000) // Check every 30 seconds
+    const interval = setInterval(() => {
+      console.log("🔄 Periodic check for shoe updates...")
+      loadShoes()
+    }, 10000) // Check every 10 seconds for faster updates
 
     return () => {
       window.removeEventListener("storage", handleStorageChange)

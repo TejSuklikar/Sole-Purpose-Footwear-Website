@@ -33,7 +33,7 @@ export async function syncToRepo({ filename, data, message }: SyncToRepoOptions)
 
 export async function syncShoesToRepo(shoes: any[]) {
   return syncToRepo({
-    filename: "data/shoes.json",
+    filename: "public/data/shoes.json", // Updated path to public directory
     data: shoes,
     message: `Admin update: Updated shoes inventory - ${new Date().toLocaleString()}`,
   })
@@ -41,7 +41,7 @@ export async function syncShoesToRepo(shoes: any[]) {
 
 export async function syncEventsToRepo(events: any[]) {
   return syncToRepo({
-    filename: "data/events.json",
+    filename: "public/data/events.json", // Updated path to public directory
     data: events,
     message: `Admin update: Updated events - ${new Date().toLocaleString()}`,
   })

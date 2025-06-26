@@ -47,25 +47,31 @@ export function EventsStrip() {
   useEffect(() => {
     const loadEvents = async () => {
       try {
-        // First, try to fetch from the live data source
-        const response = await fetch("/data/events.json", {
+        // First, try to fetch from the live data source with cache busting
+        const timestamp = new Date().getTime()
+        const response = await fetch(`/data/events.json?t=${timestamp}`, {
           cache: "no-store",
           headers: {
-            "Cache-Control": "no-cache",
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            Pragma: "no-cache",
+            Expires: "0",
           },
         })
 
         if (response.ok) {
           const liveEvents = await response.json()
           if (Array.isArray(liveEvents) && liveEvents.length > 0) {
+            console.log("✅ Loaded live events data:", liveEvents.length, "events")
             setEvents(liveEvents)
             // Update localStorage with live data
             localStorage.setItem("sp_events_global", JSON.stringify(liveEvents))
             return
           }
+        } else {
+          console.log("❌ Failed to fetch live events data:", response.status, response.statusText)
         }
       } catch (error) {
-        console.log("Live events data not available, falling back to localStorage:", error)
+        console.log("⚠️ Live events data not available, falling back to localStorage:", error)
       }
 
       // Fallback to localStorage if live data fails
@@ -74,19 +80,22 @@ export function EventsStrip() {
         if (savedEvents) {
           const parsedEvents = JSON.parse(savedEvents)
           if (Array.isArray(parsedEvents) && parsedEvents.length > 0) {
+            console.log("📦 Loaded events from localStorage:", parsedEvents.length, "events")
             setEvents(parsedEvents)
           } else {
             // If saved events is empty or invalid, use default events
+            console.log("🔄 Using default events data")
             setEvents(defaultEvents)
             localStorage.setItem("sp_events_global", JSON.stringify(defaultEvents))
           }
         } else {
           // If no saved events, initialize with default events
+          console.log("🆕 Initializing with default events data")
           setEvents(defaultEvents)
           localStorage.setItem("sp_events_global", JSON.stringify(defaultEvents))
         }
       } catch (error) {
-        console.error("Error loading events:", error)
+        console.error("❌ Error loading events:", error)
         // Fallback to default events if there's an error
         setEvents(defaultEvents)
         localStorage.setItem("sp_events_global", JSON.stringify(defaultEvents))
@@ -99,6 +108,7 @@ export function EventsStrip() {
     // Listen for storage changes to update when admin makes changes
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === "sp_events_global") {
+        console.log("🔄 Storage change detected, reloading events...")
         loadEvents()
       }
     }
@@ -106,7 +116,10 @@ export function EventsStrip() {
     window.addEventListener("storage", handleStorageChange)
 
     // Also check for changes periodically (for same-tab updates and live data)
-    const interval = setInterval(loadEvents, 30000) // Check every 30 seconds
+    const interval = setInterval(() => {
+      console.log("🔄 Periodic check for event updates...")
+      loadEvents()
+    }, 10000) // Check every 10 seconds for faster updates
 
     return () => {
       window.removeEventListener("storage", handleStorageChange)
