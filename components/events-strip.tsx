@@ -44,30 +44,35 @@ const defaultEvents: Event[] = [
 export function EventsStrip() {
   const [events, setEvents] = useState<Event[]>(defaultEvents)
   const [lastFetch, setLastFetch] = useState<number>(0)
+  const [dataSource, setDataSource] = useState<string>("loading")
 
-  // Load events with cache busting
+  // Load events with cache busting and cross-device sync
   useEffect(() => {
-    const loadEvents = async () => {
+    const loadEvents = async (forceRefresh = false) => {
       const now = Date.now()
 
-      // Only fetch if it's been more than 5 seconds since last fetch
-      if (now - lastFetch < 5000 && events.length > 0) {
+      // Only fetch if it's been more than 3 seconds since last fetch (unless forced)
+      if (!forceRefresh && now - lastFetch < 3000 && events.length > 0) {
         return
       }
 
-      try {
-        console.log("🔄 Loading events data...")
+      console.log("🔄 Loading events data...", forceRefresh ? "(forced)" : "")
 
-        // Try to fetch from live data with cache busting
+      try {
+        // ALWAYS try to fetch from live data first with aggressive cache busting
         const response = await fetchWithCacheBusting("/data/events.json")
 
         if (response.ok) {
           const liveEvents = await response.json()
           if (Array.isArray(liveEvents) && liveEvents.length > 0) {
-            console.log("✅ Loaded live events data:", liveEvents.length, "events")
+            console.log("✅ Loaded LIVE events data:", liveEvents.length, "events")
             setEvents(liveEvents)
             setLastFetch(now)
+            setDataSource("live")
+
+            // Update localStorage with live data for offline fallback
             localStorage.setItem("sp_events_global", JSON.stringify(liveEvents))
+            localStorage.setItem("sp_events_last_fetch", now.toString())
             return
           }
         } else {
@@ -77,31 +82,41 @@ export function EventsStrip() {
         console.log("⚠️ Live events data not available:", error)
       }
 
-      // Fallback to localStorage
+      // Fallback to localStorage only if live data fails
       try {
         const savedEvents = localStorage.getItem("sp_events_global")
+        const lastFetchTime = localStorage.getItem("sp_events_last_fetch")
+
         if (savedEvents) {
           const parsedEvents = JSON.parse(savedEvents)
           if (Array.isArray(parsedEvents) && parsedEvents.length > 0) {
             console.log("📦 Loaded events from localStorage:", parsedEvents.length, "events")
+            console.log(
+              "📅 Last fetch:",
+              lastFetchTime ? new Date(Number.parseInt(lastFetchTime)).toLocaleString() : "Unknown",
+            )
             setEvents(parsedEvents)
             setLastFetch(now)
+            setDataSource("localStorage")
           } else {
-            console.log("🔄 Using default events data")
+            console.log("🔄 Using default events data (empty localStorage)")
             setEvents(defaultEvents)
             setLastFetch(now)
+            setDataSource("default")
             localStorage.setItem("sp_events_global", JSON.stringify(defaultEvents))
           }
         } else {
-          console.log("🆕 Initializing with default events data")
+          console.log("🆕 Initializing with default events data (no localStorage)")
           setEvents(defaultEvents)
           setLastFetch(now)
+          setDataSource("default")
           localStorage.setItem("sp_events_global", JSON.stringify(defaultEvents))
         }
       } catch (error) {
         console.error("❌ Error loading events:", error)
         setEvents(defaultEvents)
         setLastFetch(now)
+        setDataSource("error-fallback")
         localStorage.setItem("sp_events_global", JSON.stringify(defaultEvents))
       }
     }
@@ -109,32 +124,48 @@ export function EventsStrip() {
     // Load events immediately
     loadEvents()
 
-    // Listen for storage changes
+    // Listen for storage changes from other tabs/devices
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === "sp_events_global") {
-        console.log("🔄 Storage change detected, reloading events...")
-        loadEvents()
+        console.log("🔄 Storage change detected from another tab/device, reloading events...")
+        loadEvents(true)
       }
     }
 
     // Listen for focus events
     const handleFocus = () => {
       console.log("🔄 Tab focused, checking for event updates...")
-      loadEvents()
+      loadEvents(true)
+    }
+
+    // Listen for custom force refresh events
+    const handleForceRefresh = () => {
+      console.log("🔄 Force refresh event received...")
+      loadEvents(true)
+    }
+
+    // Listen for online/offline events
+    const handleOnline = () => {
+      console.log("🌐 Back online, refreshing events data...")
+      loadEvents(true)
     }
 
     window.addEventListener("storage", handleStorageChange)
     window.addEventListener("focus", handleFocus)
+    window.addEventListener("forceDataRefresh", handleForceRefresh)
+    window.addEventListener("online", handleOnline)
 
-    // Check for updates every 15 seconds
+    // Aggressive polling for cross-device sync - check every 8 seconds
     const interval = setInterval(() => {
       console.log("🔄 Periodic check for event updates...")
       loadEvents()
-    }, 15000)
+    }, 8000)
 
     return () => {
       window.removeEventListener("storage", handleStorageChange)
       window.removeEventListener("focus", handleFocus)
+      window.removeEventListener("forceDataRefresh", handleForceRefresh)
+      window.removeEventListener("online", handleOnline)
       clearInterval(interval)
     }
   }, [lastFetch, events.length])
@@ -145,6 +176,7 @@ export function EventsStrip() {
         <div className="text-center mb-12">
           <h2 className="font-playfair text-3xl md:text-4xl font-bold text-neutral-900 mb-4">Upcoming Events</h2>
           <p className="text-lg text-neutral-600">Join us for exclusive drops, workshops, and gallery showings</p>
+          <p className="text-xs text-neutral-500 mt-2">Data source: {dataSource}</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

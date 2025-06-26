@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useAuth } from "./auth-provider"
-import { clearAllCaches } from "@/lib/cache-buster"
+import { clearAllCaches, forceDataRefresh } from "@/lib/cache-buster"
 
 export function DebugInfo() {
   const [isVisible, setIsVisible] = useState(false)
@@ -15,19 +15,54 @@ export function DebugInfo() {
     if (isVisible) {
       const data = {
         timestamp: new Date().toISOString(),
-        userAgent: navigator.userAgent,
+        userAgent: navigator.userAgent.substring(0, 100) + "...",
         currentUser: user,
         localStorage: {
           shoes: localStorage.getItem("sp_shoes_global") ? "Present" : "Missing",
           events: localStorage.getItem("sp_events_global") ? "Present" : "Missing",
           user: localStorage.getItem("sp_current_user") ? "Present" : "Missing",
+          shoesCount: localStorage.getItem("sp_shoes_global")
+            ? JSON.parse(localStorage.getItem("sp_shoes_global") || "[]").length
+            : 0,
+          eventsCount: localStorage.getItem("sp_events_global")
+            ? JSON.parse(localStorage.getItem("sp_events_global") || "[]").length
+            : 0,
         },
         url: window.location.href,
-        referrer: document.referrer,
+        referrer: document.referrer || "Direct",
+        cacheStatus: {
+          serviceWorker: "serviceWorker" in navigator ? "Available" : "Not Available",
+          cacheAPI: "caches" in window ? "Available" : "Not Available",
+        },
       }
       setDebugData(data)
     }
   }, [isVisible, user])
+
+  const testLiveDataFetch = async () => {
+    try {
+      console.log("🧪 Testing live data fetch...")
+
+      const shoesResponse = await fetch(`/data/shoes.json?test=${Date.now()}`, {
+        cache: "no-store",
+        headers: { "Cache-Control": "no-cache" },
+      })
+
+      const eventsResponse = await fetch(`/data/events.json?test=${Date.now()}`, {
+        cache: "no-store",
+        headers: { "Cache-Control": "no-cache" },
+      })
+
+      const shoesData = shoesResponse.ok ? await shoesResponse.json() : null
+      const eventsData = eventsResponse.ok ? await eventsResponse.json() : null
+
+      alert(`Live Data Test Results:
+Shoes: ${shoesResponse.ok ? `✅ ${shoesData?.length || 0} items` : `❌ ${shoesResponse.status}`}
+Events: ${eventsResponse.ok ? `✅ ${eventsData?.length || 0} items` : `❌ ${eventsResponse.status}`}`)
+    } catch (error) {
+      alert(`❌ Live data fetch failed: ${error}`)
+    }
+  }
 
   if (!isVisible) {
     return (
@@ -58,10 +93,12 @@ export function DebugInfo() {
         <CardContent className="space-y-4">
           <div>
             <h3 className="font-semibold mb-2">Current Status</h3>
-            <pre className="bg-gray-100 p-2 rounded text-xs overflow-auto">{JSON.stringify(debugData, null, 2)}</pre>
+            <pre className="bg-gray-100 p-2 rounded text-xs overflow-auto max-h-40">
+              {JSON.stringify(debugData, null, 2)}
+            </pre>
           </div>
 
-          <div className="flex gap-2 flex-wrap">
+          <div className="grid grid-cols-2 gap-2">
             <Button
               onClick={() => {
                 clearAllCaches()
@@ -86,12 +123,38 @@ export function DebugInfo() {
 
             <Button
               onClick={() => {
+                forceDataRefresh()
+                setTimeout(() => window.location.reload(), 1000)
+              }}
+              size="sm"
+              className="bg-blue-500 text-white"
+            >
+              Force Data Refresh
+            </Button>
+
+            <Button onClick={testLiveDataFetch} size="sm" className="bg-green-500 text-white">
+              Test Live Data
+            </Button>
+
+            <Button
+              onClick={() => {
                 window.location.href = window.location.href.split("?")[0]
               }}
               size="sm"
               variant="outline"
             >
               Remove URL Parameters
+            </Button>
+
+            <Button
+              onClick={() => {
+                navigator.clipboard.writeText(JSON.stringify(debugData, null, 2))
+                alert("Debug info copied to clipboard!")
+              }}
+              size="sm"
+              variant="outline"
+            >
+              Copy Debug Info
             </Button>
           </div>
         </CardContent>
