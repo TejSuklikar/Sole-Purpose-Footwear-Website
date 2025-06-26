@@ -1,10 +1,10 @@
 "use client"
 
-import { useEffect, useState, useCallback } from "react"
+import { useEffect, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { fetchWithCacheBusting } from "@/lib/cache-buster"
+import { fetchWithCacheBusting, clearAllCaches } from "@/lib/cache-buster"
 
 interface Shoe {
   id: number
@@ -14,9 +14,6 @@ interface Shoe {
   slug: string
   sizes: string[]
   inStockSizes: string[]
-  description?: string
-  details?: string[]
-  isFeatured?: boolean
 }
 
 // CORRECTED sizing system - exactly 73 sizes INCLUDING 7.5C
@@ -199,86 +196,122 @@ const defaultShoes: Shoe[] = [
 export function ShoesGrid() {
   const [shoes, setShoes] = useState<Shoe[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [lastFetch, setLastFetch] = useState<number>(0)
 
-  const loadShoes = useCallback(
-    async (forceRefresh = false) => {
-      console.log("🔄 Loading shoes data...", forceRefresh ? "(FORCED)" : "(auto)")
+  // Load shoes with aggressive cache busting
+  useEffect(() => {
+    const loadShoes = async () => {
+      const now = Date.now()
+
+      // Only fetch if it's been more than 5 seconds since last fetch
+      if (now - lastFetch < 5000 && shoes.length > 0) {
+        return
+      }
 
       try {
+        console.log("🔄 Loading shoes data...")
+
+        // Try to fetch from live data with cache busting
         const response = await fetchWithCacheBusting("/data/shoes.json")
+
         if (response.ok) {
           const liveShoes = await response.json()
           if (Array.isArray(liveShoes) && liveShoes.length > 0) {
-            console.log(`✅ SUCCESS: Loaded ${liveShoes.length} shoes from LIVE data`)
-            const processedShoes = liveShoes.map((shoe: Shoe) => ({
+            console.log("✅ Loaded live shoes data:", liveShoes.length, "shoes")
+
+            // Update shoes with live data
+            const updatedShoes = liveShoes.map((shoe: Shoe) => ({
               ...shoe,
               sizes: shoe.sizes || allSizes,
               inStockSizes: shoe.inStockSizes || allSizes,
             }))
-            setShoes(processedShoes)
-            localStorage.setItem("sp_shoes_global", JSON.stringify(processedShoes))
+
+            setShoes(updatedShoes)
+            setLastFetch(now)
+
+            // Update localStorage with live data
+            localStorage.setItem("sp_shoes_global", JSON.stringify(updatedShoes))
             setIsLoading(false)
             return
           }
+        } else {
+          console.log("❌ Failed to fetch live shoes data:", response.status, response.statusText)
         }
       } catch (error) {
-        console.log("💥 Live data error, falling back.", error)
+        console.log("⚠️ Live shoes data not available:", error)
       }
 
+      // Fallback to localStorage
       try {
         const savedShoes = localStorage.getItem("sp_shoes_global")
         if (savedShoes) {
           const parsedShoes = JSON.parse(savedShoes)
           if (Array.isArray(parsedShoes) && parsedShoes.length > 0) {
-            console.log(`📦 Loaded ${parsedShoes.length} shoes from localStorage`)
-            setShoes(parsedShoes)
+            console.log("📦 Loaded shoes from localStorage:", parsedShoes.length, "shoes")
+
+            const updatedShoes = parsedShoes.map((shoe: Shoe) => ({
+              ...shoe,
+              sizes: allSizes,
+              inStockSizes: shoe.inStockSizes || allSizes,
+            }))
+
+            setShoes(updatedShoes)
+            setLastFetch(now)
+            localStorage.setItem("sp_shoes_global", JSON.stringify(updatedShoes))
+          } else {
+            console.log("🔄 Using default shoes data")
+            setShoes(defaultShoes)
+            setLastFetch(now)
+            localStorage.setItem("sp_shoes_global", JSON.stringify(defaultShoes))
           }
+        } else {
+          console.log("🆕 Initializing with default shoes data")
+          setShoes(defaultShoes)
+          setLastFetch(now)
+          localStorage.setItem("sp_shoes_global", JSON.stringify(defaultShoes))
         }
       } catch (error) {
-        console.log("💥 localStorage error, falling back.", error)
-      }
-
-      if (shoes.length === 0) {
-        console.log("🆕 Using default shoes data")
+        console.error("❌ Error loading shoes:", error)
         setShoes(defaultShoes)
+        setLastFetch(now)
+        localStorage.setItem("sp_shoes_global", JSON.stringify(defaultShoes))
       }
+
       setIsLoading(false)
-    },
-    [shoes.length],
-  )
+    }
 
-  useEffect(() => {
-    loadShoes(true)
+    // Load shoes immediately
+    loadShoes()
 
+    // Listen for storage changes
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === "sp_shoes_global" || e.key === "sp_force_refresh") {
-        loadShoes(true)
+      if (e.key === "sp_shoes_global") {
+        console.log("🔄 Storage change detected, reloading shoes...")
+        loadShoes()
       }
     }
-    const handleFocus = () => loadShoes(true)
-    const handleForceRefresh = () => loadShoes(true)
-    const handleOnline = () => loadShoes(true)
-    const handleVisibilityChange = () => {
-      if (!document.hidden) loadShoes(true)
+
+    // Listen for focus events to refresh data when user returns to tab
+    const handleFocus = () => {
+      console.log("🔄 Tab focused, checking for updates...")
+      loadShoes()
     }
 
     window.addEventListener("storage", handleStorageChange)
     window.addEventListener("focus", handleFocus)
-    window.addEventListener("forceDataRefresh", handleForceRefresh as EventListener)
-    window.addEventListener("online", handleOnline)
-    document.addEventListener("visibilitychange", handleVisibilityChange)
 
-    const interval = setInterval(() => loadShoes(), 3000)
+    // Check for updates every 15 seconds
+    const interval = setInterval(() => {
+      console.log("🔄 Periodic check for shoe updates...")
+      loadShoes()
+    }, 15000)
 
     return () => {
       window.removeEventListener("storage", handleStorageChange)
       window.removeEventListener("focus", handleFocus)
-      window.removeEventListener("forceDataRefresh", handleForceRefresh as EventListener)
-      window.removeEventListener("online", handleOnline)
-      document.removeEventListener("visibilitychange", handleVisibilityChange)
       clearInterval(interval)
     }
-  }, [loadShoes])
+  }, [lastFetch, shoes.length])
 
   if (isLoading) {
     return (
@@ -289,31 +322,70 @@ export function ShoesGrid() {
     )
   }
 
+  if (shoes.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-white text-lg mb-4">No shoes available at the moment.</p>
+        <p className="text-neutral-400">Check back later for new designs!</p>
+        <Button
+          onClick={() => {
+            clearAllCaches()
+            window.location.reload()
+          }}
+          className="mt-4 bg-white text-black"
+        >
+          Refresh Data
+        </Button>
+      </div>
+    )
+  }
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {shoes.map((shoe) => (
-        <div key={shoe.id}>
-          <Link href={`/shoes/${shoe.slug}`}>
-            <div className="bg-white rounded-lg shadow-sm overflow-hidden group">
-              <div className="aspect-[4/3] relative">
-                <Image
-                  src={shoe.image || "/placeholder.svg?height=400&width=400&text=Shoe+Image"}
-                  alt={shoe.name}
-                  fill
-                  className="object-cover object-center transition-transform duration-300 group-hover:scale-105"
-                  crossOrigin="anonymous"
-                />
+    <div>
+      <div className="mb-6 flex justify-between items-center">
+        <p className="text-neutral-400 text-sm">Showing {shoes.length} custom designs</p>
+        <Button
+          onClick={() => {
+            clearAllCaches()
+            window.location.reload()
+          }}
+          variant="outline"
+          size="sm"
+          className="text-xs"
+        >
+          Refresh
+        </Button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {shoes.map((shoe) => (
+          <div key={shoe.id}>
+            <Link href={`/shoes/${shoe.slug}`}>
+              <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+                <div className="aspect-[4/3] relative">
+                  <Image
+                    src={shoe.image || "/placeholder.svg?height=400&width=400&text=Shoe+Image"}
+                    alt={shoe.name}
+                    fill
+                    className="object-cover object-center"
+                    crossOrigin="anonymous"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement
+                      target.src = "/placeholder.svg?height=400&width=400&text=Shoe+Image"
+                    }}
+                  />
+                </div>
+                <div className="p-6">
+                  <h3 className="font-semibold text-lg mb-2 text-neutral-900">{shoe.name}</h3>
+                  <p className="text-2xl font-bold text-neutral-900 mb-2">${shoe.price}</p>
+                  <p className="text-sm text-neutral-600 mb-4">Available in {shoe.inStockSizes.length} sizes</p>
+                  <Button className="w-full bg-neutral-700 text-white">View Details</Button>
+                </div>
               </div>
-              <div className="p-6">
-                <h3 className="font-semibold text-lg mb-2 text-neutral-900">{shoe.name}</h3>
-                <p className="text-2xl font-bold text-neutral-900 mb-2">${shoe.price}</p>
-                <p className="text-sm text-neutral-600 mb-4">Available in {shoe.inStockSizes?.length || 0} sizes</p>
-                <Button className="w-full bg-neutral-700 text-white">View Details</Button>
-              </div>
-            </div>
-          </Link>
-        </div>
-      ))}
+            </Link>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
