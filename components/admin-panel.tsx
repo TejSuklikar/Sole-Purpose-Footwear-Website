@@ -10,8 +10,6 @@ import {
   Plus,
   Star,
   Trash2,
-  StarOff,
-  Package,
   Check,
   X,
   Calendar,
@@ -20,6 +18,9 @@ import {
   Edit,
   Cloud,
   CloudOff,
+  ImageIcon,
+  Package,
+  StarOff,
 } from "lucide-react"
 import Image from "next/image"
 import { syncShoesToRepo, syncEventsToRepo } from "@/lib/github-sync"
@@ -28,7 +29,8 @@ interface Shoe {
   id: number
   name: string
   price: number
-  image: string
+  image: string // Primary image (first in images array)
+  images: string[] // All images for the shoe
   slug: string
   sizes: string[]
   inStockSizes: string[] // New field for inventory management
@@ -129,13 +131,21 @@ const allSizes = [
   "8Y", // Add this back
 ]
 
-// All available shoes in the system - Updated with $160 sticker price
+// All available shoes in the system - Updated with multiple images
 const defaultShoes: Shoe[] = [
   {
     id: 1,
     name: "Red Kuffiyeh AF1",
     price: 160,
     image: "/images/kuffiyeh-side-sunset.png",
+    images: [
+      "/images/kuffiyeh-side-sunset.png",
+      "/images/kuffiyeh-af1.png",
+      "/images/kuffiyeh-heel-sunset.png",
+      "/images/kuffiyeh-heel-view.png",
+      "/images/kuffiyeh-side-detail.png",
+      "/images/kuffiyeh-sunset.png",
+    ],
     slug: "red-kuffiyeh-af1",
     sizes: allSizes,
     inStockSizes: allSizes, // All sizes available
@@ -153,6 +163,15 @@ const defaultShoes: Shoe[] = [
     name: "Mexican Eagle AF1",
     price: 160,
     image: "/images/mexican-side-view.png",
+    images: [
+      "/images/mexican-side-view.png",
+      "/images/mexican-af1.png",
+      "/images/mexican-full-shoe.png",
+      "/images/mexican-eagle-detail.png",
+      "/images/mexican-eagle-hero.png",
+      "/images/mexican-box-angle.png",
+      "/images/mexican-box-top.png",
+    ],
     slug: "mexican-eagle-af1",
     sizes: allSizes,
     inStockSizes: allSizes,
@@ -170,6 +189,7 @@ const defaultShoes: Shoe[] = [
     name: "Black & Red Geometric",
     price: 160,
     image: "/images/black-red-geometric-hero.jpg",
+    images: ["/images/black-red-geometric-hero.jpg", "/images/black-red-af1.png", "/images/geometric-af1.png"],
     slug: "black-red-geometric",
     sizes: allSizes,
     inStockSizes: allSizes,
@@ -187,6 +207,12 @@ const defaultShoes: Shoe[] = [
     name: "Jordanian Flag AF1",
     price: 160,
     image: "/images/jordanian-side-view.jpg",
+    images: [
+      "/images/jordanian-side-view.jpg",
+      "/images/jordanian-heel-view.jpg",
+      "/images/jordanian-af1.png",
+      "/images/jordanian-detail.png",
+    ],
     slug: "jordanian-flag-af1",
     sizes: allSizes,
     inStockSizes: allSizes,
@@ -204,6 +230,14 @@ const defaultShoes: Shoe[] = [
     name: "Geometric Checkered",
     price: 160,
     image: "/images/geometric-checkered-side.jpg",
+    images: [
+      "/images/geometric-checkered-side.jpg",
+      "/images/checkered-drip-af1.png",
+      "/images/checkered-drip-heel.png",
+      "/images/checkered-drip-pair.png",
+      "/images/checkered-drip-sunset.png",
+      "/images/checkered-sunset.png",
+    ],
     slug: "geometric-checkered",
     sizes: allSizes,
     inStockSizes: allSizes,
@@ -221,6 +255,12 @@ const defaultShoes: Shoe[] = [
     name: "Chinese Flag AF1",
     price: 160,
     image: "/images/chinese-side-sunset.png",
+    images: [
+      "/images/chinese-side-sunset.png",
+      "/images/chinese-af1.png",
+      "/images/chinese-collection.png",
+      "/images/chinese-heel-view.png",
+    ],
     slug: "chinese-flag-af1",
     sizes: allSizes,
     inStockSizes: allSizes,
@@ -238,6 +278,12 @@ const defaultShoes: Shoe[] = [
     name: "Checkered Drip AF1",
     price: 160,
     image: "/images/checkered-drip-sunset.png",
+    images: [
+      "/images/checkered-drip-sunset.png",
+      "/images/checkered-drip-af1.png",
+      "/images/checkered-drip-heel.png",
+      "/images/checkered-drip-pair.png",
+    ],
     slug: "checkered-drip-af1",
     sizes: allSizes,
     inStockSizes: allSizes,
@@ -255,6 +301,7 @@ const defaultShoes: Shoe[] = [
     name: "Map of Palestine AF1",
     price: 160,
     image: "/images/palestine-map-side.jpg",
+    images: ["/images/palestine-map-side.jpg", "/images/palestine-map-angle.jpg"],
     slug: "map-of-palestine-af1",
     sizes: allSizes,
     inStockSizes: allSizes,
@@ -272,6 +319,7 @@ const defaultShoes: Shoe[] = [
     name: "Lebanese Cedar AF1",
     price: 160,
     image: "/images/lebanese-side-view.jpg",
+    images: ["/images/lebanese-side-view.jpg", "/images/lebanese-heel-view.jpg"],
     slug: "lebanese-cedar-af1",
     sizes: allSizes,
     inStockSizes: allSizes,
@@ -280,7 +328,7 @@ const defaultShoes: Shoe[] = [
       "Hand-painted Lebanese cedar tree",
       "Traditional red and white flag stripes",
       "Lebanese flag colors on branding",
-      "Infant (1C-7.5C): $135 total | Toddler (8C-13.5C): $145 total | Youth: $145 total | Big Kids: $145-175 total | Adults: $230 total",
+      "Infant (1C-7.5C): $135 total | Toddler (8C-13.5C): $145-175 total | Youth: $145 total | Big Kids: $145-175 total | Adults: $230 total",
     ],
     isFeatured: false,
   },
@@ -289,6 +337,7 @@ const defaultShoes: Shoe[] = [
     name: "Filipino Sun AF1",
     price: 160,
     image: "/images/filipino-side-view.jpg",
+    images: ["/images/filipino-side-view.jpg", "/images/filipino-heel-view.jpg"],
     slug: "filipino-sun-af1",
     sizes: allSizes,
     inStockSizes: allSizes,
@@ -338,12 +387,14 @@ export function AdminPanel() {
   const [showAddEventForm, setShowAddEventForm] = useState(false)
   const [editingInventory, setEditingInventory] = useState<number | null>(null)
   const [editingEvent, setEditingEvent] = useState<number | null>(null)
+  const [editingImages, setEditingImages] = useState<number | null>(null)
+  const [editingShoe, setEditingShoe] = useState<number | null>(null)
   const [syncStatus, setSyncStatus] = useState<"idle" | "syncing" | "success" | "error">("idle")
   const [lastSyncTime, setLastSyncTime] = useState<string | null>(null)
   const [newShoe, setNewShoe] = useState({
     name: "",
     price: "160", // Default to $160 sticker price
-    image: "",
+    images: [""], // Start with one empty image field
     description: "",
     details: "",
     sizes: [] as string[],
@@ -356,19 +407,21 @@ export function AdminPanel() {
     description: "",
   })
 
-  // Add this state for editing events
+  // Add this state for editing events and shoes
   const [editingEventData, setEditingEventData] = useState<Event | null>(null)
+  const [editingShoeData, setEditingShoeData] = useState<Shoe | null>(null)
 
   // Load shoes and events from localStorage on mount
   useEffect(() => {
     const savedShoes = localStorage.getItem("sp_shoes_global")
     if (savedShoes) {
       const parsedShoes = JSON.parse(savedShoes)
-      // Migration: Update existing shoes to use the new 73-size array
+      // Migration: Update existing shoes to use the new structure with images array
       const updatedShoes = parsedShoes.map((shoe: Shoe) => ({
         ...shoe,
         sizes: allSizes, // Update to new 73-size array
-        inStockSizes: allSizes, // Update in-stock sizes too
+        inStockSizes: shoe.inStockSizes || allSizes, // Update in-stock sizes too
+        images: shoe.images || [shoe.image], // Ensure images array exists
       }))
       setShoes(updatedShoes)
       // Save the migrated data back to localStorage
@@ -440,13 +493,16 @@ export function AdminPanel() {
   }
 
   const handleAddShoe = async () => {
-    if (!newShoe.name || !newShoe.price || !newShoe.image) return
+    if (!newShoe.name || !newShoe.price || newShoe.images.filter((img) => img.trim()).length === 0) return
+
+    const validImages = newShoe.images.filter((img) => img.trim())
 
     const shoe: Shoe = {
       id: Date.now(),
       name: newShoe.name,
       price: Number.parseInt(newShoe.price),
-      image: newShoe.image,
+      image: validImages[0], // Primary image is the first one
+      images: validImages,
       slug: newShoe.name
         .toLowerCase()
         .replace(/\s+/g, "-")
@@ -465,7 +521,7 @@ export function AdminPanel() {
     setNewShoe({
       name: "",
       price: "160", // Reset to default sticker price
-      image: "",
+      images: [""],
       description: "",
       details: "",
       sizes: [],
@@ -538,14 +594,52 @@ export function AdminPanel() {
     setEditingEventData(null)
   }
 
+  // Add handleUpdateShoe function
+  const handleUpdateShoe = async (updatedShoe: Shoe) => {
+    const validImages = updatedShoe.images.filter((img) => img.trim())
+    if (validImages.length === 0) return
+
+    const finalShoe = {
+      ...updatedShoe,
+      images: validImages,
+      image: validImages[0], // Update primary image to first in array
+      slug: updatedShoe.name
+        .toLowerCase()
+        .replace(/\s+/g, "-")
+        .replace(/[^a-z0-9-]/g, ""),
+      details:
+        typeof updatedShoe.details === "string"
+          ? updatedShoe.details.split("\n").filter((d) => d.trim())
+          : updatedShoe.details || [],
+    }
+
+    const updatedShoes = shoes.map((shoe) => (shoe.id === updatedShoe.id ? finalShoe : shoe))
+    await saveShoes(updatedShoes)
+    setEditingShoe(null)
+    setEditingShoeData(null)
+  }
+
   const startEditingEvent = (event: Event) => {
     setEditingEvent(event.id)
     setEditingEventData({ ...event }) // Create a copy for editing
   }
 
+  const startEditingShoe = (shoe: Shoe) => {
+    setEditingShoe(shoe.id)
+    setEditingShoeData({
+      ...shoe,
+      details: Array.isArray(shoe.details) ? shoe.details.join("\n") : shoe.details || "",
+    }) // Create a copy for editing
+  }
+
   const cancelEditingEvent = () => {
     setEditingEvent(null)
     setEditingEventData(null)
+  }
+
+  const cancelEditingShoe = () => {
+    setEditingShoe(null)
+    setEditingShoeData(null)
   }
 
   const toggleFeatured = async (id: number) => {
@@ -573,6 +667,16 @@ export function AdminPanel() {
     setNewShoe({ ...newShoe, sizes: updatedSizes })
   }
 
+  const handleEditSizeToggle = (size: string) => {
+    if (!editingShoeData) return
+
+    const updatedSizes = editingShoeData.sizes.includes(size)
+      ? editingShoeData.sizes.filter((s) => s !== size)
+      : [...editingShoeData.sizes, size]
+
+    setEditingShoeData({ ...editingShoeData, sizes: updatedSizes })
+  }
+
   const toggleSizeStock = async (shoeId: number, size: string) => {
     const updatedShoes = shoes.map((shoe) => {
       if (shoe.id === shoeId) {
@@ -586,12 +690,56 @@ export function AdminPanel() {
     await saveShoes(updatedShoes)
   }
 
+  // Image management functions
+  const addImageField = () => {
+    setNewShoe({ ...newShoe, images: [...newShoe.images, ""] })
+  }
+
+  const addEditImageField = () => {
+    if (!editingShoeData) return
+    setEditingShoeData({ ...editingShoeData, images: [...editingShoeData.images, ""] })
+  }
+
+  const removeImageField = (index: number) => {
+    const updatedImages = newShoe.images.filter((_, i) => i !== index)
+    setNewShoe({ ...newShoe, images: updatedImages.length > 0 ? updatedImages : [""] })
+  }
+
+  const removeEditImageField = (index: number) => {
+    if (!editingShoeData) return
+    const updatedImages = editingShoeData.images.filter((_, i) => i !== index)
+    setEditingShoeData({ ...editingShoeData, images: updatedImages.length > 0 ? updatedImages : [""] })
+  }
+
+  const updateImageField = (index: number, value: string) => {
+    const updatedImages = [...newShoe.images]
+    updatedImages[index] = value
+    setNewShoe({ ...newShoe, images: updatedImages })
+  }
+
+  const updateEditImageField = (index: number, value: string) => {
+    if (!editingShoeData) return
+    const updatedImages = [...editingShoeData.images]
+    updatedImages[index] = value
+    setEditingShoeData({ ...editingShoeData, images: updatedImages })
+  }
+
   const selectAllSizes = () => {
     setNewShoe({ ...newShoe, sizes: [...allSizes] })
   }
 
+  const selectAllEditSizes = () => {
+    if (!editingShoeData) return
+    setEditingShoeData({ ...editingShoeData, sizes: [...allSizes] })
+  }
+
   const clearAllSizes = () => {
     setNewShoe({ ...newShoe, sizes: [] })
+  }
+
+  const clearAllEditSizes = () => {
+    if (!editingShoeData) return
+    setEditingShoeData({ ...editingShoeData, sizes: [] })
   }
 
   const selectSizeCategory = (category: "men" | "women" | "infant" | "toddler" | "youth" | "big-kids") => {
@@ -636,6 +784,52 @@ export function AdminPanel() {
     // Add to existing selection (don't replace)
     const newSizes = [...new Set([...newShoe.sizes, ...categorySizes])]
     setNewShoe({ ...newShoe, sizes: newSizes })
+  }
+
+  const selectEditSizeCategory = (category: "men" | "women" | "infant" | "toddler" | "youth" | "big-kids") => {
+    if (!editingShoeData) return
+
+    let categorySizes: string[] = []
+
+    if (category === "men") {
+      categorySizes = allSizes.filter((size) => !size.includes("W") && !size.includes("C") && !size.includes("Y"))
+    } else if (category === "women") {
+      categorySizes = allSizes.filter((size) => size.includes("W"))
+    } else if (category === "infant") {
+      categorySizes = allSizes.filter((size) => {
+        if (!size.includes("C")) return false
+        const num = Number.parseFloat(size)
+        return num >= 1 && num <= 7.5
+      })
+    } else if (category === "toddler") {
+      categorySizes = allSizes.filter((size) => {
+        if (size.includes("C")) {
+          const num = Number.parseFloat(size)
+          return num >= 8 && num <= 13.5
+        }
+        return false
+      })
+    } else if (category === "youth") {
+      categorySizes = allSizes.filter((size) => {
+        if (size.includes("Y")) {
+          const num = Number.parseFloat(size)
+          return num >= 1 && num <= 5.5
+        }
+        return false
+      })
+    } else if (category === "big-kids") {
+      categorySizes = allSizes.filter((size) => {
+        if (size.includes("Y")) {
+          const num = Number.parseFloat(size)
+          return num >= 6 && num <= 8
+        }
+        return false
+      })
+    }
+
+    // Add to existing selection (don't replace)
+    const newSizes = [...new Set([...editingShoeData.sizes, ...categorySizes])]
+    setEditingShoeData({ ...editingShoeData, sizes: newSizes })
   }
 
   const featuredShoes = shoes.filter((shoe) => shoe.isFeatured)
@@ -851,7 +1045,12 @@ export function AdminPanel() {
                         <Check className="h-3 w-3 mr-1" />
                         Save
                       </Button>
-                      <Button onClick={cancelEditingEvent} size="sm" variant="outline" className="flex-1">
+                      <Button
+                        onClick={cancelEditingEvent}
+                        size="sm"
+                        variant="outline"
+                        className="flex-1 bg-transparent"
+                      >
                         <X className="h-3 w-3 mr-1" />
                         Cancel
                       </Button>
@@ -1031,6 +1230,9 @@ export function AdminPanel() {
                 <p className="text-xs text-neutral-500 mt-1">
                   {shoe.inStockSizes.length}/{shoe.sizes.length} sizes in stock
                 </p>
+                <p className="text-xs text-neutral-600 mt-1">
+                  {shoe.images.length} image{shoe.images.length !== 1 ? "s" : ""}
+                </p>
               </div>
             ))}
             {Array.from({ length: 3 - featuredShoes.length }).map((_, i) => (
@@ -1049,383 +1251,666 @@ export function AdminPanel() {
       </Card>
 
       {/* Add Shoe Form */}
-      <Card className="bg-neutral-900 border-neutral-800">
-        <CardHeader>
-          <CardTitle className="text-white">Add New Shoe</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {showAddForm && (
+        <Card className="bg-neutral-900 border-neutral-800">
+          <CardHeader>
+            <CardTitle className="text-white">Add New Shoe</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="name" className="text-white">
+                  Shoe Name
+                </Label>
+                <Input
+                  id="name"
+                  value={newShoe.name}
+                  onChange={(e) => setNewShoe({ ...newShoe, name: e.target.value })}
+                  placeholder="e.g., Red Kuffiyeh AF1"
+                />
+              </div>
+              <div>
+                <Label htmlFor="price" className="text-white">
+                  Sticker Price ($)
+                </Label>
+                <Input
+                  id="price"
+                  type="number"
+                  value={newShoe.price}
+                  onChange={(e) => setNewShoe({ ...newShoe, price: e.target.value })}
+                  placeholder="160"
+                />
+                <p className="text-xs text-neutral-400 mt-1">
+                  Display price only. Actual pricing calculated by size at checkout.
+                </p>
+              </div>
+            </div>
+
+            {/* Multiple Images Section */}
             <div>
-              <Label htmlFor="name" className="text-white">
-                Shoe Name
+              <Label className="text-white flex items-center">
+                <ImageIcon className="mr-2 h-4 w-4" />
+                Product Images
               </Label>
-              <Input
-                id="name"
-                value={newShoe.name}
-                onChange={(e) => setNewShoe({ ...newShoe, name: e.target.value })}
-                placeholder="e.g., Red Kuffiyeh AF1"
+              <p className="text-xs text-neutral-400 mb-3">
+                Add multiple images to showcase different angles. First image will be the primary display image.
+              </p>
+
+              <div className="space-y-3">
+                {newShoe.images.map((image, index) => (
+                  <div key={index} className="flex gap-2 items-center">
+                    <div className="flex-1">
+                      <Input
+                        value={image}
+                        onChange={(e) => updateImageField(index, e.target.value)}
+                        placeholder={
+                          index === 0 ? "/images/shoe-name-main.png (Primary)" : `/images/shoe-name-${index + 1}.png`
+                        }
+                        className="text-sm"
+                      />
+                    </div>
+                    {image && (
+                      <div className="w-12 h-12 relative rounded border overflow-hidden bg-neutral-800">
+                        <Image
+                          src={image || "/placeholder.svg"}
+                          alt={`Preview ${index + 1}`}
+                          fill
+                          className="object-cover"
+                          crossOrigin="anonymous"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement
+                            target.src = "/placeholder.svg"
+                          }}
+                        />
+                      </div>
+                    )}
+                    {newShoe.images.length > 1 && (
+                      <Button
+                        type="button"
+                        onClick={() => removeImageField(index)}
+                        size="sm"
+                        variant="outline"
+                        className="text-red-400 border-red-400 hover:bg-red-400 hover:text-white"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                ))}
+
+                <Button
+                  type="button"
+                  onClick={addImageField}
+                  size="sm"
+                  variant="outline"
+                  className="text-blue-400 border-blue-400 hover:bg-blue-400 hover:text-white bg-transparent"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Another Image
+                </Button>
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="description" className="text-white">
+                Description
+              </Label>
+              <Textarea
+                id="description"
+                value={newShoe.description}
+                onChange={(e) => setNewShoe({ ...newShoe, description: e.target.value })}
+                placeholder="Describe the shoe design..."
+                rows={3}
               />
             </div>
+
             <div>
-              <Label htmlFor="price" className="text-white">
-                Sticker Price ($)
+              <Label htmlFor="details" className="text-white">
+                Details (one per line)
               </Label>
-              <Input
-                id="price"
-                type="number"
-                value={newShoe.price}
-                onChange={(e) => setNewShoe({ ...newShoe, price: e.target.value })}
-                placeholder="160"
+              <Textarea
+                id="details"
+                value={newShoe.details}
+                onChange={(e) => setNewShoe({ ...newShoe, details: e.target.value })}
+                placeholder="Hand-painted with premium paints&#10;Sealed with protective coating&#10;Based on Nike Air Force 1&#10;Infant (1C-7.5C): $135 total | Toddler (8C-13.5C): $145 total | Youth: $145 total | Big Kids: $145-175 total | Adults: $230 total"
+                rows={4}
               />
-              <p className="text-xs text-neutral-400 mt-1">
-                Display price only. Actual pricing calculated by size at checkout.
+            </div>
+
+            <div>
+              <Label className="text-white">Available Sizes (Updated Sizing System)</Label>
+
+              {/* Size Selection Controls */}
+              <div className="flex flex-wrap gap-2 mt-2 mb-4">
+                <Button
+                  type="button"
+                  onClick={selectAllSizes}
+                  size="sm"
+                  variant="outline"
+                  className="text-xs bg-transparent"
+                >
+                  Select All ({allSizes.length})
+                </Button>
+                <Button
+                  type="button"
+                  onClick={clearAllSizes}
+                  size="sm"
+                  variant="outline"
+                  className="text-xs bg-transparent"
+                >
+                  Clear All
+                </Button>
+                <Button
+                  type="button"
+                  onClick={() => selectSizeCategory("men")}
+                  size="sm"
+                  variant="outline"
+                  className="text-xs"
+                >
+                  + Men's ({mensSizes.length})
+                </Button>
+                <Button
+                  type="button"
+                  onClick={() => selectSizeCategory("women")}
+                  size="sm"
+                  variant="outline"
+                  className="text-xs"
+                >
+                  + Women's ({womensSizes.length})
+                </Button>
+                <Button
+                  type="button"
+                  onClick={() => selectSizeCategory("big-kids")}
+                  size="sm"
+                  variant="outline"
+                  className="text-xs"
+                >
+                  + Big Kids ({bigKidsSizes.length})
+                </Button>
+                <Button
+                  type="button"
+                  onClick={() => selectSizeCategory("youth")}
+                  size="sm"
+                  variant="outline"
+                  className="text-xs"
+                >
+                  + Youth ({youthSizes.length})
+                </Button>
+                <Button
+                  type="button"
+                  onClick={() => selectSizeCategory("toddler")}
+                  size="sm"
+                  variant="outline"
+                  className="text-xs"
+                >
+                  + Toddler ({toddlerSizes.length})
+                </Button>
+                <Button
+                  type="button"
+                  onClick={() => selectSizeCategory("infant")}
+                  size="sm"
+                  variant="outline"
+                  className="text-xs"
+                >
+                  + Infant ({infantSizes.length})
+                </Button>
+              </div>
+
+              {/* Men's Sizes */}
+              <div className="mb-4">
+                <h4 className="text-white text-sm font-medium mb-2">Men's Sizes (7-15) - $230 total</h4>
+                <div className="grid grid-cols-6 gap-2">
+                  {mensSizes.map((size) => (
+                    <button
+                      key={size}
+                      type="button"
+                      onClick={() => handleSizeToggle(size)}
+                      className={`p-2 rounded border text-sm ${
+                        newShoe.sizes.includes(size)
+                          ? "bg-white text-black border-white"
+                          : "bg-neutral-800 text-white border-neutral-600"
+                      }`}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Women's Sizes */}
+              <div className="mb-4">
+                <h4 className="text-white text-sm font-medium mb-2">Women's Sizes - $230 total</h4>
+                <div className="grid grid-cols-6 gap-2">
+                  {womensSizes.map((size) => (
+                    <button
+                      key={size}
+                      type="button"
+                      onClick={() => handleSizeToggle(size)}
+                      className={`p-2 rounded border text-sm ${
+                        newShoe.sizes.includes(size)
+                          ? "bg-white text-black border-white"
+                          : "bg-neutral-800 text-white border-neutral-600"
+                      }`}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Big Kids */}
+              <div className="mb-4">
+                <h4 className="text-white text-sm font-medium mb-2">Big Kids (6Y-8Y) - $175 total</h4>
+                <div className="grid grid-cols-6 gap-2">
+                  {bigKidsSizes.map((size) => (
+                    <button
+                      key={size}
+                      type="button"
+                      onClick={() => handleSizeToggle(size)}
+                      className={`p-2 rounded border text-sm ${
+                        newShoe.sizes.includes(size)
+                          ? "bg-white text-black border-white"
+                          : "bg-neutral-800 text-white border-neutral-600"
+                      }`}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Youth */}
+              <div className="mb-4">
+                <h4 className="text-white text-sm font-medium mb-2">Youth (1Y-5.5Y) - $145 total</h4>
+                <div className="grid grid-cols-6 gap-2">
+                  {youthSizes.map((size) => (
+                    <button
+                      key={size}
+                      type="button"
+                      onClick={() => handleSizeToggle(size)}
+                      className={`p-2 rounded border text-sm ${
+                        newShoe.sizes.includes(size)
+                          ? "bg-white text-black border-white"
+                          : "bg-neutral-800 text-white border-neutral-600"
+                      }`}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Toddler Sizes */}
+              <div className="mb-4">
+                <h4 className="text-white text-sm font-medium mb-2">Toddler (8C-13.5C) - $145 total</h4>
+                <div className="grid grid-cols-6 gap-2">
+                  {toddlerSizes.map((size) => (
+                    <button
+                      key={size}
+                      type="button"
+                      onClick={() => handleSizeToggle(size)}
+                      className={`p-2 rounded border text-sm ${
+                        newShoe.sizes.includes(size)
+                          ? "bg-white text-black border-white"
+                          : "bg-neutral-800 text-white border-neutral-600"
+                      }`}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Infant Sizes */}
+              <div className="mb-4">
+                <h4 className="text-white text-sm font-medium mb-2">Infant (1C-7.5C) - $135 total</h4>
+                <div className="grid grid-cols-6 gap-2">
+                  {infantSizes.map((size) => (
+                    <button
+                      key={size}
+                      type="button"
+                      onClick={() => handleSizeToggle(size)}
+                      className={`p-2 rounded border text-sm ${
+                        newShoe.sizes.includes(size)
+                          ? "bg-white text-black border-white"
+                          : "bg-neutral-800 text-white border-neutral-600"
+                      }`}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <p className="text-neutral-400 text-sm mt-1">
+                {newShoe.sizes.length === 0 ? "All sizes will be available" : `${newShoe.sizes.length} sizes selected`}
               </p>
             </div>
-          </div>
 
-          <div>
-            <Label htmlFor="image" className="text-white">
-              Image URL
-            </Label>
-            <Input
-              id="image"
-              value={newShoe.image}
-              onChange={(e) => setNewShoe({ ...newShoe, image: e.target.value })}
-              placeholder="/images/shoe-name.png"
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="description" className="text-white">
-              Description
-            </Label>
-            <Textarea
-              id="description"
-              value={newShoe.description}
-              onChange={(e) => setNewShoe({ ...newShoe, description: e.target.value })}
-              placeholder="Describe the shoe design..."
-              rows={3}
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="details" className="text-white">
-              Details (one per line)
-            </Label>
-            <Textarea
-              id="details"
-              value={newShoe.details}
-              onChange={(e) => setNewShoe({ ...newShoe, details: e.target.value })}
-              placeholder="Hand-painted with premium paints&#10;Sealed with protective coating&#10;Based on Nike Air Force 1&#10;Infant (1C-7.5C): $135 total | Toddler (8C-13.5C): $145 total | Youth: $145 total | Big Kids: $145-175 total | Adults: $230 total"
-              rows={4}
-            />
-          </div>
-
-          <div>
-            <Label className="text-white">Available Sizes (Updated Sizing System)</Label>
-
-            {/* Size Selection Controls */}
-            <div className="flex flex-wrap gap-2 mt-2 mb-4">
-              <Button type="button" onClick={selectAllSizes} size="sm" variant="outline" className="text-xs">
-                Select All ({allSizes.length})
+            <div className="flex gap-2">
+              <Button onClick={handleAddShoe} className="bg-white text-black">
+                Add Shoe
               </Button>
-              <Button type="button" onClick={clearAllSizes} size="sm" variant="outline" className="text-xs">
-                Clear All
-              </Button>
-              <Button
-                type="button"
-                onClick={() => selectSizeCategory("men")}
-                size="sm"
-                variant="outline"
-                className="text-xs"
-              >
-                + Men's ({mensSizes.length})
-              </Button>
-              <Button
-                type="button"
-                onClick={() => selectSizeCategory("women")}
-                size="sm"
-                variant="outline"
-                className="text-xs"
-              >
-                + Women's ({womensSizes.length})
-              </Button>
-              <Button
-                type="button"
-                onClick={() => selectSizeCategory("big-kids")}
-                size="sm"
-                variant="outline"
-                className="text-xs"
-              >
-                + Big Kids ({bigKidsSizes.length})
-              </Button>
-              <Button
-                type="button"
-                onClick={() => selectSizeCategory("youth")}
-                size="sm"
-                variant="outline"
-                className="text-xs"
-              >
-                + Youth ({youthSizes.length})
-              </Button>
-              <Button
-                type="button"
-                onClick={() => selectSizeCategory("toddler")}
-                size="sm"
-                variant="outline"
-                className="text-xs"
-              >
-                + Toddler ({toddlerSizes.length})
-              </Button>
-              <Button
-                type="button"
-                onClick={() => selectSizeCategory("infant")}
-                size="sm"
-                variant="outline"
-                className="text-xs"
-              >
-                + Infant ({infantSizes.length})
+              <Button onClick={() => setShowAddForm(false)} variant="outline">
+                Cancel
               </Button>
             </div>
-
-            {/* Men's Sizes */}
-            <div className="mb-4">
-              <h4 className="text-white text-sm font-medium mb-2">Men's Sizes (7-15) - $230 total</h4>
-              <div className="grid grid-cols-6 gap-2">
-                {mensSizes.map((size) => (
-                  <button
-                    key={size}
-                    type="button"
-                    onClick={() => handleSizeToggle(size)}
-                    className={`p-2 rounded border text-sm ${
-                      newShoe.sizes.includes(size)
-                        ? "bg-white text-black border-white"
-                        : "bg-neutral-800 text-white border-neutral-600"
-                    }`}
-                  >
-                    {size}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Women's Sizes */}
-            <div className="mb-4">
-              <h4 className="text-white text-sm font-medium mb-2">Women's Sizes - $230 total</h4>
-              <div className="grid grid-cols-6 gap-2">
-                {womensSizes.map((size) => (
-                  <button
-                    key={size}
-                    type="button"
-                    onClick={() => handleSizeToggle(size)}
-                    className={`p-2 rounded border text-sm ${
-                      newShoe.sizes.includes(size)
-                        ? "bg-white text-black border-white"
-                        : "bg-neutral-800 text-white border-neutral-600"
-                    }`}
-                  >
-                    {size}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Big Kids */}
-            <div className="mb-4">
-              <h4 className="text-white text-sm font-medium mb-2">Big Kids (6Y-8Y) - $175 total</h4>
-              <div className="grid grid-cols-6 gap-2">
-                {bigKidsSizes.map((size) => (
-                  <button
-                    key={size}
-                    type="button"
-                    onClick={() => handleSizeToggle(size)}
-                    className={`p-2 rounded border text-sm ${
-                      newShoe.sizes.includes(size)
-                        ? "bg-white text-black border-white"
-                        : "bg-neutral-800 text-white border-neutral-600"
-                    }`}
-                  >
-                    {size}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Youth */}
-            <div className="mb-4">
-              <h4 className="text-white text-sm font-medium mb-2">Youth (1Y-5.5Y) - $145 total</h4>
-              <div className="grid grid-cols-6 gap-2">
-                {youthSizes.map((size) => (
-                  <button
-                    key={size}
-                    type="button"
-                    onClick={() => handleSizeToggle(size)}
-                    className={`p-2 rounded border text-sm ${
-                      newShoe.sizes.includes(size)
-                        ? "bg-white text-black border-white"
-                        : "bg-neutral-800 text-white border-neutral-600"
-                    }`}
-                  >
-                    {size}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Toddler Sizes */}
-            <div className="mb-4">
-              <h4 className="text-white text-sm font-medium mb-2">Toddler (8C-13.5C) - $145 total</h4>
-              <div className="grid grid-cols-6 gap-2">
-                {toddlerSizes.map((size) => (
-                  <button
-                    key={size}
-                    type="button"
-                    onClick={() => handleSizeToggle(size)}
-                    className={`p-2 rounded border text-sm ${
-                      newShoe.sizes.includes(size)
-                        ? "bg-white text-black border-white"
-                        : "bg-neutral-800 text-white border-neutral-600"
-                    }`}
-                  >
-                    {size}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Infant Sizes */}
-            <div className="mb-4">
-              <h4 className="text-white text-sm font-medium mb-2">Infant (1C-7.5C) - $135 total</h4>
-              <div className="grid grid-cols-6 gap-2">
-                {infantSizes.map((size) => (
-                  <button
-                    key={size}
-                    type="button"
-                    onClick={() => handleSizeToggle(size)}
-                    className={`p-2 rounded border text-sm ${
-                      newShoe.sizes.includes(size)
-                        ? "bg-white text-black border-white"
-                        : "bg-neutral-800 text-white border-neutral-600"
-                    }`}
-                  >
-                    {size}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <p className="text-neutral-400 text-sm mt-1">
-              {newShoe.sizes.length === 0 ? "All sizes will be available" : `${newShoe.sizes.length} sizes selected`}
-            </p>
-          </div>
-
-          <div className="flex gap-2">
-            <Button onClick={handleAddShoe} className="bg-white text-black">
-              Add Shoe
-            </Button>
-            <Button onClick={() => setShowAddForm(false)} variant="outline">
-              Cancel
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
       {/* All Shoes List */}
       <Card className="bg-neutral-900 border-neutral-800">
         <CardHeader>
           <CardTitle className="text-white">All Shoes ({shoes.length})</CardTitle>
           <p className="text-neutral-400 text-sm">
-            Manage featured status and inventory. Click the package icon to manage size availability.
+            Manage featured status, inventory, and images. Click the edit icon to modify shoe details.
           </p>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {shoes.map((shoe) => (
               <div key={shoe.id} className="bg-neutral-800 rounded-lg p-4">
-                <div className="aspect-square relative mb-3 rounded-lg overflow-hidden">
-                  <Image
-                    src={shoe.image || "/placeholder.svg"}
-                    alt={shoe.name}
-                    fill
-                    className="object-cover"
-                    crossOrigin="anonymous"
-                  />
-                  {shoe.isFeatured && (
-                    <div className="absolute top-2 right-2 bg-yellow-500 text-black p-1 rounded">
-                      <Star className="h-4 w-4" />
+                {editingShoe === shoe.id && editingShoeData ? (
+                  <div className="space-y-4">
+                    {/* Edit Shoe Form */}
+                    <div className="grid grid-cols-1 gap-4">
+                      <div>
+                        <Label className="text-white text-sm">Shoe Name</Label>
+                        <Input
+                          value={editingShoeData.name}
+                          onChange={(e) => setEditingShoeData({ ...editingShoeData, name: e.target.value })}
+                          placeholder="Shoe name"
+                          className="text-sm mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-white text-sm">Price ($)</Label>
+                        <Input
+                          type="number"
+                          value={editingShoeData.price}
+                          onChange={(e) =>
+                            setEditingShoeData({ ...editingShoeData, price: Number.parseInt(e.target.value) })
+                          }
+                          placeholder="160"
+                          className="text-sm mt-1"
+                        />
+                      </div>
                     </div>
-                  )}
-                </div>
-                <h3 className="text-white font-semibold mb-1">{shoe.name}</h3>
-                <p className="text-neutral-400 mb-1">${shoe.price} (sticker price)</p>
-                <p className="text-xs text-neutral-500 mb-3">
-                  {shoe.inStockSizes.length}/{shoe.sizes.length} sizes in stock
-                </p>
 
-                {/* Inventory Management */}
-                {editingInventory === shoe.id && (
-                  <div className="mb-4 p-3 bg-neutral-700 rounded-lg">
-                    <h4 className="text-white text-sm font-medium mb-2">Size Inventory</h4>
-                    <div className="grid grid-cols-4 gap-1 max-h-32 overflow-y-auto">
-                      {shoe.sizes.map((size) => (
-                        <button
-                          key={size}
-                          onClick={() => toggleSizeStock(shoe.id, size)}
-                          className={`p-1 rounded text-xs border ${
-                            shoe.inStockSizes.includes(size)
-                              ? "bg-green-600 text-white border-green-500"
-                              : "bg-red-600 text-white border-red-500"
-                          }`}
-                          title={shoe.inStockSizes.includes(size) ? "In Stock" : "Out of Stock"}
+                    {/* Edit Images Section */}
+                    <div>
+                      <Label className="text-white text-sm flex items-center">
+                        <ImageIcon className="mr-2 h-3 w-3" />
+                        Product Images
+                      </Label>
+                      <div className="space-y-2 mt-2">
+                        {editingShoeData.images.map((image, index) => (
+                          <div key={index} className="flex gap-2 items-center">
+                            <div className="flex-1">
+                              <Input
+                                value={image}
+                                onChange={(e) => updateEditImageField(index, e.target.value)}
+                                placeholder={index === 0 ? "Primary image" : `Image ${index + 1}`}
+                                className="text-xs"
+                              />
+                            </div>
+                            {image && (
+                              <div className="w-8 h-8 relative rounded border overflow-hidden bg-neutral-700">
+                                <Image
+                                  src={image || "/placeholder.svg"}
+                                  alt={`Preview ${index + 1}`}
+                                  fill
+                                  className="object-cover"
+                                  crossOrigin="anonymous"
+                                  onError={(e) => {
+                                    const target = e.target as HTMLImageElement
+                                    target.src = "/placeholder.svg"
+                                  }}
+                                />
+                              </div>
+                            )}
+                            {editingShoeData.images.length > 1 && (
+                              <Button
+                                type="button"
+                                onClick={() => removeEditImageField(index)}
+                                size="sm"
+                                variant="outline"
+                                className="text-red-400 border-red-400 hover:bg-red-400 hover:text-white p-1 h-8 w-8"
+                              >
+                                <X className="h-3 w-3" />
+                              </Button>
+                            )}
+                          </div>
+                        ))}
+                        <Button
+                          type="button"
+                          onClick={addEditImageField}
+                          size="sm"
+                          variant="outline"
+                          className="text-blue-400 border-blue-400 hover:bg-blue-400 hover:text-white bg-transparent text-xs"
                         >
-                          {size}
-                          {shoe.inStockSizes.includes(size) ? (
-                            <Check className="h-2 w-2 inline ml-1" />
-                          ) : (
-                            <X className="h-2 w-2 inline ml-1" />
-                          )}
-                        </button>
-                      ))}
+                          <Plus className="h-3 w-3 mr-1" />
+                          Add Image
+                        </Button>
+                      </div>
                     </div>
-                    <Button
-                      onClick={() => setEditingInventory(null)}
-                      size="sm"
-                      variant="outline"
-                      className="mt-2 w-full"
-                    >
-                      Done
-                    </Button>
-                  </div>
-                )}
 
-                <div className="flex gap-2">
-                  <Button
-                    onClick={() => toggleFeatured(shoe.id)}
-                    size="sm"
-                    variant={shoe.isFeatured ? "default" : "outline"}
-                    className={shoe.isFeatured ? "bg-yellow-500 text-black hover:bg-yellow-600" : ""}
-                    title={shoe.isFeatured ? "Remove from featured" : "Add to featured"}
-                  >
-                    {shoe.isFeatured ? <Star className="h-4 w-4" /> : <StarOff className="h-4 w-4" />}
-                  </Button>
-                  <Button
-                    onClick={() => setEditingInventory(editingInventory === shoe.id ? null : shoe.id)}
-                    size="sm"
-                    variant="outline"
-                    className="text-blue-400 border-blue-400 hover:bg-blue-400 hover:text-white"
-                    title="Manage inventory"
-                  >
-                    <Package className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    onClick={() => handleDeleteShoe(shoe.id)}
-                    size="sm"
-                    variant="outline"
-                    className="text-red-400 border-red-400 hover:bg-red-400 hover:text-white"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
+                    <div>
+                      <Label className="text-white text-sm">Description</Label>
+                      <Textarea
+                        value={editingShoeData.description || ""}
+                        onChange={(e) => setEditingShoeData({ ...editingShoeData, description: e.target.value })}
+                        placeholder="Shoe description"
+                        rows={2}
+                        className="text-sm mt-1"
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="text-white text-sm">Details (one per line)</Label>
+                      <Textarea
+                        value={
+                          typeof editingShoeData.details === "string"
+                            ? editingShoeData.details
+                            : editingShoeData.details?.join("\n") || ""
+                        }
+                        onChange={(e) => setEditingShoeData({ ...editingShoeData, details: e.target.value })}
+                        placeholder="Shoe details"
+                        rows={3}
+                        className="text-sm mt-1"
+                      />
+                    </div>
+
+                    {/* Edit Available Sizes */}
+                    <div>
+                      <Label className="text-white text-sm">Available Sizes</Label>
+                      <div className="flex flex-wrap gap-1 mt-2 mb-2">
+                        <Button
+                          type="button"
+                          onClick={selectAllEditSizes}
+                          size="sm"
+                          variant="outline"
+                          className="text-xs bg-transparent h-6 px-2"
+                        >
+                          All
+                        </Button>
+                        <Button
+                          type="button"
+                          onClick={clearAllEditSizes}
+                          size="sm"
+                          variant="outline"
+                          className="text-xs bg-transparent h-6 px-2"
+                        >
+                          Clear
+                        </Button>
+                        <Button
+                          type="button"
+                          onClick={() => selectEditSizeCategory("men")}
+                          size="sm"
+                          variant="outline"
+                          className="text-xs h-6 px-2"
+                        >
+                          Men's
+                        </Button>
+                        <Button
+                          type="button"
+                          onClick={() => selectEditSizeCategory("women")}
+                          size="sm"
+                          variant="outline"
+                          className="text-xs h-6 px-2"
+                        >
+                          Women's
+                        </Button>
+                        <Button
+                          type="button"
+                          onClick={() => selectEditSizeCategory("youth")}
+                          size="sm"
+                          variant="outline"
+                          className="text-xs h-6 px-2"
+                        >
+                          Youth
+                        </Button>
+                      </div>
+                      <div className="grid grid-cols-8 gap-1 max-h-32 overflow-y-auto">
+                        {allSizes.map((size) => (
+                          <button
+                            key={size}
+                            type="button"
+                            onClick={() => handleEditSizeToggle(size)}
+                            className={`p-1 rounded border text-xs ${
+                              editingShoeData.sizes.includes(size)
+                                ? "bg-white text-black border-white"
+                                : "bg-neutral-700 text-white border-neutral-600"
+                            }`}
+                          >
+                            {size}
+                          </button>
+                        ))}
+                      </div>
+                      <p className="text-neutral-400 text-xs mt-1">{editingShoeData.sizes.length} sizes selected</p>
+                    </div>
+
+                    <div className="flex gap-2 pt-2">
+                      <Button
+                        onClick={() => handleUpdateShoe(editingShoeData)}
+                        size="sm"
+                        className="bg-green-600 hover:bg-green-700 text-white flex-1"
+                      >
+                        <Check className="h-3 w-3 mr-1" />
+                        Save
+                      </Button>
+                      <Button onClick={cancelEditingShoe} size="sm" variant="outline" className="flex-1 bg-transparent">
+                        <X className="h-3 w-3 mr-1" />
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="aspect-square relative mb-3 rounded-lg overflow-hidden">
+                      <Image
+                        src={shoe.image || "/placeholder.svg"}
+                        alt={shoe.name}
+                        fill
+                        className="object-cover"
+                        crossOrigin="anonymous"
+                      />
+                      {shoe.isFeatured && (
+                        <div className="absolute top-2 right-2 bg-yellow-500 text-black p-1 rounded">
+                          <Star className="h-4 w-4" />
+                        </div>
+                      )}
+                      {shoe.images.length > 1 && (
+                        <div className="absolute top-2 left-2 bg-blue-500 text-white px-2 py-1 rounded text-xs">
+                          {shoe.images.length} photos
+                        </div>
+                      )}
+                    </div>
+                    <h3 className="text-white font-semibold mb-1">{shoe.name}</h3>
+                    <p className="text-neutral-400">${shoe.price} (sticker price)</p>
+                    <p className="text-xs text-neutral-500 mt-1">
+                      {shoe.inStockSizes.length}/{shoe.sizes.length} sizes in stock
+                    </p>
+                    <p className="text-xs text-neutral-600 mt-1">
+                      {shoe.images.length} image{shoe.images.length !== 1 ? "s" : ""}
+                    </p>
+
+                    {/* Inventory Management */}
+                    {editingInventory === shoe.id && (
+                      <div className="mb-4 p-3 bg-neutral-700 rounded-lg">
+                        <h4 className="text-white text-sm font-medium mb-2">Size Inventory</h4>
+                        <div className="grid grid-cols-4 gap-1 max-h-32 overflow-y-auto">
+                          {shoe.sizes.map((size) => (
+                            <button
+                              key={size}
+                              onClick={() => toggleSizeStock(shoe.id, size)}
+                              className={`p-1 rounded text-xs border ${
+                                shoe.inStockSizes.includes(size)
+                                  ? "bg-green-600 text-white border-green-500"
+                                  : "bg-red-600 text-white border-red-500"
+                              }`}
+                              title={shoe.inStockSizes.includes(size) ? "In Stock" : "Out of Stock"}
+                            >
+                              {size}
+                              {shoe.inStockSizes.includes(size) ? (
+                                <Check className="h-2 w-2 inline ml-1" />
+                              ) : (
+                                <X className="h-2 w-2 inline ml-1" />
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                        <Button
+                          onClick={() => setEditingInventory(null)}
+                          size="sm"
+                          variant="outline"
+                          className="mt-2 w-full"
+                        >
+                          Done
+                        </Button>
+                      </div>
+                    )}
+
+                    <div className="flex gap-1 mt-3">
+                      <Button
+                        onClick={() => toggleFeatured(shoe.id)}
+                        size="sm"
+                        variant={shoe.isFeatured ? "default" : "outline"}
+                        className={shoe.isFeatured ? "bg-yellow-500 text-black hover:bg-yellow-600" : ""}
+                        title={shoe.isFeatured ? "Remove from featured" : "Add to featured"}
+                      >
+                        {shoe.isFeatured ? <Star className="h-4 w-4" /> : <StarOff className="h-4 w-4" />}
+                      </Button>
+                      <Button
+                        onClick={() => setEditingInventory(editingInventory === shoe.id ? null : shoe.id)}
+                        size="sm"
+                        variant="outline"
+                        className="text-blue-400 border-blue-400 hover:bg-blue-400 hover:text-white"
+                        title="Manage inventory"
+                      >
+                        <Package className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        onClick={() => startEditingShoe(shoe)}
+                        size="sm"
+                        variant="outline"
+                        className="text-green-400 border-green-400 hover:bg-green-400 hover:text-white"
+                        title="Edit shoe details"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        onClick={() => handleDeleteShoe(shoe.id)}
+                        size="sm"
+                        variant="outline"
+                        className="text-red-400 border-red-400 hover:bg-red-400 hover:text-white"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </>
+                )}
               </div>
             ))}
           </div>
