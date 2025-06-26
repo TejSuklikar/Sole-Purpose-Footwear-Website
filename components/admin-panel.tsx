@@ -186,7 +186,7 @@ const defaultShoes: Shoe[] = [
   },
   {
     id: 3,
-    name: "Black & Red Geometric",
+    name: "Black & Red Kuffiyeh",
     price: 160,
     image: "/images/black-red-geometric-hero.jpg",
     images: ["/images/black-red-geometric-hero.jpg", "/images/black-red-af1.png", "/images/geometric-af1.png"],
@@ -227,7 +227,7 @@ const defaultShoes: Shoe[] = [
   },
   {
     id: 5,
-    name: "Geometric Checkered",
+    name: "Black & White Checkered",
     price: 160,
     image: "/images/geometric-checkered-side.jpg",
     images: [

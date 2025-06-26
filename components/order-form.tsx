@@ -20,14 +20,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Send, ShoppingCart, Truck, MapPin } from "lucide-react"
 import { useCart } from "./cart-provider"
 
-const shoeModels = [
-  "Air Force 1 Style",
-  "High-Top Canvas",
-  "Low-Top Leather",
-  "Slip-On Style",
-  "Athletic Runner",
-  "Custom Base (Specify in description)",
-]
+const shoeModels = ["Air Force 1", "Nike Dunk", "Custom Base (Specify in description)"]
 
 const allSizes = [
   // Men's sizes (7-15, including 14.5)

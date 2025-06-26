@@ -94,7 +94,7 @@ const shoes = [
     slug: "red-kuffiyeh-af1",
     sizes: allSizes,
     description:
-      "Traditional Kuffiyeh patterns hand-painted in bold red on premium white canvas. Each pair celebrates Palestinian heritage with intricate geometric designs that honor cultural identity.",
+      "Traditional Kuffiyeh patterns hand-painted in bold red on premium white canvas. Each pair celebrates Jordanian heritage with intricate geometric designs that honor cultural pride and identity.",
     details: [
       "Hand-painted with premium acrylic paints",
       "Sealed with protective coating for durability",
@@ -118,14 +118,14 @@ const shoes = [
   },
   {
     id: 3,
-    name: "Black & Red Geometric",
+    name: "Black & Red Kuffiyeh",
     price: 160,
     images: ["/images/black-red-af1.png"],
     slug: "black-red-geometric",
     sizes: allSizes,
     description:
-      "Sleek black forces with striking red geometric patterns. Modern design meets traditional craftsmanship in this bold statement piece.",
-    details: ["All-black leather base", "Hand-painted red geometric patterns", "Matte finish for sophisticated look"],
+      "Sleek black Forces with striking red Kuffiyeh detailing. Modern design meets traditional craftsmanship in this bold statement piece.",
+    details: ["All-black leather base", "Hand-painted red Kuffiyeh", "Matte finish for sophisticated look"],
   },
   // Other shoes
   {
@@ -145,15 +145,15 @@ const shoes = [
   },
   {
     id: 5,
-    name: "Geometric Checkered",
+    name: "Black & White Checkered",
     price: 160,
     images: ["/images/geometric-checkered-side.jpg"],
     slug: "geometric-checkered",
     sizes: allSizes,
     description:
-      "Clean geometric checkered pattern in black and white. Minimalist design with maximum impact, perfect for those who appreciate subtle artistry and Palestinian heritage elements.",
+      "Clean checkered pattern in black and white. Minimalist design with maximum impact, perfect for those who appreciate subtle artistry and Palestinian heritage elements.",
     details: [
-      "Hand-painted checkered geometric pattern",
+      "Hand-painted checkered pattern",
       "Black and white minimalist design",
       "Palestinian flag colors on AIR branding",
     ],
@@ -181,7 +181,7 @@ const shoes = [
     slug: "checkered-drip-af1",
     sizes: allSizes,
     description:
-      "Bold checkered pattern with artistic paint drip design in Palestinian flag colors. Street art meets cultural heritage in this eye-catching custom piece that celebrates identity through contemporary art.",
+      "Bold Kufiyyeh pattern with a striking paint drip design in the colors of the Palestinian flag. The red drips resemble the blood of martyrs and the struggle of the Palestinian people, a powerful blend of street art and cultural resistance. This custom piece honors identity, sacrifice, and unshaken pride.",
     details: [
       "Hand-painted checkered swoosh pattern",
       "Artistic paint drip effect in Palestinian flag colors",
@@ -196,10 +196,10 @@ const shoes = [
     slug: "map-of-palestine-af1",
     sizes: allSizes,
     description:
-      "Hand-painted map of Palestine in traditional flag colors with intricate Kuffiyeh geometric patterns. A powerful statement piece that honors Palestinian heritage and identity through detailed cartographic artistry.",
+      "HHand-painted map of Palestine in traditional flag colors with intricate Kufiyyeh patterns. A powerful statement piece that honors Palestinian heritage and identity through detailed cartographic artistry.",
     details: [
       "Hand-painted map of Palestine in red and green",
-      "Traditional Kuffiyeh geometric border patterns",
+      "Traditional Kuffiyeh border patterns",
       "Palestinian flag colors throughout design",
     ],
   },

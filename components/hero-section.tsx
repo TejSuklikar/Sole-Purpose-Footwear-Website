@@ -37,7 +37,7 @@ const defaultFeaturedShoes = [
   },
   {
     id: 3,
-    name: "Black & Red Geometric",
+    name: "Black & Red Kuffiyeh",
     price: 160,
     image: "/images/black-red-geometric-hero.jpg",
     slug: "black-red-geometric",
