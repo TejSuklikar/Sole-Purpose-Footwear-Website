@@ -1,46 +1,54 @@
-import "./globals.css"
-
-import type { ReactNode } from "react"
+import type React from "react"
 import type { Metadata } from "next"
-
+import { Inter, Playfair_Display } from "next/font/google"
+import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
+import { AuthProvider } from "@/components/auth-provider"
+import { CartProvider } from "@/components/cart-provider"
+import { AuthGuard } from "@/components/auth-guard"
+import { ScrollToTop } from "@/components/scroll-to-top"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
-import { CartProvider } from "@/components/cart-provider"
-import { AuthProvider } from "@/components/auth-provider"
-import { AuthGuard } from "@/components/auth-guard"
 import { CartSidebar } from "@/components/cart-sidebar"
-import { ScrollToTop } from "@/components/scroll-to-top"
+import { Toaster } from "@/components/ui/toaster"
+
+const inter = Inter({ subsets: ["latin"] })
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-playfair",
+})
 
 export const metadata: Metadata = {
-  title: {
-    default: "Sole Purpose Footwear",
-    template: "%s | Sole Purpose Footwear",
-  },
-  description: "Hand-painted custom sneakers celebrating culture, heritage, and personal stories.",
-  openGraph: {
-    type: "website",
-    locale: "en_US",
-    url: "https://solepurposefootwear.com",
-    siteName: "Sole Purpose Footwear",
+  title: "Soul Purpose Footwear - Custom Cultural Sneakers",
+  description: "Hand-painted custom sneakers celebrating cultural heritage and identity. Each pair tells a story.",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon.png", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
   },
     generator: 'v0.dev'
 }
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="min-h-screen flex flex-col bg-neutral-950 text-neutral-50 antialiased">
-        {/* Theme → Auth → Cart providers ensure all hooks work site-wide */}
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <body className={`${inter.className} ${playfair.variable}`}>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
           <AuthProvider>
             <CartProvider>
               <AuthGuard>
                 <ScrollToTop />
                 <Header />
-                <main className="flex-1">{children}</main>
+                <main className="min-h-screen">{children}</main>
                 <Footer />
                 <CartSidebar />
+                <Toaster />
               </AuthGuard>
             </CartProvider>
           </AuthProvider>

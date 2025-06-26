@@ -43,9 +43,32 @@ const defaultEvents: Event[] = [
 export function EventsStrip() {
   const [events, setEvents] = useState<Event[]>(defaultEvents)
 
-  // Load events from global storage
+  // Load events - prioritize live data over localStorage
   useEffect(() => {
-    const loadEvents = () => {
+    const loadEvents = async () => {
+      try {
+        // First, try to fetch from the live data source
+        const response = await fetch("/data/events.json", {
+          cache: "no-store",
+          headers: {
+            "Cache-Control": "no-cache",
+          },
+        })
+
+        if (response.ok) {
+          const liveEvents = await response.json()
+          if (Array.isArray(liveEvents) && liveEvents.length > 0) {
+            setEvents(liveEvents)
+            // Update localStorage with live data
+            localStorage.setItem("sp_events_global", JSON.stringify(liveEvents))
+            return
+          }
+        }
+      } catch (error) {
+        console.log("Live events data not available, falling back to localStorage:", error)
+      }
+
+      // Fallback to localStorage if live data fails
       try {
         const savedEvents = localStorage.getItem("sp_events_global")
         if (savedEvents) {
@@ -82,8 +105,8 @@ export function EventsStrip() {
 
     window.addEventListener("storage", handleStorageChange)
 
-    // Also check for changes periodically (for same-tab updates)
-    const interval = setInterval(loadEvents, 2000)
+    // Also check for changes periodically (for same-tab updates and live data)
+    const interval = setInterval(loadEvents, 30000) // Check every 30 seconds
 
     return () => {
       window.removeEventListener("storage", handleStorageChange)

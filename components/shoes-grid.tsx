@@ -196,9 +196,39 @@ export function ShoesGrid() {
   const [shoes, setShoes] = useState<Shoe[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
-  // Load shoes from global storage
+  // Load shoes - prioritize live data over localStorage
   useEffect(() => {
-    const loadShoes = () => {
+    const loadShoes = async () => {
+      try {
+        // First, try to fetch from the live data source
+        const response = await fetch("/data/shoes.json", {
+          cache: "no-store",
+          headers: {
+            "Cache-Control": "no-cache",
+          },
+        })
+
+        if (response.ok) {
+          const liveShoes = await response.json()
+          if (Array.isArray(liveShoes) && liveShoes.length > 0) {
+            // Update shoes with live data
+            const updatedShoes = liveShoes.map((shoe: Shoe) => ({
+              ...shoe,
+              sizes: allSizes, // Ensure all sizes are available
+              inStockSizes: shoe.inStockSizes || allSizes,
+            }))
+            setShoes(updatedShoes)
+            // Update localStorage with live data
+            localStorage.setItem("sp_shoes_global", JSON.stringify(updatedShoes))
+            setIsLoading(false)
+            return
+          }
+        }
+      } catch (error) {
+        console.log("Live data not available, falling back to localStorage:", error)
+      }
+
+      // Fallback to localStorage if live data fails
       try {
         const savedShoes = localStorage.getItem("sp_shoes_global")
         if (savedShoes) {
@@ -244,8 +274,8 @@ export function ShoesGrid() {
 
     window.addEventListener("storage", handleStorageChange)
 
-    // Also check for changes periodically (for same-tab updates)
-    const interval = setInterval(loadShoes, 2000)
+    // Also check for changes periodically (for same-tab updates and live data)
+    const interval = setInterval(loadShoes, 30000) // Check every 30 seconds
 
     return () => {
       window.removeEventListener("storage", handleStorageChange)
