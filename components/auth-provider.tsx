@@ -26,10 +26,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Check if user is logged in on mount
-    const savedUser = localStorage.getItem("sp_current_user")
-    if (savedUser) {
-      const userData = JSON.parse(savedUser)
-      setUser(userData)
+    try {
+      const savedUser = localStorage.getItem("sp_current_user")
+      if (savedUser) {
+        const userData = JSON.parse(savedUser)
+        // Validate the saved user data
+        if (userData && typeof userData.email === "string" && typeof userData.isAdmin === "boolean") {
+          setUser(userData)
+        } else {
+          // Clear invalid data
+          localStorage.removeItem("sp_current_user")
+        }
+      }
+    } catch (error) {
+      console.error("Error loading saved user:", error)
+      localStorage.removeItem("sp_current_user")
     }
     setLoading(false)
   }, [])
@@ -62,6 +73,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = () => {
     setUser(null)
     localStorage.removeItem("sp_current_user")
+    // Also clear any cached data
+    localStorage.removeItem("sp_shoes_global")
+    localStorage.removeItem("sp_events_global")
   }
 
   return (

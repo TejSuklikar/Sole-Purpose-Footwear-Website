@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { fetchWithCacheBusting, clearAllCaches } from "@/lib/cache-buster"
 
 interface Shoe {
   id: number
@@ -65,7 +66,7 @@ const allSizes = [
   "6C",
   "6.5C",
   "7C",
-  "7.5C", // THIS IS THE MISSING ONE!
+  "7.5C",
   // Toddler sizes (12 sizes: 8C-13.5C, including half sizes)
   "8C",
   "8.5C",
@@ -107,7 +108,7 @@ const defaultShoes: Shoe[] = [
     image: "/images/kuffiyeh-side-sunset.png",
     slug: "red-kuffiyeh-af1",
     sizes: allSizes,
-    inStockSizes: allSizes, // ALL sizes available
+    inStockSizes: allSizes,
   },
   {
     id: 2,
@@ -116,7 +117,7 @@ const defaultShoes: Shoe[] = [
     image: "/images/mexican-side-view.png",
     slug: "mexican-eagle-af1",
     sizes: allSizes,
-    inStockSizes: allSizes, // ALL sizes available
+    inStockSizes: allSizes,
   },
   {
     id: 3,
@@ -125,7 +126,7 @@ const defaultShoes: Shoe[] = [
     image: "/images/black-red-geometric-hero.jpg",
     slug: "black-red-geometric",
     sizes: allSizes,
-    inStockSizes: allSizes, // ALL sizes available
+    inStockSizes: allSizes,
   },
   {
     id: 4,
@@ -134,7 +135,7 @@ const defaultShoes: Shoe[] = [
     image: "/images/jordanian-side-view.jpg",
     slug: "jordanian-flag-af1",
     sizes: allSizes,
-    inStockSizes: allSizes, // ALL sizes available
+    inStockSizes: allSizes,
   },
   {
     id: 5,
@@ -143,7 +144,7 @@ const defaultShoes: Shoe[] = [
     image: "/images/geometric-checkered-side.jpg",
     slug: "geometric-checkered",
     sizes: allSizes,
-    inStockSizes: allSizes, // ALL sizes available
+    inStockSizes: allSizes,
   },
   {
     id: 6,
@@ -152,7 +153,7 @@ const defaultShoes: Shoe[] = [
     image: "/images/chinese-side-sunset.png",
     slug: "chinese-flag-af1",
     sizes: allSizes,
-    inStockSizes: allSizes, // ALL sizes available
+    inStockSizes: allSizes,
   },
   {
     id: 7,
@@ -161,7 +162,7 @@ const defaultShoes: Shoe[] = [
     image: "/images/checkered-drip-sunset.png",
     slug: "checkered-drip-af1",
     sizes: allSizes,
-    inStockSizes: allSizes, // ALL sizes available
+    inStockSizes: allSizes,
   },
   {
     id: 8,
@@ -170,7 +171,7 @@ const defaultShoes: Shoe[] = [
     image: "/images/palestine-map-side.jpg",
     slug: "map-of-palestine-af1",
     sizes: allSizes,
-    inStockSizes: allSizes, // ALL sizes available
+    inStockSizes: allSizes,
   },
   {
     id: 9,
@@ -179,7 +180,7 @@ const defaultShoes: Shoe[] = [
     image: "/images/lebanese-side-view.jpg",
     slug: "lebanese-cedar-af1",
     sizes: allSizes,
-    inStockSizes: allSizes, // ALL sizes available
+    inStockSizes: allSizes,
   },
   {
     id: 10,
@@ -188,40 +189,46 @@ const defaultShoes: Shoe[] = [
     image: "/images/filipino-side-view.jpg",
     slug: "filipino-sun-af1",
     sizes: allSizes,
-    inStockSizes: allSizes, // ALL sizes available
+    inStockSizes: allSizes,
   },
 ]
 
 export function ShoesGrid() {
   const [shoes, setShoes] = useState<Shoe[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [lastFetch, setLastFetch] = useState<number>(0)
 
-  // Load shoes - prioritize live data over localStorage
+  // Load shoes with aggressive cache busting
   useEffect(() => {
     const loadShoes = async () => {
+      const now = Date.now()
+
+      // Only fetch if it's been more than 5 seconds since last fetch
+      if (now - lastFetch < 5000 && shoes.length > 0) {
+        return
+      }
+
       try {
-        // First, try to fetch from the live data source with cache busting
-        const timestamp = new Date().getTime()
-        const response = await fetch(`/data/shoes.json?t=${timestamp}`, {
-          cache: "no-store",
-          headers: {
-            "Cache-Control": "no-cache, no-store, must-revalidate",
-            Pragma: "no-cache",
-            Expires: "0",
-          },
-        })
+        console.log("🔄 Loading shoes data...")
+
+        // Try to fetch from live data with cache busting
+        const response = await fetchWithCacheBusting("/data/shoes.json")
 
         if (response.ok) {
           const liveShoes = await response.json()
           if (Array.isArray(liveShoes) && liveShoes.length > 0) {
             console.log("✅ Loaded live shoes data:", liveShoes.length, "shoes")
+
             // Update shoes with live data
             const updatedShoes = liveShoes.map((shoe: Shoe) => ({
               ...shoe,
-              sizes: shoe.sizes || allSizes, // Ensure all sizes are available
+              sizes: shoe.sizes || allSizes,
               inStockSizes: shoe.inStockSizes || allSizes,
             }))
+
             setShoes(updatedShoes)
+            setLastFetch(now)
+
             // Update localStorage with live data
             localStorage.setItem("sp_shoes_global", JSON.stringify(updatedShoes))
             setIsLoading(false)
@@ -231,50 +238,52 @@ export function ShoesGrid() {
           console.log("❌ Failed to fetch live shoes data:", response.status, response.statusText)
         }
       } catch (error) {
-        console.log("⚠️ Live shoes data not available, falling back to localStorage:", error)
+        console.log("⚠️ Live shoes data not available:", error)
       }
 
-      // Fallback to localStorage if live data fails
+      // Fallback to localStorage
       try {
         const savedShoes = localStorage.getItem("sp_shoes_global")
         if (savedShoes) {
           const parsedShoes = JSON.parse(savedShoes)
           if (Array.isArray(parsedShoes) && parsedShoes.length > 0) {
             console.log("📦 Loaded shoes from localStorage:", parsedShoes.length, "shoes")
-            // Migration: Update existing shoes to use the new 73-size array
+
             const updatedShoes = parsedShoes.map((shoe: Shoe) => ({
               ...shoe,
-              sizes: allSizes, // Update to new 73-size array
-              inStockSizes: shoe.inStockSizes || allSizes, // Update in-stock sizes too
+              sizes: allSizes,
+              inStockSizes: shoe.inStockSizes || allSizes,
             }))
+
             setShoes(updatedShoes)
-            // Save the migrated data back to localStorage
+            setLastFetch(now)
             localStorage.setItem("sp_shoes_global", JSON.stringify(updatedShoes))
           } else {
-            // If saved shoes is empty or invalid, use default shoes
             console.log("🔄 Using default shoes data")
             setShoes(defaultShoes)
+            setLastFetch(now)
             localStorage.setItem("sp_shoes_global", JSON.stringify(defaultShoes))
           }
         } else {
-          // If no saved shoes, initialize with default shoes
           console.log("🆕 Initializing with default shoes data")
           setShoes(defaultShoes)
+          setLastFetch(now)
           localStorage.setItem("sp_shoes_global", JSON.stringify(defaultShoes))
         }
       } catch (error) {
         console.error("❌ Error loading shoes:", error)
-        // Fallback to default shoes if there's an error
         setShoes(defaultShoes)
+        setLastFetch(now)
         localStorage.setItem("sp_shoes_global", JSON.stringify(defaultShoes))
       }
+
       setIsLoading(false)
     }
 
     // Load shoes immediately
     loadShoes()
 
-    // Listen for storage changes to update when admin makes changes
+    // Listen for storage changes
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === "sp_shoes_global") {
         console.log("🔄 Storage change detected, reloading shoes...")
@@ -282,19 +291,27 @@ export function ShoesGrid() {
       }
     }
 
-    window.addEventListener("storage", handleStorageChange)
+    // Listen for focus events to refresh data when user returns to tab
+    const handleFocus = () => {
+      console.log("🔄 Tab focused, checking for updates...")
+      loadShoes()
+    }
 
-    // Also check for changes periodically (for same-tab updates and live data)
+    window.addEventListener("storage", handleStorageChange)
+    window.addEventListener("focus", handleFocus)
+
+    // Check for updates every 15 seconds
     const interval = setInterval(() => {
       console.log("🔄 Periodic check for shoe updates...")
       loadShoes()
-    }, 10000) // Check every 10 seconds for faster updates
+    }, 15000)
 
     return () => {
       window.removeEventListener("storage", handleStorageChange)
+      window.removeEventListener("focus", handleFocus)
       clearInterval(interval)
     }
-  }, [])
+  }, [lastFetch, shoes.length])
 
   if (isLoading) {
     return (
@@ -310,14 +327,34 @@ export function ShoesGrid() {
       <div className="text-center py-12">
         <p className="text-white text-lg mb-4">No shoes available at the moment.</p>
         <p className="text-neutral-400">Check back later for new designs!</p>
+        <Button
+          onClick={() => {
+            clearAllCaches()
+            window.location.reload()
+          }}
+          className="mt-4 bg-white text-black"
+        >
+          Refresh Data
+        </Button>
       </div>
     )
   }
 
   return (
     <div>
-      <div className="mb-6">
+      <div className="mb-6 flex justify-between items-center">
         <p className="text-neutral-400 text-sm">Showing {shoes.length} custom designs</p>
+        <Button
+          onClick={() => {
+            clearAllCaches()
+            window.location.reload()
+          }}
+          variant="outline"
+          size="sm"
+          className="text-xs"
+        >
+          Refresh
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

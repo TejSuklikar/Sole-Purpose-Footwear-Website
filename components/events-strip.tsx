@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { Calendar, MapPin, Clock } from "lucide-react"
+import { fetchWithCacheBusting } from "@/lib/cache-buster"
 
 interface Event {
   id: number
@@ -42,28 +43,30 @@ const defaultEvents: Event[] = [
 
 export function EventsStrip() {
   const [events, setEvents] = useState<Event[]>(defaultEvents)
+  const [lastFetch, setLastFetch] = useState<number>(0)
 
-  // Load events - prioritize live data over localStorage
+  // Load events with cache busting
   useEffect(() => {
     const loadEvents = async () => {
+      const now = Date.now()
+
+      // Only fetch if it's been more than 5 seconds since last fetch
+      if (now - lastFetch < 5000 && events.length > 0) {
+        return
+      }
+
       try {
-        // First, try to fetch from the live data source with cache busting
-        const timestamp = new Date().getTime()
-        const response = await fetch(`/data/events.json?t=${timestamp}`, {
-          cache: "no-store",
-          headers: {
-            "Cache-Control": "no-cache, no-store, must-revalidate",
-            Pragma: "no-cache",
-            Expires: "0",
-          },
-        })
+        console.log("🔄 Loading events data...")
+
+        // Try to fetch from live data with cache busting
+        const response = await fetchWithCacheBusting("/data/events.json")
 
         if (response.ok) {
           const liveEvents = await response.json()
           if (Array.isArray(liveEvents) && liveEvents.length > 0) {
             console.log("✅ Loaded live events data:", liveEvents.length, "events")
             setEvents(liveEvents)
-            // Update localStorage with live data
+            setLastFetch(now)
             localStorage.setItem("sp_events_global", JSON.stringify(liveEvents))
             return
           }
@@ -71,10 +74,10 @@ export function EventsStrip() {
           console.log("❌ Failed to fetch live events data:", response.status, response.statusText)
         }
       } catch (error) {
-        console.log("⚠️ Live events data not available, falling back to localStorage:", error)
+        console.log("⚠️ Live events data not available:", error)
       }
 
-      // Fallback to localStorage if live data fails
+      // Fallback to localStorage
       try {
         const savedEvents = localStorage.getItem("sp_events_global")
         if (savedEvents) {
@@ -82,22 +85,23 @@ export function EventsStrip() {
           if (Array.isArray(parsedEvents) && parsedEvents.length > 0) {
             console.log("📦 Loaded events from localStorage:", parsedEvents.length, "events")
             setEvents(parsedEvents)
+            setLastFetch(now)
           } else {
-            // If saved events is empty or invalid, use default events
             console.log("🔄 Using default events data")
             setEvents(defaultEvents)
+            setLastFetch(now)
             localStorage.setItem("sp_events_global", JSON.stringify(defaultEvents))
           }
         } else {
-          // If no saved events, initialize with default events
           console.log("🆕 Initializing with default events data")
           setEvents(defaultEvents)
+          setLastFetch(now)
           localStorage.setItem("sp_events_global", JSON.stringify(defaultEvents))
         }
       } catch (error) {
         console.error("❌ Error loading events:", error)
-        // Fallback to default events if there's an error
         setEvents(defaultEvents)
+        setLastFetch(now)
         localStorage.setItem("sp_events_global", JSON.stringify(defaultEvents))
       }
     }
@@ -105,7 +109,7 @@ export function EventsStrip() {
     // Load events immediately
     loadEvents()
 
-    // Listen for storage changes to update when admin makes changes
+    // Listen for storage changes
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === "sp_events_global") {
         console.log("🔄 Storage change detected, reloading events...")
@@ -113,19 +117,27 @@ export function EventsStrip() {
       }
     }
 
-    window.addEventListener("storage", handleStorageChange)
+    // Listen for focus events
+    const handleFocus = () => {
+      console.log("🔄 Tab focused, checking for event updates...")
+      loadEvents()
+    }
 
-    // Also check for changes periodically (for same-tab updates and live data)
+    window.addEventListener("storage", handleStorageChange)
+    window.addEventListener("focus", handleFocus)
+
+    // Check for updates every 15 seconds
     const interval = setInterval(() => {
       console.log("🔄 Periodic check for event updates...")
       loadEvents()
-    }, 10000) // Check every 10 seconds for faster updates
+    }, 15000)
 
     return () => {
       window.removeEventListener("storage", handleStorageChange)
+      window.removeEventListener("focus", handleFocus)
       clearInterval(interval)
     }
-  }, [])
+  }, [lastFetch, events.length])
 
   return (
     <section className="py-16 bg-neutral-50">

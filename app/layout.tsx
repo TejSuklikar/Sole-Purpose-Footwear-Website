@@ -10,6 +10,7 @@ import { ScrollToTop } from "@/components/scroll-to-top"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { CartSidebar } from "@/components/cart-sidebar"
+import { DebugInfo } from "@/components/debug-info"
 import { Toaster } from "@/components/ui/toaster"
 
 const inter = Inter({ subsets: ["latin"] })
@@ -38,6 +39,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <meta httpEquiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+        <meta httpEquiv="Pragma" content="no-cache" />
+        <meta httpEquiv="Expires" content="0" />
+      </head>
       <body className={`${inter.className} ${playfair.variable}`}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
           <AuthProvider>
@@ -48,6 +54,7 @@ export default function RootLayout({
                 <main className="min-h-screen">{children}</main>
                 <Footer />
                 <CartSidebar />
+                <DebugInfo />
                 <Toaster />
               </AuthGuard>
             </CartProvider>
