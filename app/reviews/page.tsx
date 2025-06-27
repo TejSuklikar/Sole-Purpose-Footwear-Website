@@ -19,7 +19,7 @@ const existingReviews = [
     content:
       "The custom Palestinian design exceeded my expectations. The attention to detail is incredible and the quality is top-notch. I get compliments everywhere I go!",
     orderType: "Custom Design",
-    date: "2024-12-15",
+    date: "2025-6-15",
   },
   {
     id: 2,
@@ -29,7 +29,7 @@ const existingReviews = [
     content:
       "Drew created exactly what I envisioned. The Mexican eagle design is stunning and the craftsmanship is outstanding. Will definitely order again!",
     orderType: "Custom Design",
-    date: "2024-12-10",
+    date: "2025-3-10",
   },
   {
     id: 3,
@@ -39,7 +39,7 @@ const existingReviews = [
     content:
       "The Lebanese flag design is beautiful and meaningful. The shoes are comfortable and well-made. So happy to support a business that celebrates culture!",
     orderType: "Custom Design",
-    date: "2024-12-05",
+    date: "2025-1-05",
   },
   {
     id: 4,
@@ -49,7 +49,7 @@ const existingReviews = [
     content:
       "From design consultation to delivery, the entire process was smooth. The final product is exactly what we discussed. Highly recommend!",
     orderType: "Custom Design",
-    date: "2024-11-28",
+    date: "2024-12-28",
   },
   {
     id: 5,
@@ -59,7 +59,7 @@ const existingReviews = [
     content:
       "The quality and uniqueness of these shoes make them worth the investment. The Filipino-inspired design is gorgeous and the fit is perfect.",
     orderType: "Custom Design",
-    date: "2024-11-20",
+    date: "2024-12-20",
   },
   {
     id: 6,
@@ -162,7 +162,7 @@ export default function ReviewsPage() {
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <CheckCircle className="w-8 h-8 text-green-600" />
               </div>
-              <h1 className="font-playfair text-2xl font-bold mb-4">Thank You for Your Review!</h1>
+              <h1 className="font-playfair text-2xl font-bold mb-4 text-neutral-900">Thank You for Your Review!</h1>
               <p className="text-neutral-600 mb-6">
                 Your review has been submitted and will help other customers learn about our work. We appreciate your
                 feedback!
@@ -195,17 +195,28 @@ export default function ReviewsPage() {
           <div className="lg:col-span-1">
             <Card className="sticky top-8">
               <CardHeader>
-                <CardTitle className="font-playfair text-xl">Share Your Experience</CardTitle>
+                <CardTitle className="font-playfair text-xl text-neutral-900">Share Your Experience</CardTitle>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
-                    <Label htmlFor="name">Name</Label>
-                    <Input id="name" name="name" value={formData.name} onChange={handleInputChange} required />
+                    <Label htmlFor="name" className="text-neutral-900 font-medium">
+                      Name
+                    </Label>
+                    <Input
+                      id="name"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      required
+                      className="mt-1 text-neutral-900"
+                    />
                   </div>
 
                   <div>
-                    <Label htmlFor="email">Email</Label>
+                    <Label htmlFor="email" className="text-neutral-900 font-medium">
+                      Email
+                    </Label>
                     <Input
                       id="email"
                       name="email"
@@ -213,17 +224,20 @@ export default function ReviewsPage() {
                       value={formData.email}
                       onChange={handleInputChange}
                       required
+                      className="mt-1 text-neutral-900"
                     />
                   </div>
 
                   <div>
-                    <Label htmlFor="orderType">Order Type</Label>
+                    <Label htmlFor="orderType" className="text-neutral-900 font-medium">
+                      Order Type
+                    </Label>
                     <select
                       id="orderType"
                       name="orderType"
                       value={formData.orderType}
                       onChange={handleInputChange}
-                      className="w-full p-2 border rounded-lg"
+                      className="w-full p-2 border rounded-lg mt-1 text-neutral-900 bg-white"
                       required
                     >
                       <option value="">Select order type</option>
@@ -234,17 +248,30 @@ export default function ReviewsPage() {
                   </div>
 
                   <div>
-                    <Label>Rating</Label>
-                    {renderStars(formData.rating, true, (rating) => setFormData((prev) => ({ ...prev, rating })))}
+                    <Label className="text-neutral-900 font-medium">Rating</Label>
+                    <div className="mt-1">
+                      {renderStars(formData.rating, true, (rating) => setFormData((prev) => ({ ...prev, rating })))}
+                    </div>
                   </div>
 
                   <div>
-                    <Label htmlFor="title">Review Title</Label>
-                    <Input id="title" name="title" value={formData.title} onChange={handleInputChange} required />
+                    <Label htmlFor="title" className="text-neutral-900 font-medium">
+                      Review Title
+                    </Label>
+                    <Input
+                      id="title"
+                      name="title"
+                      value={formData.title}
+                      onChange={handleInputChange}
+                      required
+                      className="mt-1 text-neutral-900"
+                    />
                   </div>
 
                   <div>
-                    <Label htmlFor="content">Your Review</Label>
+                    <Label htmlFor="content" className="text-neutral-900 font-medium">
+                      Your Review
+                    </Label>
                     <Textarea
                       id="content"
                       name="content"
@@ -253,6 +280,7 @@ export default function ReviewsPage() {
                       onChange={handleInputChange}
                       placeholder="Tell us about your experience..."
                       required
+                      className="mt-1 text-neutral-900"
                     />
                   </div>
 
@@ -273,7 +301,7 @@ export default function ReviewsPage() {
                   <CardContent className="p-6">
                     <div className="flex items-start justify-between mb-4">
                       <div>
-                        <h3 className="font-semibold text-lg">{review.title}</h3>
+                        <h3 className="font-semibold text-lg text-neutral-900">{review.title}</h3>
                         <p className="text-neutral-600">{review.name}</p>
                       </div>
                       <div className="text-right">
