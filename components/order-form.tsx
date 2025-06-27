@@ -112,17 +112,17 @@ export function OrderForm() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100 py-12 px-4">
+    <div className="min-h-screen bg-black py-12 px-4">
       <div className="max-w-2xl mx-auto">
-        <Card className="shadow-xl border-0">
+        <Card className="shadow-xl border-0 bg-black">
           <CardHeader className="text-center pb-8">
             <div className="mx-auto w-16 h-16 bg-gradient-to-br from-purple-600 to-blue-600 rounded-full flex items-center justify-center mb-4">
               <Palette className="w-8 h-8 text-white" />
             </div>
-            <CardTitle className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+            <CardTitle className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
               Custom Order Form
             </CardTitle>
-            <CardDescription className="text-lg text-neutral-600 mt-2">
+            <CardDescription className="text-lg text-neutral-300 mt-2">
               Create your unique pair of custom sneakers
             </CardDescription>
           </CardHeader>
@@ -132,48 +132,56 @@ export function OrderForm() {
               {/* Personal Information */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="firstName">First Name</Label>
+                  <Label htmlFor="firstName" className="text-white">
+                    First Name
+                  </Label>
                   <Input
                     id="firstName"
                     value={formData.firstName}
                     onChange={(e) => handleInputChange("firstName", e.target.value)}
                     required
-                    className="border-neutral-300 focus:border-purple-500 focus:ring-purple-500"
+                    className="bg-neutral-800 border-neutral-700 text-white focus:border-purple-500 focus:ring-purple-500"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="lastName">Last Name</Label>
+                  <Label htmlFor="lastName" className="text-white">
+                    Last Name
+                  </Label>
                   <Input
                     id="lastName"
                     value={formData.lastName}
                     onChange={(e) => handleInputChange("lastName", e.target.value)}
                     required
-                    className="border-neutral-300 focus:border-purple-500 focus:ring-purple-500"
+                    className="bg-neutral-800 border-neutral-700 text-white focus:border-purple-500 focus:ring-purple-500"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email" className="text-white">
+                    Email
+                  </Label>
                   <Input
                     id="email"
                     type="email"
                     value={formData.email}
                     onChange={(e) => handleInputChange("email", e.target.value)}
                     required
-                    className="border-neutral-300 focus:border-purple-500 focus:ring-purple-500"
+                    className="bg-neutral-800 border-neutral-700 text-white focus:border-purple-500 focus:ring-purple-500"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="phone">Phone Number</Label>
+                  <Label htmlFor="phone" className="text-white">
+                    Phone Number
+                  </Label>
                   <Input
                     id="phone"
                     type="tel"
                     value={formData.phone}
                     onChange={(e) => handleInputChange("phone", e.target.value)}
                     required
-                    className="border-neutral-300 focus:border-purple-500 focus:ring-purple-500"
+                    className="bg-neutral-800 border-neutral-700 text-white focus:border-purple-500 focus:ring-purple-500"
                   />
                 </div>
               </div>
@@ -181,30 +189,40 @@ export function OrderForm() {
               {/* Shoe Details */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="shoeModel">Base Shoe Model</Label>
+                  <Label htmlFor="shoeModel" className="text-white">
+                    Base Shoe Model
+                  </Label>
                   <Select value={formData.shoeModel} onValueChange={(value) => handleInputChange("shoeModel", value)}>
-                    <SelectTrigger>
+                    <SelectTrigger className="bg-neutral-800 border-neutral-700 text-white">
                       <SelectValue placeholder="Select base model" />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Air Force 1">Air Force 1</SelectItem>
-                      <SelectItem value="Nike Dunk">Nike Dunk</SelectItem>
-                      <SelectItem value="Custom">Custom (Specify in description)</SelectItem>
+                    <SelectContent className="bg-neutral-800 border-neutral-700">
+                      <SelectItem value="Air Force 1" className="text-white focus:bg-neutral-700">
+                        Air Force 1
+                      </SelectItem>
+                      <SelectItem value="Nike Dunk" className="text-white focus:bg-neutral-700">
+                        Nike Dunk
+                      </SelectItem>
+                      <SelectItem value="Custom" className="text-white focus:bg-neutral-700">
+                        Custom (Specify in description)
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="size">Size</Label>
+                  <Label htmlFor="size" className="text-white">
+                    Size
+                  </Label>
                   <Select value={formData.size} onValueChange={(value) => handleInputChange("size", value)}>
-                    <SelectTrigger>
+                    <SelectTrigger className="bg-neutral-800 border-neutral-700 text-white">
                       <SelectValue placeholder="Select size" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-neutral-800 border-neutral-700">
                       {sizeCategories.map((category) => (
                         <div key={category.category}>
-                          <div className="px-2 py-1 text-sm font-semibold text-neutral-600">{category.category}</div>
+                          <div className="px-2 py-1 text-sm font-semibold text-neutral-400">{category.category}</div>
                           {category.sizes.map((size) => (
-                            <SelectItem key={size} value={size}>
+                            <SelectItem key={size} value={size} className="text-white focus:bg-neutral-700">
                               {size}
                             </SelectItem>
                           ))}
@@ -217,7 +235,7 @@ export function OrderForm() {
 
               {/* Design Description */}
               <div>
-                <Label htmlFor="designDescription" className="mb-3 block">
+                <Label htmlFor="designDescription" className="mb-3 block text-white">
                   Design Description
                 </Label>
                 <Textarea
@@ -227,27 +245,29 @@ export function OrderForm() {
                   onChange={(e) => handleInputChange("designDescription", e.target.value)}
                   rows={6}
                   required
-                  className="border-neutral-300 focus:border-purple-500 focus:ring-purple-500 resize-none"
+                  className="bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-400 focus:border-purple-500 focus:ring-purple-500 resize-none"
                 />
               </div>
 
               {/* Additional Notes */}
               <div className="space-y-2">
-                <Label htmlFor="additionalNotes">Additional Notes (Optional)</Label>
+                <Label htmlFor="additionalNotes" className="text-white">
+                  Additional Notes (Optional)
+                </Label>
                 <Textarea
                   id="additionalNotes"
                   value={formData.additionalNotes}
                   onChange={(e) => handleInputChange("additionalNotes", e.target.value)}
                   placeholder="Any additional requests, timeline preferences, or special instructions..."
                   rows={3}
-                  className="border-neutral-300 focus:border-purple-500 focus:ring-purple-500 resize-none"
+                  className="bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-400 focus:border-purple-500 focus:ring-purple-500 resize-none"
                 />
               </div>
 
               {/* Pricing Info */}
-              <div className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg p-4">
-                <h3 className="font-semibold text-purple-800 mb-2">Custom Order Information</h3>
-                <ul className="text-sm text-purple-700 space-y-1">
+              <div className="bg-gradient-to-r from-purple-900/50 to-blue-900/50 border border-purple-700 rounded-lg p-4">
+                <h3 className="font-semibold text-purple-300 mb-2">Custom Order Information</h3>
+                <ul className="text-sm text-purple-200 space-y-1">
                   <li>• Design consultation included</li>
                   <li>• 2-4 week creation timeline</li>
                   <li>• Progress updates provided</li>
@@ -255,7 +275,11 @@ export function OrderForm() {
                 </ul>
               </div>
 
-              <Button type="submit" className="w-full" disabled={isSubmitting || !formData.size}>
+              <Button
+                type="submit"
+                className="w-full bg-white text-black hover:bg-neutral-100"
+                disabled={isSubmitting || !formData.size}
+              >
                 {isSubmitting ? "Adding to Cart..." : `Add to Cart - $${getSelectedPrice()}`}
               </Button>
             </form>
