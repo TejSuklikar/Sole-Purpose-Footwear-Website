@@ -4,16 +4,19 @@ import { useEffect, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { fetchWithCacheBusting, clearAllCaches } from "@/lib/cache-buster"
 
 interface Shoe {
   id: number
   name: string
   price: number
   image: string
+  images: string[]
   slug: string
   sizes: string[]
   inStockSizes: string[]
+  description: string
+  details: string[]
+  isFeatured: boolean
 }
 
 // CORRECTED sizing system - exactly 73 sizes INCLUDING 7.5C
@@ -106,113 +109,145 @@ const defaultShoes: Shoe[] = [
     name: "Red Kuffiyeh AF1",
     price: 160,
     image: "/images/kuffiyeh-side-sunset.png",
+    images: ["/images/kuffiyeh-side-sunset.png"],
     slug: "red-kuffiyeh-af1",
     sizes: allSizes,
     inStockSizes: allSizes,
+    description: "A vibrant red kuffiyeh design.",
+    details: ["Sticker price: $160"],
+    isFeatured: true,
   },
   {
     id: 2,
     name: "Mexican Eagle AF1",
     price: 160,
     image: "/images/mexican-side-view.png",
+    images: ["/images/mexican-side-view.png"],
     slug: "mexican-eagle-af1",
     sizes: allSizes,
     inStockSizes: allSizes,
+    description: "A design featuring the Mexican eagle.",
+    details: ["Sticker price: $160"],
+    isFeatured: true,
   },
   {
     id: 3,
     name: "Black & Red Kuffiyeh",
     price: 160,
     image: "/images/black-red-geometric-hero.jpg",
+    images: ["/images/black-red-geometric-hero.jpg"],
     slug: "black-red-geometric",
     sizes: allSizes,
     inStockSizes: allSizes,
+    description: "A striking black and red geometric design.",
+    details: ["Sticker price: $160"],
+    isFeatured: true,
   },
   {
     id: 4,
     name: "Jordanian Flag AF1",
     price: 160,
     image: "/images/jordanian-side-view.jpg",
+    images: ["/images/jordanian-side-view.jpg"],
     slug: "jordanian-flag-af1",
     sizes: allSizes,
     inStockSizes: allSizes,
+    description: "A design featuring the Jordanian flag.",
+    details: ["Sticker price: $160"],
+    isFeatured: true,
   },
   {
     id: 5,
     name: "Black & White Checkered",
     price: 160,
     image: "/images/geometric-checkered-side.jpg",
+    images: ["/images/geometric-checkered-side.jpg"],
     slug: "geometric-checkered",
     sizes: allSizes,
     inStockSizes: allSizes,
+    description: "A classic black and white checkered design.",
+    details: ["Sticker price: $160"],
+    isFeatured: true,
   },
   {
     id: 6,
     name: "Chinese Flag AF1",
     price: 160,
     image: "/images/chinese-side-sunset.png",
+    images: ["/images/chinese-side-sunset.png"],
     slug: "chinese-flag-af1",
     sizes: allSizes,
     inStockSizes: allSizes,
+    description: "A design featuring the Chinese flag.",
+    details: ["Sticker price: $160"],
+    isFeatured: true,
   },
   {
     id: 7,
     name: "Checkered Drip AF1",
     price: 160,
     image: "/images/checkered-drip-sunset.png",
+    images: ["/images/checkered-drip-sunset.png"],
     slug: "checkered-drip-af1",
     sizes: allSizes,
     inStockSizes: allSizes,
+    description: "A checkered drip design.",
+    details: ["Sticker price: $160"],
+    isFeatured: true,
   },
   {
     id: 8,
     name: "Map of Palestine AF1",
     price: 160,
     image: "/images/palestine-map-side.jpg",
+    images: ["/images/palestine-map-side.jpg"],
     slug: "map-of-palestine-af1",
     sizes: allSizes,
     inStockSizes: allSizes,
+    description: "A design featuring the map of Palestine.",
+    details: ["Sticker price: $160"],
+    isFeatured: true,
   },
   {
     id: 9,
     name: "Lebanese Cedar AF1",
     price: 160,
     image: "/images/lebanese-side-view.jpg",
+    images: ["/images/lebanese-side-view.jpg"],
     slug: "lebanese-cedar-af1",
     sizes: allSizes,
     inStockSizes: allSizes,
+    description: "A design featuring the Lebanese cedar.",
+    details: ["Sticker price: $160"],
+    isFeatured: true,
   },
   {
     id: 10,
     name: "Filipino Sun AF1",
     price: 160,
     image: "/images/filipino-side-view.jpg",
+    images: ["/images/filipino-side-view.jpg"],
     slug: "filipino-sun-af1",
     sizes: allSizes,
     inStockSizes: allSizes,
+    description: "A design featuring the Filipino sun.",
+    details: ["Sticker price: $160"],
+    isFeatured: true,
   },
 ]
 
 export function ShoesGrid() {
   const [shoes, setShoes] = useState<Shoe[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [lastFetch, setLastFetch] = useState<number>(0)
 
-  // Load shoes with aggressive cache busting
+  // Load shoes data
   useEffect(() => {
     const loadShoes = async () => {
-      const now = Date.now()
-
-      // Only fetch if it's been more than 5 seconds since last fetch
-      if (now - lastFetch < 5000 && shoes.length > 0) {
-        return
-      }
-
       try {
         console.log("🔄 Loading shoes data...")
 
-        // Try to fetch from live data with cache busting
-        const response = await fetchWithCacheBusting("/data/shoes.json")
+        // Try to fetch from live data
+        const response = await fetch("/data/shoes.json")
 
         if (response.ok) {
           const liveShoes = await response.json()
@@ -227,10 +262,6 @@ export function ShoesGrid() {
             }))
 
             setShoes(updatedShoes)
-            setLastFetch(now)
-
-            // Update localStorage with live data
-            localStorage.setItem("sp_shoes_global", JSON.stringify(updatedShoes))
             setIsLoading(false)
             return
           }
@@ -241,77 +272,14 @@ export function ShoesGrid() {
         console.log("⚠️ Live shoes data not available:", error)
       }
 
-      // Fallback to localStorage
-      try {
-        const savedShoes = localStorage.getItem("sp_shoes_global")
-        if (savedShoes) {
-          const parsedShoes = JSON.parse(savedShoes)
-          if (Array.isArray(parsedShoes) && parsedShoes.length > 0) {
-            console.log("📦 Loaded shoes from localStorage:", parsedShoes.length, "shoes")
-
-            const updatedShoes = parsedShoes.map((shoe: Shoe) => ({
-              ...shoe,
-              sizes: allSizes,
-              inStockSizes: shoe.inStockSizes || allSizes,
-            }))
-
-            setShoes(updatedShoes)
-            setLastFetch(now)
-            localStorage.setItem("sp_shoes_global", JSON.stringify(updatedShoes))
-          } else {
-            console.log("🔄 Using default shoes data")
-            setShoes(defaultShoes)
-            setLastFetch(now)
-            localStorage.setItem("sp_shoes_global", JSON.stringify(defaultShoes))
-          }
-        } else {
-          console.log("🆕 Initializing with default shoes data")
-          setShoes(defaultShoes)
-          setLastFetch(now)
-          localStorage.setItem("sp_shoes_global", JSON.stringify(defaultShoes))
-        }
-      } catch (error) {
-        console.error("❌ Error loading shoes:", error)
-        setShoes(defaultShoes)
-        setLastFetch(now)
-        localStorage.setItem("sp_shoes_global", JSON.stringify(defaultShoes))
-      }
-
+      // Fallback to default shoes
+      console.log("🔄 Using default shoes data")
+      setShoes(defaultShoes)
       setIsLoading(false)
     }
 
-    // Load shoes immediately
     loadShoes()
-
-    // Listen for storage changes
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === "sp_shoes_global") {
-        console.log("🔄 Storage change detected, reloading shoes...")
-        loadShoes()
-      }
-    }
-
-    // Listen for focus events to refresh data when user returns to tab
-    const handleFocus = () => {
-      console.log("🔄 Tab focused, checking for updates...")
-      loadShoes()
-    }
-
-    window.addEventListener("storage", handleStorageChange)
-    window.addEventListener("focus", handleFocus)
-
-    // Check for updates every 15 seconds
-    const interval = setInterval(() => {
-      console.log("🔄 Periodic check for shoe updates...")
-      loadShoes()
-    }, 15000)
-
-    return () => {
-      window.removeEventListener("storage", handleStorageChange)
-      window.removeEventListener("focus", handleFocus)
-      clearInterval(interval)
-    }
-  }, [lastFetch, shoes.length])
+  }, [])
 
   if (isLoading) {
     return (
@@ -329,7 +297,6 @@ export function ShoesGrid() {
         <p className="text-neutral-400">Check back later for new designs!</p>
         <Button
           onClick={() => {
-            clearAllCaches()
             window.location.reload()
           }}
           className="mt-4 bg-white text-black"
@@ -346,7 +313,6 @@ export function ShoesGrid() {
         <p className="text-neutral-400 text-sm">Showing {shoes.length} custom designs</p>
         <Button
           onClick={() => {
-            clearAllCaches()
             window.location.reload()
           }}
           variant="outline"

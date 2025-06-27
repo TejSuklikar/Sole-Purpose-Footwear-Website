@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react"
 import { Calendar, MapPin, Clock } from "lucide-react"
-import { fetchWithCacheBusting } from "@/lib/cache-buster"
 
 interface Event {
   id: number
@@ -13,7 +12,6 @@ interface Event {
   description: string
 }
 
-// Default events (fallback)
 const defaultEvents: Event[] = [
   {
     id: 1,
@@ -43,101 +41,31 @@ const defaultEvents: Event[] = [
 
 export function EventsStrip() {
   const [events, setEvents] = useState<Event[]>(defaultEvents)
-  const [lastFetch, setLastFetch] = useState<number>(0)
 
-  // Load events with cache busting
   useEffect(() => {
-    const loadEvents = async () => {
-      const now = Date.now()
-
-      // Only fetch if it's been more than 5 seconds since last fetch
-      if (now - lastFetch < 5000 && events.length > 0) {
-        return
-      }
-
+    const fetchEvents = async () => {
       try {
-        console.log("🔄 Loading events data...")
-
-        // Try to fetch from live data with cache busting
-        const response = await fetchWithCacheBusting("/data/events.json")
-
-        if (response.ok) {
-          const liveEvents = await response.json()
-          if (Array.isArray(liveEvents) && liveEvents.length > 0) {
-            console.log("✅ Loaded live events data:", liveEvents.length, "events")
-            setEvents(liveEvents)
-            setLastFetch(now)
-            localStorage.setItem("sp_events_global", JSON.stringify(liveEvents))
-            return
+        const response = await fetch("/data/events.json")
+        if (response.ok && response.headers.get("content-type")?.includes("application/json")) {
+          try {
+            const data = (await response.json()) as Event[]
+            if (Array.isArray(data) && data.length > 0) {
+              setEvents(data)
+            }
+          } catch (err) {
+            console.error("Failed to parse events.json:", err)
           }
         } else {
-          console.log("❌ Failed to fetch live events data:", response.status, response.statusText)
+          console.warn("events.json not found or not JSON – falling back to defaultEvents")
         }
       } catch (error) {
-        console.log("⚠️ Live events data not available:", error)
-      }
-
-      // Fallback to localStorage
-      try {
-        const savedEvents = localStorage.getItem("sp_events_global")
-        if (savedEvents) {
-          const parsedEvents = JSON.parse(savedEvents)
-          if (Array.isArray(parsedEvents) && parsedEvents.length > 0) {
-            console.log("📦 Loaded events from localStorage:", parsedEvents.length, "events")
-            setEvents(parsedEvents)
-            setLastFetch(now)
-          } else {
-            console.log("🔄 Using default events data")
-            setEvents(defaultEvents)
-            setLastFetch(now)
-            localStorage.setItem("sp_events_global", JSON.stringify(defaultEvents))
-          }
-        } else {
-          console.log("🆕 Initializing with default events data")
-          setEvents(defaultEvents)
-          setLastFetch(now)
-          localStorage.setItem("sp_events_global", JSON.stringify(defaultEvents))
-        }
-      } catch (error) {
-        console.error("❌ Error loading events:", error)
-        setEvents(defaultEvents)
-        setLastFetch(now)
-        localStorage.setItem("sp_events_global", JSON.stringify(defaultEvents))
+        console.error("Could not fetch events:", error)
+        // Keep default events on error
       }
     }
 
-    // Load events immediately
-    loadEvents()
-
-    // Listen for storage changes
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === "sp_events_global") {
-        console.log("🔄 Storage change detected, reloading events...")
-        loadEvents()
-      }
-    }
-
-    // Listen for focus events
-    const handleFocus = () => {
-      console.log("🔄 Tab focused, checking for event updates...")
-      loadEvents()
-    }
-
-    window.addEventListener("storage", handleStorageChange)
-    window.addEventListener("focus", handleFocus)
-
-    // Check for updates every 15 seconds
-    const interval = setInterval(() => {
-      console.log("🔄 Periodic check for event updates...")
-      loadEvents()
-    }, 15000)
-
-    return () => {
-      window.removeEventListener("storage", handleStorageChange)
-      window.removeEventListener("focus", handleFocus)
-      clearInterval(interval)
-    }
-  }, [lastFetch, events.length])
+    fetchEvents()
+  }, [])
 
   return (
     <section className="py-16 bg-neutral-50">
@@ -151,11 +79,11 @@ export function EventsStrip() {
           {events.map((event) => (
             <div
               key={event.id}
-              className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow duration-300"
+              className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow duration-300 h-full flex flex-col"
             >
               <h3 className="font-semibold text-xl mb-3 text-neutral-900">{event.title}</h3>
-              <p className="text-neutral-600 mb-4">{event.description}</p>
-              <div className="space-y-2 text-sm text-neutral-500">
+              <p className="text-neutral-600 mb-4 flex-grow">{event.description}</p>
+              <div className="space-y-2 text-sm text-neutral-500 mt-auto">
                 <div className="flex items-center">
                   <Calendar className="w-4 h-4 mr-2" />
                   {event.date}

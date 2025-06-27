@@ -1,15 +1,15 @@
 import { HeroSection } from "@/components/hero-section"
 import { FeaturedWork } from "@/components/featured-work"
-import TestimonialsSection from "@/components/testimonials-section"
 import { EventsStrip } from "@/components/events-strip"
+import { TestimonialsSection } from "@/components/testimonials-section"
 
 export default function HomePage() {
   return (
-    <main>
+    <div className="min-h-screen">
       <HeroSection />
       <FeaturedWork />
-      <TestimonialsSection />
       <EventsStrip />
-    </main>
+      <TestimonialsSection />
+    </div>
   )
 }

@@ -1,174 +1,178 @@
 "use client"
 
-import { useState } from "react"
-import { useCart } from "./cart-provider"
+import { useCart } from "@/components/cart-provider"
 import { Button } from "@/components/ui/button"
-import { X, Minus, Plus, ShoppingBag, Send } from "lucide-react"
+import { Minus, Plus, Trash2, ShoppingBag, Palette } from "lucide-react"
 import Image from "next/image"
-
-// Shipping calculation function
-const getShippingForSize = (size: string): number => {
-  // Kids and toddlers: $15 shipping
-  if (size.includes("C") || size.includes("Y")) {
-    return 15
-  }
-  // Adults: $20 shipping
-  return 20
-}
+import Link from "next/link"
 
 export function CartSidebar() {
-  const { state, dispatch } = useCart()
-  const [isProcessing, setIsProcessing] = useState(false)
+  const { items, total, updateQuantity, removeItem, clearCart } = useCart()
 
-  // Calculate subtotal (base prices only)
-  const subtotal = state.items.reduce((sum, item) => sum + item.price * item.quantity, 0)
-
-  // Calculate shipping based on items in cart
-  const shipping = state.items.reduce((sum, item) => {
-    return sum + getShippingForSize(item.size) * item.quantity
-  }, 0)
-
-  const total = subtotal + shipping
-
-  const handleCheckout = async () => {
-    setIsProcessing(true)
-
-    // Simulate processing time
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    // Store order in localStorage for the checkout page
-    const orderData = {
-      items: state.items,
-      subtotal,
-      shipping,
-      total,
-      timestamp: new Date().toISOString(),
-      orderId: `SP-${Date.now()}`,
-    }
-
-    localStorage.setItem("pendingOrder", JSON.stringify(orderData))
-
-    // Redirect to checkout page
-    window.location.href = "/checkout/payment"
-
-    setIsProcessing(false)
+  if (items.length === 0) {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center p-6">
+        <div className="text-center">
+          <ShoppingBag className="h-16 w-16 text-neutral-400 mb-4 mx-auto" />
+          <h3 className="text-lg font-medium text-neutral-900 mb-2">Your cart is empty</h3>
+          <p className="text-neutral-600 mb-4">Add some shoes to get started!</p>
+          <Link href="/shoes">
+            <Button>Browse Shoes</Button>
+          </Link>
+        </div>
+      </div>
+    )
   }
 
-  if (!state.isOpen) return null
+  const handleProceedToPayment = () => {
+    // Create order data with mixed items
+    const orderData = {
+      items: items,
+      total: total,
+      timestamp: new Date().toISOString(),
+      orderId: `SP-MIXED-${Date.now()}`,
+      hasCustomItems: items.some((item) => item.type === "custom"),
+      hasRegularItems: items.some((item) => item.type !== "custom"),
+    }
+
+    // Store in localStorage for checkout
+    localStorage.setItem("pendingOrder", JSON.stringify(orderData))
+
+    // Redirect to payment
+    window.location.href = "/checkout/payment"
+  }
+
+  const regularItems = items.filter((item) => item.type !== "custom")
+  const customItems = items.filter((item) => item.type === "custom")
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden">
-      <div className="absolute inset-0 bg-black bg-opacity-50" onClick={() => dispatch({ type: "TOGGLE_CART" })} />
-
-      <div className="absolute right-0 top-0 h-full w-full max-w-sm sm:max-w-md bg-white shadow-xl">
-        <div className="flex h-full flex-col">
-          <div className="flex items-center justify-between p-3 sm:p-4 border-b">
-            <h2 className="text-base sm:text-lg font-semibold text-black">Shopping Cart</h2>
-            <Button variant="ghost" size="sm" onClick={() => dispatch({ type: "TOGGLE_CART" })}>
-              <X className="h-4 w-4 sm:h-5 sm:w-5" />
-            </Button>
-          </div>
-
-          <div className="flex-1 overflow-y-auto p-3 sm:p-4">
-            {state.items.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full text-center">
-                <ShoppingBag className="h-10 w-10 sm:h-12 sm:w-12 text-neutral-400 mb-4" />
-                <p className="text-neutral-600 text-sm sm:text-base">Your cart is empty</p>
-              </div>
-            ) : (
-              <div className="space-y-3 sm:space-y-4">
-                {state.items.map((item) => (
-                  <div
-                    key={`${item.id}-${item.size}`}
-                    className="flex items-center space-x-3 sm:space-x-4 border-b pb-3 sm:pb-4"
-                  >
+    <div className="flex-1 flex flex-col">
+      {/* Cart Items */}
+      <div className="flex-1 overflow-y-auto p-4">
+        <div className="space-y-4">
+          {/* Regular Items */}
+          {regularItems.length > 0 && (
+            <div>
+              <h4 className="font-semibold text-neutral-800 mb-3">Regular Orders</h4>
+              {regularItems.map((item) => (
+                <div
+                  key={`${item.id}-${item.size}`}
+                  className="flex items-center space-x-3 bg-neutral-50 p-3 rounded-lg mb-3"
+                >
+                  <div className="flex-shrink-0">
                     <Image
-                      src={item.image || "/placeholder.svg?height=80&width=80&text=Product"}
+                      src={item.image || "/placeholder.svg?height=60&width=60&text=Product"}
                       alt={item.name}
                       width={60}
                       height={60}
-                      className="sm:w-20 sm:h-20 rounded-lg object-cover flex-shrink-0"
+                      className="rounded-md object-cover"
                       crossOrigin="anonymous"
                     />
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-medium text-sm sm:text-base text-black truncate">{item.name}</h3>
-                      <p className="text-xs sm:text-sm text-black">Size: {item.size}</p>
-                      <p className="font-semibold text-sm sm:text-base text-black">${item.price}</p>
-                      <p className="text-xs text-neutral-600">+ ${getShippingForSize(item.size)} shipping</p>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="text-sm font-medium text-neutral-900 truncate">{item.name}</h4>
+                    <p className="text-sm text-neutral-600">Size: {item.size}</p>
+                    <p className="text-sm font-medium text-neutral-900">${item.price}</p>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => updateQuantity(item.id, item.size, Math.max(0, item.quantity - 1))}
+                      className="h-8 w-8 p-0"
+                    >
+                      <Minus className="h-3 w-3" />
+                    </Button>
+                    <span className="text-sm font-medium w-8 text-center">{item.quantity}</span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => updateQuantity(item.id, item.size, item.quantity + 1)}
+                      className="h-8 w-8 p-0"
+                    >
+                      <Plus className="h-3 w-3" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeItem(item.id, item.size)}
+                      className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Custom Items */}
+          {customItems.length > 0 && (
+            <div>
+              <h4 className="font-semibold text-neutral-800 mb-3 flex items-center">
+                <Palette className="w-4 h-4 mr-2" />
+                Custom Orders
+              </h4>
+              {customItems.map((item) => (
+                <div key={`${item.id}-${item.size}`} className="bg-blue-50 border border-blue-200 p-3 rounded-lg mb-3">
+                  <div className="flex items-center space-x-3">
+                    <div className="flex-shrink-0">
+                      <div className="w-15 h-15 bg-blue-100 rounded-md flex items-center justify-center">
+                        <Palette className="w-8 h-8 text-blue-600" />
+                      </div>
                     </div>
-                    <div className="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-sm font-medium text-blue-900">{item.name}</h4>
+                      <p className="text-sm text-blue-700">Size: {item.size}</p>
+                      <p className="text-sm font-medium text-blue-900">${item.price}</p>
+                      {item.customDetails && (
+                        <p className="text-xs text-blue-600 mt-1">
+                          {item.customDetails.designDescription.substring(0, 40)}...
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-sm font-medium text-blue-900">Qty: {item.quantity}</span>
                       <Button
-                        variant="outline"
+                        variant="ghost"
                         size="sm"
-                        className="border-neutral-800 text-black hover:bg-neutral-100 h-7 w-7 sm:h-8 sm:w-8 p-0"
-                        onClick={() =>
-                          dispatch({
-                            type: "UPDATE_QUANTITY",
-                            payload: { id: `${item.id}-${item.size}`, quantity: Math.max(0, item.quantity - 1) },
-                          })
-                        }
+                        onClick={() => removeItem(item.id, item.size)}
+                        className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
                       >
-                        <Minus className="h-3 w-3" />
-                      </Button>
-                      <span className="w-6 sm:w-8 text-center text-black font-medium text-sm">{item.quantity}</span>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="border-neutral-800 text-black hover:bg-neutral-100 h-7 w-7 sm:h-8 sm:w-8 p-0"
-                        onClick={() =>
-                          dispatch({
-                            type: "UPDATE_QUANTITY",
-                            payload: { id: `${item.id}-${item.size}`, quantity: item.quantity + 1 },
-                          })
-                        }
-                      >
-                        <Plus className="h-3 w-3" />
+                        <Trash2 className="h-3 w-3" />
                       </Button>
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {state.items.length > 0 && (
-            <div className="border-t p-3 sm:p-4">
-              <div className="space-y-2 mb-3 sm:mb-4">
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-neutral-600">Subtotal:</span>
-                  <span className="text-black">${subtotal}</span>
                 </div>
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-neutral-600">Shipping:</span>
-                  <span className="text-black">${shipping}</span>
-                </div>
-                <div className="flex justify-between items-center text-base sm:text-lg font-semibold border-t pt-2">
-                  <span className="text-black">Total:</span>
-                  <span className="text-black">${total}</span>
-                </div>
-              </div>
-              <Button
-                className="w-full bg-neutral-900 hover:bg-neutral-800 text-white border border-neutral-700"
-                size="lg"
-                onClick={handleCheckout}
-                disabled={isProcessing}
-              >
-                {isProcessing ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Processing...
-                  </>
-                ) : (
-                  <>
-                    <Send className="mr-2 h-4 w-4" />
-                    Proceed to Payment
-                  </>
-                )}
-              </Button>
+              ))}
             </div>
           )}
         </div>
       </div>
+
+      {/* Cart Footer */}
+      <div className="border-t p-4 space-y-4">
+        <div className="flex justify-between items-center">
+          <span className="text-lg font-semibold">Total: ${total.toFixed(2)}</span>
+          <Button variant="outline" size="sm" onClick={clearCart}>
+            Clear Cart
+          </Button>
+        </div>
+
+        {customItems.length > 0 && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+            <p className="text-xs text-blue-800">
+              ✨ Custom orders include design consultation and 2-4 week creation time
+            </p>
+          </div>
+        )}
+
+        <Button onClick={handleProceedToPayment} className="w-full bg-black text-white hover:bg-neutral-800">
+          Proceed to Payment
+        </Button>
+      </div>
     </div>
   )
 }
+
+export default CartSidebar

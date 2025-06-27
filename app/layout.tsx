@@ -5,7 +5,6 @@ import "./globals.css"
 import Header from "@/components/header"
 import { Footer } from "@/components/footer"
 import { CartProvider } from "@/components/cart-provider"
-import { AuthProvider } from "@/components/auth-provider"
 import { ScrollToTop } from "@/components/scroll-to-top"
 import { Toaster } from "@/components/ui/toaster"
 
@@ -86,17 +85,15 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
       <body className="bg-black text-white font-sans antialiased">
-        <AuthProvider>
-          <CartProvider>
-            <div className="min-h-screen bg-black">
-              <Header />
-              <main className="bg-black">{children}</main>
-              <Footer />
-              <ScrollToTop />
-              <Toaster />
-            </div>
-          </CartProvider>
-        </AuthProvider>
+        <CartProvider>
+          <div className="min-h-screen bg-black">
+            <Header />
+            <main className="bg-black">{children}</main>
+            <Footer />
+            <ScrollToTop />
+            <Toaster />
+          </div>
+        </CartProvider>
       </body>
     </html>
   )

@@ -1,52 +1,56 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { Star, Quote } from "lucide-react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 
 interface Testimonial {
-  id: string
+  id: number
   name: string
-  rating: number
-  content: string
   orderType: string
+  rating: number
+  comment: string
 }
 
-const featuredTestimonials: Testimonial[] = [
-  {
-    id: "1",
-    name: "Marcus Johnson",
-    rating: 5,
-    content:
-      "Absolutely incredible Palestinian flag AF1s! The quality and attention to detail blew me away. These shoes mean so much to me and my heritage.",
-    orderType: "Custom Design",
-  },
-  {
-    id: "2",
-    name: "Sofia Rodriguez",
-    rating: 5,
-    content:
-      "Perfect family Christmas gift! The team worked with us to create something special representing our Mexican heritage. Everyone loved them!",
-    orderType: "Family Set",
-  },
-  {
-    id: "3",
-    name: "Ahmed Hassan",
-    rating: 5,
-    content:
-      "Best custom shoes I've ever owned. The Jordanian flag design came out perfect and I get compliments everywhere I go.",
-    orderType: "Custom Design",
-  },
-]
+export function TestimonialsSection() {
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([])
 
-export default function TestimonialsSection() {
+  useEffect(() => {
+    const dummyTestimonials: Testimonial[] = [
+      {
+        id: 1,
+        name: "Aisha K.",
+        orderType: "Custom Design",
+        rating: 5,
+        comment:
+          "Absolutely stunning work! My custom shoes are a work of art and exactly what I envisioned. The attention to detail is incredible.",
+      },
+      {
+        id: 2,
+        name: "Omar S.",
+        orderType: "Family Set",
+        rating: 5,
+        comment:
+          "We ordered a family set for Christmas and everyone loved them! Such a unique and personal gift. Highly recommend!",
+      },
+      {
+        id: 3,
+        name: "Layla M.",
+        orderType: "Holiday Special",
+        rating: 4,
+        comment:
+          "Great quality and beautiful design. The colors are so vibrant and the shoes are very comfortable. Will definitely order again!",
+      },
+    ]
+    setTestimonials(dummyTestimonials)
+  }, [])
+
   const renderStars = (rating: number) => {
     return (
-      <div className="flex">
+      <div className="flex items-center mb-3">
         {[1, 2, 3, 4, 5].map((star) => (
           <Star
             key={star}
-            className={`w-4 h-4 ${star <= rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
+            className={`h-4 w-4 ${star <= rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
           />
         ))}
       </div>
@@ -54,7 +58,7 @@ export default function TestimonialsSection() {
   }
 
   return (
-    <section className="py-20">
+    <section className="py-20 bg-neutral-950">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="font-playfair text-3xl md:text-4xl font-bold text-white mb-4">What Our Customers Say</h2>
@@ -63,36 +67,21 @@ export default function TestimonialsSection() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-          {featuredTestimonials.map((testimonial) => (
-            <Card key={testimonial.id} className="bg-neutral-900/50 border-neutral-800 relative">
-              <CardContent className="p-6">
-                <Quote className="w-8 h-8 text-neutral-600 mb-4" />
-                <p className="text-neutral-300 leading-relaxed mb-6">"{testimonial.content}"</p>
-
-                <div className="flex items-center gap-3">
-                  <Avatar className="w-10 h-10">
-                    <AvatarFallback className="bg-neutral-700 text-white text-sm">
-                      {testimonial.name
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="font-semibold text-white">{testimonial.name}</p>
-                    <div className="flex items-center gap-2">
-                      {renderStars(testimonial.rating)}
-                      <span className="text-sm text-neutral-400">• {testimonial.orderType}</span>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {testimonials.map((testimonial) => (
+            <div key={testimonial.id} className="bg-neutral-900/50 border border-neutral-800 rounded-xl p-6 relative">
+              <Quote className="w-8 h-8 text-neutral-600 mb-4" />
+              {renderStars(testimonial.rating)}
+              <p className="text-neutral-300 leading-relaxed mb-6">"{testimonial.comment}"</p>
+              <div className="mt-auto">
+                <p className="font-semibold text-white">{testimonial.name}</p>
+                <p className="text-sm text-neutral-400">{testimonial.orderType}</p>
+              </div>
+            </div>
           ))}
         </div>
 
-        <div className="text-center">
+        <div className="text-center mt-12">
           <a
             href="/reviews"
             className="inline-flex items-center justify-center px-6 py-3 border border-white text-base font-medium rounded-md text-white hover:bg-white hover:text-black transition-colors"

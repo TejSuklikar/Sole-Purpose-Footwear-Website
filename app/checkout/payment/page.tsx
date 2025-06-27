@@ -1,53 +1,66 @@
 "use client"
-
 import type React from "react"
-
-import { useEffect, useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Copy, Check, Send, ExternalLink, Upload, AlertCircle, MapPin } from "lucide-react"
-import Link from "next/link"
+import {
+  CheckCircle,
+  Copy,
+  Check,
+  Mail,
+  Phone,
+  MapPin,
+  AlertCircle,
+  CreditCard,
+  Upload,
+  ExternalLink,
+  Palette,
+} from "lucide-react"
 
 interface OrderItem {
-  id: string
+  id: string | number
   name: string
   price: number
   size: string
   quantity: number
+  type?: "regular" | "custom"
+  customDetails?: {
+    firstName: string
+    lastName: string
+    email: string
+    phone: string
+    shoeModel: string
+    designDescription: string
+    isBayArea: boolean
+  }
 }
 
 interface OrderData {
   items: OrderItem[]
-  subtotal: number
-  shipping: number
   total: number
   timestamp: string
   orderId: string
+  hasCustomItems?: boolean
+  hasRegularItems?: boolean
 }
 
 export default function PaymentPage() {
+  const router = useRouter()
   const [orderData, setOrderData] = useState<OrderData | null>(null)
-  const [isBayArea, setIsBayArea] = useState(false)
-  const [customerInfo, setCustomerInfo] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    address: "",
-  })
+  const [currentStep, setCurrentStep] = useState(1)
+  const [copiedField, setCopiedField] = useState<string | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [paymentProof, setPaymentProof] = useState({
     method: "",
     transactionId: "",
     screenshot: null as File | null,
     notes: "",
   })
-  const [isSubmitted, setIsSubmitted] = useState(false)
-  const [copiedField, setCopiedField] = useState<string | null>(null)
-  const [currentStep, setCurrentStep] = useState(1)
-  const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Payment information
   const paymentMethods = {
@@ -56,15 +69,15 @@ export default function PaymentPage() {
   }
 
   useEffect(() => {
-    const stored = localStorage.getItem("pendingOrder")
-    if (stored) {
-      setOrderData(JSON.parse(stored))
+    // Get order data from localStorage
+    const pendingOrder = localStorage.getItem("pendingOrder")
+    if (pendingOrder) {
+      const order = JSON.parse(pendingOrder)
+      setOrderData(order)
+    } else {
+      router.push("/shoes")
     }
-  }, [])
-
-  // Calculate final totals based on Bay Area selection
-  const finalShipping = isBayArea ? 0 : orderData?.shipping || 0
-  const finalTotal = (orderData?.subtotal || 0) + finalShipping
+  }, [router])
 
   const copyToClipboard = async (text: string, field: string) => {
     try {
@@ -73,20 +86,6 @@ export default function PaymentPage() {
       setTimeout(() => setCopiedField(null), 2000)
     } catch (err) {
       console.error("Failed to copy text: ", err)
-      // Fallback for older browsers
-      const textArea = document.createElement("textarea")
-      textArea.value = text
-      document.body.appendChild(textArea)
-      textArea.focus()
-      textArea.select()
-      try {
-        document.execCommand("copy")
-        setCopiedField(field)
-        setTimeout(() => setCopiedField(null), 2000)
-      } catch (fallbackErr) {
-        console.error("Fallback copy failed: ", fallbackErr)
-      }
-      document.body.removeChild(textArea)
     }
   }
 
@@ -97,315 +96,238 @@ export default function PaymentPage() {
     }
   }
 
-  const sendCustomerConfirmation = async () => {
-    if (!orderData || !customerInfo.email) return
-
-    const formData = new FormData()
-
-    formData.append("_subject", `✅ Order Confirmation #${orderData.orderId} - Sole Purpose Footwear`)
-    formData.append("_template", "box")
-    formData.append("_captcha", "false")
-
-    const customerMessage = `
-Hi ${customerInfo.name},
-
-Thank you for your order with Sole Purpose Footwear! 🎨
-
-📋 ORDER CONFIRMATION:
-• Order ID: ${orderData.orderId}
-• Date: ${new Date(orderData.timestamp).toLocaleString()}
-• Subtotal: $${orderData.subtotal}
-• Shipping: $${finalShipping} ${isBayArea ? "(Bay Area - FREE!)" : ""}
-• Total: $${finalTotal}
-
-👟 YOUR ORDER:
-${orderData.items.map((item) => `• ${item.name} (Size ${item.size}) x${item.quantity} - $${item.price * item.quantity}`).join("\n")}
-
-💳 PAYMENT STATUS:
-• Method: ${paymentProof.method.toUpperCase()}
-• Transaction ID: ${paymentProof.transactionId}
-• Status: Pending Verification
-
-⏰ WHAT HAPPENS NEXT:
-1. We'll verify your payment within 2-4 hours
-2. Your order will be prepared and shipped to:
-   ${customerInfo.address}
-3. You'll receive tracking information once shipped
-${isBayArea ? "4. Bay Area pickup/dropoff will be arranged if selected" : ""}
-
-📞 QUESTIONS?
-Email: solepurposefootwear813@gmail.com
-Phone: (415) 939-8270
-
-Thank you for choosing Sole Purpose Footwear!
-
----
-The Sole Purpose Team
-Custom sneaker artistry that tells your story
-  `
-
-    formData.append("Customer_Message", customerMessage)
-    formData.append("Order_ID", orderData.orderId)
-    formData.append("Customer_Name", customerInfo.name)
-    formData.append("Total_Amount", `$${finalTotal}`)
-
-    return fetch(`https://formsubmit.co/${customerInfo.email}`, {
-      method: "POST",
-      body: formData,
-    })
-  }
-
-  const handleSubmitOrder = async () => {
-    if (!orderData) return
-
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
     setIsSubmitting(true)
 
-    try {
-      // Send both business and customer emails simultaneously
-      const [businessResponse, customerResponse] = await Promise.all([
-        sendBusinessNotification(),
-        sendCustomerConfirmation(),
-      ])
-
-      if (!businessResponse.ok) {
-        throw new Error("Failed to send business notification")
-      }
-
-      if (!customerResponse.ok) {
-        console.warn("Customer confirmation email may have failed, but order was processed")
-      }
-
-      setIsSubmitted(true)
-      localStorage.removeItem("pendingOrder")
-    } catch (error) {
-      console.error("Error submitting order:", error)
-      alert("There was an error submitting your order. Please try again or contact us directly.")
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
-
-  const sendBusinessNotification = async () => {
     if (!orderData) return
 
-    const formData = new FormData()
+    const formData = new FormData(e.currentTarget)
 
-    formData.append("_subject", `🛒 New Order #${orderData.orderId} - Payment Verification`)
-    formData.append("_template", "box")
-    formData.append("_captcha", "false")
-
-    // Order details
+    // Add order details to form data
     formData.append("Order_ID", orderData.orderId)
-    formData.append("Order_Items", JSON.stringify(orderData.items, null, 2))
-    formData.append("Subtotal_Amount", `$${orderData.subtotal}`)
-    formData.append("Shipping_Amount", `$${finalShipping}`)
-    formData.append("Total_Amount", `$${finalTotal}`)
-    formData.append("Bay_Area_Customer", isBayArea ? "YES - Free pickup/dropoff" : "NO")
-    formData.append("Customer_Info", JSON.stringify(customerInfo, null, 2))
-    formData.append("Payment_Method", paymentProof.method.toUpperCase())
+    formData.append("Customer", `${formData.get("firstName")} ${formData.get("lastName")}`)
+    formData.append("Total", `$${orderData.total}`)
+    formData.append("Payment_Method", paymentProof.method)
     formData.append("Transaction_ID", paymentProof.transactionId)
+    formData.append("Payment_Notes", paymentProof.notes)
+
+    // Separate regular and custom items
+    const regularItems = orderData.items.filter((item) => item.type !== "custom")
+    const customItems = orderData.items.filter((item) => item.type === "custom")
+
+    if (regularItems.length > 0) {
+      formData.append("Regular_Items", JSON.stringify(regularItems))
+    }
+
+    if (customItems.length > 0) {
+      formData.append("Custom_Items", JSON.stringify(customItems))
+      // Add custom details for each custom item
+      customItems.forEach((item, index) => {
+        if (item.customDetails) {
+          formData.append(`Custom_${index + 1}_Details`, JSON.stringify(item.customDetails))
+        }
+      })
+    }
+
+    formData.append(
+      "Order_Type",
+      orderData.hasCustomItems && orderData.hasRegularItems
+        ? "Mixed Order"
+        : orderData.hasCustomItems
+          ? "Custom Only"
+          : "Regular Only",
+    )
 
     if (paymentProof.screenshot) {
       formData.append("Payment_Screenshot", paymentProof.screenshot)
     }
 
-    return fetch("https://formsubmit.co/solepurposefootwear813@gmail.com", {
-      method: "POST",
-      body: formData,
-    })
-  }
+    try {
+      // Submit to FormSubmit
+      const response = await fetch("https://formsubmit.co/solepurposefootwear813@gmail.com", {
+        method: "POST",
+        body: formData,
+      })
 
-  const isPaymentProofComplete =
-    paymentProof.method &&
-    paymentProof.transactionId &&
-    paymentProof.screenshot &&
-    customerInfo.name &&
-    customerInfo.email &&
-    customerInfo.phone &&
-    customerInfo.address
+      if (response.ok) {
+        // Clear cart and pending order
+        localStorage.removeItem("sp_cart")
+        localStorage.removeItem("pendingOrder")
+
+        // Redirect to success page
+        router.push("/checkout/success?type=order")
+      } else {
+        throw new Error("Failed to submit order")
+      }
+    } catch (error) {
+      console.error("Error submitting order:", error)
+      alert("There was an error submitting your order. Please try again.")
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
   if (!orderData) {
     return (
-      <div className="py-20">
-        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Card>
-            <CardContent className="text-center py-12">
-              <p className="text-neutral-600 mb-4">No order found.</p>
-              <Button asChild>
-                <Link href="/shoes">Continue Shopping</Link>
-              </Button>
-            </CardContent>
-          </Card>
+      <div className="min-h-screen bg-neutral-950 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-white mx-auto mb-4"></div>
+          <p className="text-white">Loading order...</p>
         </div>
       </div>
     )
   }
 
-  if (isSubmitted) {
-    return (
-      <div className="py-20">
-        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Card>
-            <CardContent className="text-center py-12">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Check className="w-8 h-8 text-green-600" />
-              </div>
-              <h1 className="font-playfair text-2xl font-bold mb-4">Order & Payment Proof Submitted!</h1>
-              <p className="text-neutral-600 mb-6">
-                Thank you! We've received your order and payment verification. We'll confirm your payment within 2-4
-                hours and send you an email confirmation.
-              </p>
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                <p className="text-sm text-blue-800">
-                  <strong>Next Steps:</strong> We'll verify your payment and email you within 2-4 hours. If there are
-                  any issues, we'll contact you immediately.
-                </p>
-              </div>
-              <div className="space-y-4">
-                <Button asChild>
-                  <Link href="/shoes">Continue Shopping</Link>
-                </Button>
-                <Button variant="outline" asChild>
-                  <Link href="/">Return Home</Link>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    )
-  }
+  const isFormComplete =
+    paymentProof.method && paymentProof.transactionId && paymentProof.screenshot && currentStep >= 2
+
+  const regularItems = orderData.items.filter((item) => item.type !== "custom")
+  const customItems = orderData.items.filter((item) => item.type === "custom")
 
   return (
-    <div className="py-20">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-neutral-950 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Progress Steps */}
         <div className="mb-8">
-          <div className="flex items-center justify-center space-x-4">
-            <div className={`flex items-center ${currentStep >= 1 ? "text-neutral-600" : "text-neutral-400"}`}>
-              <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep >= 1 ? "bg-neutral-900 text-white" : "bg-neutral-200"}`}
-              >
+          <div className="flex items-center justify-center space-x-8">
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-white text-black rounded-full flex items-center justify-center font-semibold">
                 1
               </div>
-              <span className="ml-2 font-medium">Send Payment</span>
+              <span className="text-white font-medium">Send Payment</span>
             </div>
-            <div className="w-16 h-0.5 bg-neutral-200"></div>
-            <div className={`flex items-center ${currentStep >= 2 ? "text-neutral-600" : "text-neutral-400"}`}>
+            <div className="w-16 h-0.5 bg-neutral-600"></div>
+            <div className="flex items-center space-x-3">
               <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep >= 2 ? "bg-neutral-900 text-white" : "bg-neutral-200"}`}
+                className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold ${
+                  currentStep >= 2 ? "bg-white text-black" : "bg-neutral-600 text-neutral-400"
+                }`}
               >
                 2
               </div>
-              <span className="ml-2 font-medium">Upload Proof</span>
+              <span className={`font-medium ${currentStep >= 2 ? "text-white" : "text-neutral-400"}`}>
+                Upload Proof
+              </span>
             </div>
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Order Summary */}
-          <Card>
+          <Card className="bg-neutral-900 border-neutral-800">
             <CardHeader>
-              <CardTitle className="font-playfair text-xl">Order Summary</CardTitle>
-              <p className="text-sm text-neutral-600">Order ID: {orderData.orderId}</p>
+              <CardTitle className="text-white flex items-center">
+                <CheckCircle className="w-5 h-5 mr-2" />
+                Order Summary
+              </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {orderData.items.map((item) => (
-                  <div key={`${item.id}-${item.size}`} className="flex justify-between items-center border-b pb-2">
-                    <div>
-                      <h4 className="font-medium">{item.name}</h4>
-                      <p className="text-sm text-neutral-600">
-                        Size: {item.size} × {item.quantity}
-                      </p>
-                    </div>
-                    <p className="font-semibold">${item.price * item.quantity}</p>
-                  </div>
-                ))}
-
-                {/* Bay Area Option */}
-                <div className="border-t pt-4">
-                  <div className="flex items-center space-x-2 mb-3">
-                    <Checkbox
-                      id="bayArea"
-                      checked={isBayArea}
-                      onCheckedChange={(checked) => setIsBayArea(checked as boolean)}
-                    />
-                    <Label htmlFor="bayArea" className="text-sm font-medium cursor-pointer">
-                      <div className="flex items-center space-x-2">
-                        <MapPin className="w-4 h-4 text-green-600" />
-                        <span>Yes, I'm in the Bay Area (Free pickup/dropoff)</span>
+            <CardContent className="space-y-4">
+              {/* Regular Items */}
+              {regularItems.length > 0 && (
+                <div>
+                  <h4 className="text-neutral-300 font-medium mb-3">Regular Orders</h4>
+                  {regularItems.map((item, index) => (
+                    <div key={index} className="flex justify-between text-neutral-300 mb-2">
+                      <div>
+                        <p className="font-medium text-white">{item.name}</p>
+                        <p className="text-sm text-neutral-400">
+                          Size: {item.size} • Qty: {item.quantity}
+                        </p>
                       </div>
-                    </Label>
-                  </div>
-                  {isBayArea && (
-                    <p className="text-xs text-green-600 ml-6">
-                      We'll contact you to arrange free pickup or dropoff in the Bay Area!
-                    </p>
-                  )}
+                      <span className="text-white font-semibold">${item.price * item.quantity}</span>
+                    </div>
+                  ))}
                 </div>
+              )}
 
-                {/* Order Totals */}
-                <div className="border-t pt-4 space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span>Subtotal:</span>
-                    <span>${orderData.subtotal}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span>Shipping:</span>
-                    <span className={isBayArea ? "text-green-600 font-medium" : ""}>
-                      ${finalShipping} {isBayArea && "(FREE!)"}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center text-lg font-bold pt-2 border-t">
-                    <span>Total:</span>
-                    <span>${finalTotal}</span>
-                  </div>
+              {/* Custom Items */}
+              {customItems.length > 0 && (
+                <div>
+                  <h4 className="text-blue-300 font-medium mb-3 flex items-center">
+                    <Palette className="w-4 h-4 mr-2" />
+                    Custom Orders
+                  </h4>
+                  {customItems.map((item, index) => (
+                    <div key={index} className="bg-blue-900/20 border border-blue-800 rounded-lg p-3 mb-2">
+                      <div className="flex justify-between text-blue-300">
+                        <div>
+                          <p className="font-medium text-blue-200">{item.name}</p>
+                          <p className="text-sm text-blue-400">Size: {item.size}</p>
+                          {item.customDetails && (
+                            <p className="text-xs text-blue-500 mt-1">
+                              {item.customDetails.designDescription.substring(0, 50)}...
+                            </p>
+                          )}
+                        </div>
+                        <span className="text-blue-200 font-semibold">${item.price}</span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
+              )}
+
+              <Separator className="bg-neutral-700" />
+              <div className="flex justify-between text-white font-bold text-lg">
+                <span>Total</span>
+                <span>${orderData.total}</span>
               </div>
+
+              {customItems.length > 0 && (
+                <div className="bg-blue-900/20 border border-blue-800 rounded-lg p-3">
+                  <p className="text-blue-300 text-sm">
+                    ✨ Custom designs include consultation and 2-4 week creation time
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
 
-          {/* Payment Instructions */}
-          <Card>
+          {/* Step 1: Send Payment */}
+          <Card className="bg-white">
             <CardHeader>
-              <CardTitle className="font-playfair text-xl">Step 1: Send Payment</CardTitle>
+              <CardTitle className="text-black">Step 1: Send Payment</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
+              {/* Important Notice */}
               <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                 <div className="flex items-start space-x-2">
-                  <AlertCircle className="w-5 h-5 text-red-600 mt-0.5" />
+                  <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
                   <div>
-                    <h3 className="font-semibold text-red-800 mb-1">IMPORTANT:</h3>
+                    <h4 className="font-semibold text-red-800 mb-1">IMPORTANT:</h4>
                     <p className="text-sm text-red-700">
-                      You MUST include your Order ID: <strong>{orderData.orderId}</strong> in the payment note/memo.
-                      Orders without proper ID will be delayed.
+                      You MUST include your Order ID:{" "}
+                      <span className="font-bold bg-red-100 px-1 rounded">{orderData.orderId}</span> in the payment
+                      note/memo. Orders without proper ID will be delayed.
                     </p>
                   </div>
                 </div>
               </div>
 
+              {/* Payment Amount */}
               <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                <h3 className="font-semibold text-green-800 mb-2">Payment Amount: ${finalTotal}</h3>
+                <h3 className="font-semibold text-green-800 text-lg mb-1">Payment Amount: ${orderData.total}</h3>
                 <p className="text-sm text-green-700">
-                  {isBayArea
-                    ? "Bay Area special pricing - no shipping charges!"
-                    : `Includes $${finalShipping} shipping`}
+                  {customItems.length > 0 && regularItems.length > 0
+                    ? "Mixed order with custom designs and regular shoes"
+                    : customItems.length > 0
+                      ? "Custom design with shipping included"
+                      : "Regular order with shipping included"}
                 </p>
               </div>
 
               {/* Payment Methods */}
               <div className="space-y-4">
-                <div className="border rounded-lg p-4">
+                <div className="border border-neutral-200 rounded-lg p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="font-semibold">Zelle</h4>
+                      <h4 className="font-semibold text-black">Zelle</h4>
                       <p className="text-sm text-neutral-600">{paymentMethods.zelle}</p>
                       <p className="text-xs text-neutral-500 mt-1">Include Order ID in memo</p>
                     </div>
                     <button
                       onClick={() => copyToClipboard(paymentMethods.zelle, "zelle")}
-                      className="w-10 h-10 bg-neutral-800 hover:bg-neutral-700 rounded-lg flex items-center justify-center transition-colors"
+                      className="w-10 h-10 bg-black hover:bg-neutral-800 rounded-lg flex items-center justify-center transition-colors"
                     >
                       {copiedField === "zelle" ? (
                         <Check className="h-4 w-4 text-white" />
@@ -416,19 +338,19 @@ Custom sneaker artistry that tells your story
                   </div>
                 </div>
 
-                <div className="border rounded-lg p-4">
+                <div className="border border-neutral-200 rounded-lg p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="font-semibold">Venmo</h4>
+                      <h4 className="font-semibold text-black">Venmo</h4>
                       <p className="text-sm text-neutral-600">Drew Alaraj</p>
                       <p className="text-xs text-neutral-500 mt-1">Include Order ID in note</p>
                     </div>
                     <div className="flex gap-2">
                       <button
-                        onClick={() => copyToClipboard(paymentMethods.venmo, "venmo")}
-                        className="w-10 h-10 bg-neutral-800 hover:bg-neutral-700 rounded-lg flex items-center justify-center transition-colors"
+                        onClick={() => copyToClipboard("Drew-Alaraj", "venmo-username")}
+                        className="w-10 h-10 bg-black hover:bg-neutral-800 rounded-lg flex items-center justify-center transition-colors"
                       >
-                        {copiedField === "venmo" ? (
+                        {copiedField === "venmo-username" ? (
                           <Check className="h-4 w-4 text-white" />
                         ) : (
                           <Copy className="h-4 w-4 text-white" />
@@ -444,146 +366,202 @@ Custom sneaker artistry that tells your story
                 </div>
               </div>
 
-              <Button className="w-full" onClick={() => setCurrentStep(2)} disabled={currentStep >= 2}>
+              <Button
+                className="w-full bg-black hover:bg-neutral-800 text-white"
+                onClick={() => setCurrentStep(2)}
+                disabled={currentStep >= 2}
+              >
                 {currentStep >= 2 ? "✓ Payment Sent" : "I've Sent the Payment"}
               </Button>
             </CardContent>
           </Card>
 
-          {/* Payment Verification */}
-          <Card>
+          {/* Step 2: Contact & Payment Information */}
+          <Card className="bg-neutral-900 border-neutral-800">
             <CardHeader>
-              <CardTitle className="font-playfair text-xl">Step 2: Verify Payment</CardTitle>
+              <CardTitle className="text-white flex items-center">
+                <CreditCard className="w-5 h-5 mr-2" />
+                Step 2: Contact & Payment Information
+              </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6">
-              {currentStep < 2 && (
-                <div className="text-center py-8 text-neutral-500">
-                  <p>Complete Step 1 first</p>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <input type="hidden" name="_next" value={`${window.location.origin}/checkout/success?type=order`} />
+                <input
+                  type="hidden"
+                  name="_subject"
+                  value={`New ${
+                    orderData.hasCustomItems && orderData.hasRegularItems
+                      ? "Mixed"
+                      : orderData.hasCustomItems
+                        ? "Custom"
+                        : "Regular"
+                  } Order - SolePurpose`}
+                />
+                <input type="hidden" name="_captcha" value="false" />
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="firstName" className="text-white">
+                      First Name
+                    </Label>
+                    <Input
+                      id="firstName"
+                      name="firstName"
+                      required
+                      className="bg-neutral-800 border-neutral-700 text-white"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="lastName" className="text-white">
+                      Last Name
+                    </Label>
+                    <Input
+                      id="lastName"
+                      name="lastName"
+                      required
+                      className="bg-neutral-800 border-neutral-700 text-white"
+                    />
+                  </div>
                 </div>
-              )}
 
-              {currentStep >= 2 && (
-                <>
-                  <div className="space-y-4">
-                    <div>
-                      <Label htmlFor="paymentMethod">Payment Method Used</Label>
-                      <select
-                        id="paymentMethod"
-                        className="w-full p-2 border rounded-lg"
-                        value={paymentProof.method}
-                        onChange={(e) => setPaymentProof({ ...paymentProof, method: e.target.value })}
-                        required
-                      >
-                        <option value="">Select payment method</option>
-                        <option value="zelle">Zelle</option>
-                        <option value="venmo">Venmo</option>
-                      </select>
-                    </div>
+                <div>
+                  <Label htmlFor="email" className="text-white flex items-center">
+                    <Mail className="w-4 h-4 mr-2" />
+                    Email Address
+                  </Label>
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    required
+                    className="bg-neutral-800 border-neutral-700 text-white"
+                  />
+                </div>
 
-                    <div>
-                      <Label htmlFor="transactionId">Transaction ID / Reference Number</Label>
-                      <Input
-                        id="transactionId"
-                        placeholder="Enter transaction ID from your payment app"
-                        value={paymentProof.transactionId}
-                        onChange={(e) => setPaymentProof({ ...paymentProof, transactionId: e.target.value })}
-                        required
-                      />
-                    </div>
+                <div>
+                  <Label htmlFor="phone" className="text-white flex items-center">
+                    <Phone className="w-4 h-4 mr-2" />
+                    Phone Number
+                  </Label>
+                  <Input
+                    id="phone"
+                    name="phone"
+                    type="tel"
+                    required
+                    className="bg-neutral-800 border-neutral-700 text-white"
+                  />
+                </div>
 
-                    <div>
-                      <Label htmlFor="screenshot">Payment Screenshot</Label>
-                      <div className="border-2 border-dashed border-neutral-300 rounded-lg p-6 text-center">
-                        <input
-                          type="file"
-                          id="screenshot"
-                          accept="image/*"
-                          onChange={handleFileUpload}
-                          className="hidden"
-                        />
-                        <label htmlFor="screenshot" className="cursor-pointer">
-                          <Upload className="w-8 h-8 text-neutral-400 mx-auto mb-2" />
-                          <p className="text-sm text-neutral-600">
-                            {paymentProof.screenshot ? paymentProof.screenshot.name : "Upload payment screenshot"}
-                          </p>
-                          <p className="text-xs text-neutral-500 mt-1">PNG, JPG up to 10MB</p>
-                        </label>
-                      </div>
-                    </div>
+                <div>
+                  <Label htmlFor="address" className="text-white flex items-center">
+                    <MapPin className="w-4 h-4 mr-2" />
+                    Shipping Address
+                  </Label>
+                  <Input
+                    id="address"
+                    name="address"
+                    required
+                    className="bg-neutral-800 border-neutral-700 text-white"
+                    placeholder="Full shipping address"
+                  />
+                </div>
 
-                    <div>
-                      <Label htmlFor="notes">Additional Notes (Optional)</Label>
-                      <Textarea
-                        id="notes"
-                        placeholder="Any additional information about your payment"
-                        value={paymentProof.notes}
-                        onChange={(e) => setPaymentProof({ ...paymentProof, notes: e.target.value })}
-                        rows={3}
-                      />
-                    </div>
-                  </div>
+                {/* Payment Proof Section */}
+                {currentStep >= 2 && (
+                  <>
+                    <Separator className="bg-neutral-700" />
+                    <div className="space-y-4">
+                      <h3 className="text-white font-semibold">Payment Verification</h3>
 
-                  {/* Customer Information */}
-                  <div className="border-t pt-6">
-                    <h3 className="font-semibold mb-4">Your Information</h3>
-                    <div className="grid grid-cols-1 gap-4">
                       <div>
-                        <Label htmlFor="name">Full Name</Label>
-                        <Input
-                          id="name"
-                          value={customerInfo.name}
-                          onChange={(e) => setCustomerInfo({ ...customerInfo, name: e.target.value })}
+                        <Label htmlFor="paymentMethod" className="text-white">
+                          Payment Method Used
+                        </Label>
+                        <select
+                          id="paymentMethod"
+                          className="w-full p-2 bg-neutral-800 border border-neutral-700 rounded-lg text-white"
+                          value={paymentProof.method}
+                          onChange={(e) => setPaymentProof({ ...paymentProof, method: e.target.value })}
                           required
-                        />
+                        >
+                          <option value="">Select payment method</option>
+                          <option value="zelle">Zelle</option>
+                          <option value="venmo">Venmo</option>
+                        </select>
                       </div>
+
                       <div>
-                        <Label htmlFor="email">Email</Label>
+                        <Label htmlFor="transactionId" className="text-white">
+                          Transaction ID / Reference Number
+                        </Label>
                         <Input
-                          id="email"
-                          type="email"
-                          value={customerInfo.email}
-                          onChange={(e) => setCustomerInfo({ ...customerInfo, email: e.target.value })}
+                          id="transactionId"
+                          placeholder="Enter transaction ID from your payment app"
+                          value={paymentProof.transactionId}
+                          onChange={(e) => setPaymentProof({ ...paymentProof, transactionId: e.target.value })}
                           required
+                          className="bg-neutral-800 border-neutral-700 text-white"
                         />
                       </div>
+
                       <div>
-                        <Label htmlFor="phone">Phone Number</Label>
-                        <Input
-                          id="phone"
-                          value={customerInfo.phone}
-                          onChange={(e) => setCustomerInfo({ ...customerInfo, phone: e.target.value })}
-                          required
-                        />
+                        <Label htmlFor="screenshot" className="text-white">
+                          Payment Screenshot
+                        </Label>
+                        <div className="border-2 border-dashed border-neutral-600 rounded-lg p-6 text-center bg-neutral-800">
+                          <input
+                            type="file"
+                            id="screenshot"
+                            accept="image/*"
+                            onChange={handleFileUpload}
+                            className="hidden"
+                            required
+                          />
+                          <label htmlFor="screenshot" className="cursor-pointer">
+                            <Upload className="w-8 h-8 text-neutral-400 mx-auto mb-2" />
+                            <p className="text-sm text-neutral-300">
+                              {paymentProof.screenshot ? paymentProof.screenshot.name : "Upload payment screenshot"}
+                            </p>
+                            <p className="text-xs text-neutral-500 mt-1">PNG, JPG up to 10MB</p>
+                          </label>
+                        </div>
                       </div>
+
                       <div>
-                        <Label htmlFor="address">Shipping Address</Label>
+                        <Label htmlFor="notes" className="text-white">
+                          Additional Notes (Optional)
+                        </Label>
                         <Textarea
-                          id="address"
+                          id="notes"
+                          placeholder="Any additional information about your payment"
+                          value={paymentProof.notes}
+                          onChange={(e) => setPaymentProof({ ...paymentProof, notes: e.target.value })}
                           rows={3}
-                          value={customerInfo.address}
-                          onChange={(e) => setCustomerInfo({ ...customerInfo, address: e.target.value })}
-                          required
-                          placeholder={
-                            isBayArea
-                              ? "Address for pickup/dropoff coordination"
-                              : "Full shipping address including postal code"
-                          }
+                          className="bg-neutral-800 border-neutral-700 text-white"
                         />
                       </div>
                     </div>
-                  </div>
+                  </>
+                )}
 
-                  <Button
-                    className="w-full"
-                    size="lg"
-                    onClick={handleSubmitOrder}
-                    disabled={!isPaymentProofComplete || isSubmitting}
-                  >
-                    <Send className="mr-2 h-4 w-4" />
-                    {isSubmitting ? "Submitting..." : "Submit Order & Payment Proof"}
-                  </Button>
-                </>
-              )}
+                <div className="bg-neutral-800 p-4 rounded-lg">
+                  <h3 className="text-white font-semibold mb-2">Order Processing</h3>
+                  <p className="text-neutral-300 text-sm">
+                    {customItems.length > 0
+                      ? "Custom designs will be processed within 2-4 weeks with progress updates. Regular items ship within 1-2 business days."
+                      : "Your order will be processed and shipped within 1-2 business days."}
+                  </p>
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={isSubmitting || !isFormComplete}
+                  className="w-full bg-white text-black hover:bg-neutral-100"
+                >
+                  {isSubmitting ? "Submitting Order..." : `Submit Order`}
+                </Button>
+              </form>
             </CardContent>
           </Card>
         </div>
