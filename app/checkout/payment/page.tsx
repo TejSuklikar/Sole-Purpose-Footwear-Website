@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
   CheckCircle,
   Copy,
@@ -49,12 +50,23 @@ interface OrderData {
   hasRegularItems?: boolean
 }
 
+// Function to calculate shipping based on size
+const getShippingForSize = (size: string): number => {
+  // Men's/Women's sizes: $20 shipping
+  if (!size.includes("C") && !size.includes("Y")) {
+    return 20
+  }
+  // All kids sizes (C and Y): $15 shipping
+  return 15
+}
+
 export default function PaymentPage() {
   const router = useRouter()
   const [orderData, setOrderData] = useState<OrderData | null>(null)
   const [currentStep, setCurrentStep] = useState(1)
   const [copiedField, setCopiedField] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isBayAreaResident, setIsBayAreaResident] = useState(false)
   const [paymentProof, setPaymentProof] = useState({
     method: "",
     transactionId: "",
@@ -104,10 +116,14 @@ export default function PaymentPage() {
 
     const formData = new FormData(e.currentTarget)
 
+    // Calculate final total with Bay Area discount
+    const finalTotal = calculateFinalTotal()
+
     // Add order details to form data
     formData.append("Order_ID", orderData.orderId)
     formData.append("Customer", `${formData.get("firstName")} ${formData.get("lastName")}`)
-    formData.append("Total", `$${orderData.total}`)
+    formData.append("Total", `$${finalTotal}`)
+    formData.append("Bay_Area_Resident", isBayAreaResident ? "Yes" : "No")
     formData.append("Payment_Method", paymentProof.method)
     formData.append("Transaction_ID", paymentProof.transactionId)
     formData.append("Payment_Notes", paymentProof.notes)
@@ -168,6 +184,34 @@ export default function PaymentPage() {
     }
   }
 
+  const calculateShippingTotal = () => {
+    if (!orderData || isBayAreaResident) return 0
+
+    // Calculate shipping for ALL items (both regular and custom)
+    let maxShipping = 0
+    orderData.items.forEach((item) => {
+      const itemShipping = getShippingForSize(item.size)
+      if (itemShipping > maxShipping) {
+        maxShipping = itemShipping
+      }
+    })
+
+    return maxShipping
+  }
+
+  const calculateFinalTotal = () => {
+    if (!orderData) return 0
+
+    // Calculate base total (all items)
+    let total = orderData.items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+
+    // Add shipping for all items
+    const shippingCost = calculateShippingTotal()
+    total += shippingCost
+
+    return total
+  }
+
   if (!orderData) {
     return (
       <div className="min-h-screen bg-neutral-950 flex items-center justify-center">
@@ -184,6 +228,9 @@ export default function PaymentPage() {
 
   const regularItems = orderData.items.filter((item) => item.type !== "custom")
   const customItems = orderData.items.filter((item) => item.type === "custom")
+  const finalTotal = calculateFinalTotal()
+  const shippingCost = calculateShippingTotal()
+  const subtotal = orderData.items.reduce((sum, item) => sum + item.price * item.quantity, 0)
 
   return (
     <div className="min-h-screen bg-neutral-950 py-12">
@@ -267,10 +314,26 @@ export default function PaymentPage() {
                 </div>
               )}
 
+              {/* Subtotal */}
+              <Separator className="bg-neutral-700" />
+              <div className="flex justify-between text-neutral-300">
+                <span>Subtotal</span>
+                <span>${subtotal}</span>
+              </div>
+
+              {/* Shipping */}
+              <div className="flex justify-between text-neutral-300">
+                <span>Shipping</span>
+                <span className={isBayAreaResident ? "line-through text-neutral-500" : ""}>
+                  {isBayAreaResident ? "FREE" : `$${shippingCost}`}
+                </span>
+              </div>
+              {isBayAreaResident && <p className="text-green-400 text-sm">✓ Bay Area resident discount applied</p>}
+
               <Separator className="bg-neutral-700" />
               <div className="flex justify-between text-white font-bold text-lg">
                 <span>Total</span>
-                <span>${orderData.total}</span>
+                <span>${finalTotal}</span>
               </div>
 
               {customItems.length > 0 && (
@@ -306,13 +369,15 @@ export default function PaymentPage() {
 
               {/* Payment Amount */}
               <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                <h3 className="font-semibold text-green-800 text-lg mb-1">Payment Amount: ${orderData.total}</h3>
+                <h3 className="font-semibold text-green-800 text-lg mb-1">Payment Amount: ${finalTotal}</h3>
                 <p className="text-sm text-green-700">
                   {customItems.length > 0 && regularItems.length > 0
-                    ? "Mixed order with custom designs and regular shoes"
+                    ? `Mixed order: $${subtotal} + $${shippingCost} shipping`
                     : customItems.length > 0
-                      ? "Custom design with shipping included"
-                      : "Regular order with shipping included"}
+                      ? `Custom design: $${subtotal} + $${shippingCost} shipping`
+                      : isBayAreaResident
+                        ? "Bay Area resident - free shipping!"
+                        : `Regular order: $${subtotal} + $${shippingCost} shipping`}
                 </p>
               </div>
 
@@ -465,6 +530,19 @@ export default function PaymentPage() {
                     className="bg-neutral-800 border-neutral-700 text-white"
                     placeholder="Full shipping address"
                   />
+                </div>
+
+                {/* Bay Area Resident Checkbox */}
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="bayAreaResident"
+                    checked={isBayAreaResident}
+                    onCheckedChange={(checked) => setIsBayAreaResident(checked as boolean)}
+                    className="border-neutral-600 data-[state=checked]:bg-white data-[state=checked]:text-black"
+                  />
+                  <Label htmlFor="bayAreaResident" className="text-white text-sm">
+                    I am a Bay Area resident (free shipping)
+                  </Label>
                 </div>
 
                 {/* Payment Proof Section */}
