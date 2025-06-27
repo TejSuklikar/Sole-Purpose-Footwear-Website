@@ -1,22 +1,6 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Inter, Playfair_Display } from "next/font/google"
-import "./globals.css"
-import Header from "@/components/header"
-import { Footer } from "@/components/footer"
-import { CartProvider } from "@/components/cart-provider"
-import { ScrollToTop } from "@/components/scroll-to-top"
-import { Toaster } from "@/components/ui/toaster"
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-})
-
-const playfair = Playfair_Display({
-  subsets: ["latin"],
-  variable: "--font-playfair",
-})
+import ClientRootLayout from "./client-layout"
 
 export const metadata: Metadata = {
   title: "Sole Purpose Footwear - Custom Sneakers & Cultural Designs",
@@ -82,19 +66,8 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  return (
-    <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
-      <body className="bg-black text-white font-sans antialiased">
-        <CartProvider>
-          <div className="min-h-screen bg-black">
-            <Header />
-            <main className="bg-black">{children}</main>
-            <Footer />
-            <ScrollToTop />
-            <Toaster />
-          </div>
-        </CartProvider>
-      </body>
-    </html>
-  )
+  return <ClientRootLayout>{children}</ClientRootLayout>
 }
+
+
+import './globals.css'
