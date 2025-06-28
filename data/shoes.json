@@ -3,9 +3,21 @@
     "id": 1,
     "name": "Red Kuffiyeh AF1",
     "price": 160,
-    "images": ["/images/kuffiyeh-side-sunset.png"],
-    "description": "A vibrant red kuffiyeh design.",
-    "details": ["Sticker price: $160"],
+    "images": [
+      "/images/kuffiyeh-side-sunset.png",
+      "/images/kuffiyeh-af1.png",
+      "/images/kuffiyeh-heel-sunset.png",
+      "/images/kuffiyeh-heel-view.png",
+      "/images/kuffiyeh-side-detail.png",
+      "/images/kuffiyeh-sunset.png"
+    ],
+    "description": "Traditional Kuffiyeh patterns hand-painted in bold red on premium white canvas.",
+    "details": [
+      "Hand-painted with premium acrylic paints",
+      "Sealed with protective coating",
+      "Based on Nike Air Force 1",
+      "Infant (1C-7.5C): $135 total | Toddler (8C-13.5C): $145 total | Youth: $145 total | Big Kids: $145-175 total | Adults: $230 total"
+    ],
     "availableSizes": [
       "7",
       "7.5",
@@ -88,9 +100,22 @@
     "id": 2,
     "name": "Mexican Eagle AF1",
     "price": 160,
-    "images": ["/images/mexican-side-view.png"],
-    "description": "A design featuring the Mexican eagle.",
-    "details": ["Sticker price: $160"],
+    "images": [
+      "/images/mexican-side-view.png",
+      "/images/mexican-af1.png",
+      "/images/mexican-full-shoe.png",
+      "/images/mexican-eagle-detail.png",
+      "/images/mexican-eagle-hero.png",
+      "/images/mexican-box-angle.png",
+      "/images/mexican-box-top.png"
+    ],
+    "description": "Detailed Mexican flag design featuring the iconic eagle and serpent coat of arms.",
+    "details": [
+      "Hand-painted Mexican coat of arms",
+      "Mexican flag colors on swoosh",
+      "Premium white leather base",
+      "Infant (1C-7.5C): $135 total | Toddler (8C-13.5C): $145 total | Youth: $145 total | Big Kids: $145-175 total | Adults: $230 total"
+    ],
     "availableSizes": [
       "7",
       "7.5",
@@ -173,9 +198,14 @@
     "id": 3,
     "name": "Black & Red Kuffiyeh",
     "price": 160,
-    "images": ["/images/black-red-geometric-hero.jpg"],
-    "description": "A striking black and red geometric design.",
-    "details": ["Sticker price: $160"],
+    "images": ["/images/black-red-geometric-hero.jpg", "/images/black-red-af1.png", "/images/geometric-af1.png"],
+    "description": "Sleek black forces with striking red Kuffiyeh patterns.",
+    "details": [
+      "All-black leather base",
+      "Hand-painted red Kuffiyeh patterns",
+      "Matte finish",
+      "Infant (1C-7.5C): $135 total | Toddler (8C-13.5C): $145 total | Youth: $145 total | Big Kids: $145-175 total | Adults: $230 total"
+    ],
     "availableSizes": [
       "7",
       "7.5",
@@ -258,9 +288,19 @@
     "id": 4,
     "name": "Jordanian Flag AF1",
     "price": 160,
-    "images": ["/images/jordanian-side-view.jpg"],
-    "description": "A design featuring the Jordanian flag.",
-    "details": ["Sticker price: $160"],
+    "images": [
+      "/images/jordanian-side-view.jpg",
+      "/images/jordanian-heel-view.jpg",
+      "/images/jordanian-af1.png",
+      "/images/jordanian-detail.png"
+    ],
+    "description": "Jordanian flag design with traditional colors and patterns.",
+    "details": [
+      "Hand-painted Jordanian flag design",
+      "Traditional red, black, white, and green colors",
+      "Kuffiyeh pattern details",
+      "Infant (1C-7.5C): $135 total | Toddler (8C-13.5C): $145 total | Youth: $145 total | Big Kids: $145-175 total | Adults: $230 total"
+    ],
     "availableSizes": [
       "7",
       "7.5",
@@ -343,9 +383,21 @@
     "id": 5,
     "name": "Black & White Checkered",
     "price": 160,
-    "images": ["/images/geometric-checkered-side.jpg"],
-    "description": "A classic black and white checkered design.",
-    "details": ["Sticker price: $160"],
+    "images": [
+      "/images/geometric-checkered-side.jpg",
+      "/images/checkered-drip-af1.png",
+      "/images/checkered-drip-heel.png",
+      "/images/checkered-drip-pair.png",
+      "/images/checkered-drip-sunset.png",
+      "/images/checkered-sunset.png"
+    ],
+    "description": "Clean geometric checkered pattern in black and white.",
+    "details": [
+      "Hand-painted checkered pattern",
+      "Black and white minimalist design",
+      "Palestinian flag colors on branding",
+      "Infant (1C-7.5C): $135 total | Toddler (8C-13.5C): $145 total | Youth: $145 total | Big Kids: $145-175 total | Adults: $230 total"
+    ],
     "availableSizes": [
       "7",
       "7.5",
@@ -428,9 +480,19 @@
     "id": 6,
     "name": "Chinese Flag AF1",
     "price": 160,
-    "images": ["/images/chinese-side-sunset.png"],
-    "description": "A design featuring the Chinese flag.",
-    "details": ["Sticker price: $160"],
+    "images": [
+      "/images/chinese-side-sunset.png",
+      "/images/chinese-af1.png",
+      "/images/chinese-collection.png",
+      "/images/chinese-heel-view.png"
+    ],
+    "description": "Chinese flag design featuring the iconic red and gold color scheme.",
+    "details": [
+      "Hand-painted Chinese flag design",
+      "Authentic red and gold colors",
+      "Flag elements integrated into swoosh",
+      "Infant (1C-7.5C): $135 total | Toddler (8C-13.5C): $145 total | Youth: $145 total | Big Kids: $145-175 total | Adults: $230 total"
+    ],
     "availableSizes": [
       "7",
       "7.5",
@@ -513,9 +575,19 @@
     "id": 7,
     "name": "Checkered Drip AF1",
     "price": 160,
-    "images": ["/images/checkered-drip-sunset.png"],
-    "description": "A checkered drip design.",
-    "details": ["Sticker price: $160"],
+    "images": [
+      "/images/checkered-drip-sunset.png",
+      "/images/checkered-drip-af1.png",
+      "/images/checkered-drip-heel.png",
+      "/images/checkered-drip-pair.png"
+    ],
+    "description": "Bold checkered pattern with artistic paint drip design.",
+    "details": [
+      "Hand-painted checkered swoosh",
+      "Artistic paint drip effect",
+      "Street art aesthetic",
+      "Infant (1C-7.5C): $135 total | Toddler (8C-13.5C): $145 total | Youth: $145 total | Big Kids: $145-175 total | Adults: $230 total"
+    ],
     "availableSizes": [
       "7",
       "7.5",
@@ -598,9 +670,14 @@
     "id": 8,
     "name": "Map of Palestine AF1",
     "price": 160,
-    "images": ["/images/palestine-map-side.jpg"],
-    "description": "A design featuring the map of Palestine.",
-    "details": ["Sticker price: $160"],
+    "images": ["/images/palestine-map-side.jpg", "/images/palestine-map-angle.jpg"],
+    "description": "Hand-painted map of Palestine in traditional flag colors.",
+    "details": [
+      "Hand-painted map of Palestine",
+      "Traditional Kuffiyeh geometric patterns",
+      "Palestinian flag colors throughout",
+      "Infant (1C-7.5C): $135 total | Toddler (8C-13.5C): $145 total | Youth: $145 total | Big Kids: $145-175 total | Adults: $230 total"
+    ],
     "availableSizes": [
       "7",
       "7.5",
@@ -683,9 +760,14 @@
     "id": 9,
     "name": "Lebanese Cedar AF1",
     "price": 160,
-    "images": ["/images/lebanese-side-view.jpg"],
-    "description": "A design featuring the Lebanese cedar.",
-    "details": ["Sticker price: $160"],
+    "images": ["/images/lebanese-side-view.jpg", "/images/lebanese-heel-view.jpg"],
+    "description": "Lebanese flag design featuring the iconic cedar tree symbol.",
+    "details": [
+      "Hand-painted Lebanese cedar tree",
+      "Traditional red and white flag stripes",
+      "Lebanese flag colors on branding",
+      "Infant (1C-7.5C): $135 total | Toddler (8C-13.5C): $145-175 total | Youth: $145 total | Big Kids: $145-175 total | Adults: $230 total"
+    ],
     "availableSizes": [
       "7",
       "7.5",
@@ -768,9 +850,14 @@
     "id": 10,
     "name": "Filipino Sun AF1",
     "price": 160,
-    "images": ["/images/filipino-side-view.jpg"],
-    "description": "A design featuring the Filipino sun.",
-    "details": ["Sticker price: $160"],
+    "images": ["/images/filipino-side-view.jpg", "/images/filipino-heel-view.jpg"],
+    "description": "Filipino flag design featuring the golden sun symbol.",
+    "details": [
+      "Hand-painted Filipino golden sun",
+      "Authentic blue, red, and yellow colors",
+      "Traditional eight-rayed sun design",
+      "Infant (1C-7.5C): $135 total | Toddler (8C-13.5C): $145 total | Youth: $145 total | Big Kids: $145-175 total | Adults: $230 total"
+    ],
     "availableSizes": [
       "7",
       "7.5",
@@ -855,7 +942,13 @@
     "price": 160,
     "images": ["/images/kuffiyeh-dunk-single.jpeg", "/images/kuffiyeh-dunk-pair.jpeg"],
     "description": "Traditional Kuffiyeh patterns on black Nike Dunks.",
-    "details": ["Sticker price: $160"],
+    "details": [
+      "Hand-painted with premium acrylic paints",
+      "Traditional Palestinian Kuffiyeh patterns",
+      "Black leather base with white accents",
+      "Based on Nike Dunk silhouette",
+      "Infant (1C-7.5C): $135 total | Toddler (8C-13.5C): $145 total | Youth: $145 total | Big Kids: $145-175 total | Adults: $230 total"
+    ],
     "availableSizes": [
       "7",
       "7.5",
@@ -945,7 +1038,7 @@
       "Traditional Kuffiyeh geometric patterns",
       "Premium white leather base",
       "Palestinian flag colors on Nike AIR branding",
-      "Sticker price: $160"
+      "Infant (1C-7.5C): $135 total | Toddler (8C-13.5C): $145 total | Youth: $145 total | Big Kids: $145-175 total | Adults: $230 total"
     ],
     "availableSizes": [
       "7",
@@ -1023,6 +1116,6 @@
       "8Y"
     ],
     "slug": "palestine-heel-kuffiyeh-af1",
-    "isFeatured": true
+    "isFeatured": false
   }
 ]

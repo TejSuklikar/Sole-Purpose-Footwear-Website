@@ -250,6 +250,22 @@ const shoes = [
       "Based on Nike Dunk silhouette",
     ],
   },
+  {
+    id: 12,
+    name: "Palestine Heel Kuffiyeh AF1",
+    price: 160,
+    images: ["/images/palestine-heel-af1-side.jpeg", "/images/palestine-heel-af1-back.jpeg"],
+    slug: "palestine-heel-kuffiyeh-af1",
+    sizes: allSizes,
+    description:
+      "White Nike Air Force 1 with Palestinian flag design on heel and traditional Kuffiyeh patterns. A powerful statement piece that honors Palestinian heritage and identity through detailed flag artistry and geometric patterns.",
+    details: [
+      "Hand-painted Palestinian flag on heel",
+      "Traditional Kuffiyeh geometric patterns",
+      "Premium white leather base",
+      "Palestinian flag colors on Nike AIR branding",
+    ],
+  },
 ]
 
 export function generateStaticParams() {
