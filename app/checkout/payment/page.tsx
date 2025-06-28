@@ -361,6 +361,10 @@ export default function PaymentPage() {
                 <h4 className="text-white font-medium mb-2">Questions?</h4>
                 <div className="space-y-1 text-sm">
                   <div className="flex items-center space-x-2">
+                    <Phone className="h-4 w-4 text-neutral-400" />
+                    <span className="text-neutral-300">(415) 939-8270</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
                     <Mail className="h-4 w-4 text-neutral-400" />
                     <span className="text-neutral-300">solepurposefootwear813@gmail.com</span>
                   </div>

@@ -13,9 +13,7 @@ export default function AboutPage() {
         <div className="text-center mb-16">
           <h1 className="font-playfair text-4xl md:text-5xl font-bold text-white mb-6">Our Story</h1>
           <p className="text-xl text-neutral-300 leading-relaxed">
-            At SolePurpose, we believe your shoes should speak louder than words. We create custom kicks that are all
-            about you, your culture, your vision, your vibe. Every pair is built with purpose, mixing bold design, real
-            comfort, and quality that holds up.
+            At SolePurpose, we believe what you wear should speak louder than words. What started as one hand-painted gift for a friend turned into a movement—rooted in culture, not in capital. We specialize in custom footwear that's all about you—your culture, your passion, your story. Each design is made with care, turning where you come from into something you can step into.
           </p>
           <p className="text-xl text-neutral-300 leading-relaxed mt-4">
             We represent all cultures and walks of life. Want your flag on the toe box? A personal quote? Something the
