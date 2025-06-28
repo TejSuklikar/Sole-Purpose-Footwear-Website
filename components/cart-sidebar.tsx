@@ -25,20 +25,50 @@ export function CartSidebar() {
   }
 
   const handleProceedToPayment = () => {
-    // Create order data with mixed items
+    // Create order data with all cart items
     const orderData = {
-      items: items,
-      total: total,
+      items: items.map(item => ({
+        ...item,
+        // Ensure all necessary fields are included
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        size: item.size,
+        quantity: item.quantity,
+        image: item.image,
+        type: item.type || "regular",
+        customDetails: item.customDetails || undefined
+      })),
+      total: total, // This is the subtotal from cart
       timestamp: new Date().toISOString(),
-      orderId: `SP-MIXED-${Date.now()}`,
+      orderId: `SP-ORDER-${Date.now()}`,
       hasCustomItems: items.some((item) => item.type === "custom"),
       hasRegularItems: items.some((item) => item.type !== "custom"),
     }
 
-    // Store in localStorage for checkout
-    localStorage.setItem("pendingOrder", JSON.stringify(orderData))
+    console.log("Creating pending order:", orderData) // Debug log
 
-    // Redirect to payment
+    // Store in localStorage for checkout
+    try {
+      localStorage.setItem("pendingOrder", JSON.stringify(orderData))
+      console.log("Pending order saved to localStorage") // Debug log
+      
+      // Verify it was saved
+      const saved = localStorage.getItem("pendingOrder")
+      if (saved) {
+        console.log("Verified pending order exists:", JSON.parse(saved))
+      } else {
+        console.error("Failed to save pending order to localStorage")
+        alert("Error creating order. Please try again.")
+        return
+      }
+    } catch (error) {
+      console.error("Error saving to localStorage:", error)
+      alert("Error creating order. Please try again.")
+      return
+    }
+
+    // Navigate to payment
     window.location.href = "/checkout/payment"
   }
 
@@ -127,7 +157,7 @@ export function CartSidebar() {
                       <p className="text-sm font-medium text-blue-900">${item.price}</p>
                       {item.customDetails && (
                         <p className="text-xs text-blue-600 mt-1">
-                          {item.customDetails.designDescription.substring(0, 40)}...
+                          {item.customDetails.designDescription?.substring(0, 40) || "Custom design request"}...
                         </p>
                       )}
                     </div>
