@@ -1,4 +1,5 @@
-"use client"
+```typescriptreact file="components/shoes-grid.tsx"
+[v0-no-op-code-block-prefix]"use client"
 
 import { useEffect, useState } from "react"
 import Image from "next/image"
@@ -236,15 +237,15 @@ const defaultShoes: Shoe[] = [
   },
   {
     id: 11,
-    name: "Palestine AF1",
+    name: "Kuffiyeh Dunks",
     price: 160,
-    image: "/images/palestine-af1-side-v3.jpeg",
-    images: ["/images/palestine-af1-side-v3.jpeg", "/images/palestine-af1-pair-v3.jpeg"],
-    slug: "palestine-af1",
+    image: "/images/kuffiyeh-dunk-single.jpeg",
+    images: ["/images/kuffiyeh-dunk-single.jpeg", "/images/kuffiyeh-dunk-pair.jpeg"],
+    slug: "kuffiyeh-dunks",
     sizes: allSizes,
     inStockSizes: allSizes,
-    description: "White Nike Air Force 1s featuring a Palestinian flag and kuffiyeh design on the swoosh.",
-    details: ["Hand-painted with premium acrylic paints", "Based on Nike Air Force 1 silhouette"],
+    description: "Traditional Kuffiyeh patterns on black Nike Dunks.",
+    details: ["Sticker price: $160"],
     isFeatured: false,
   },
   {
@@ -297,6 +298,19 @@ const defaultShoes: Shoe[] = [
     sizes: allSizes,
     inStockSizes: allSizes,
     description: "Classic white Nike Air Force 1s featuring a traditional black kuffiyeh pattern.",
+    details: ["Sticker price: $160"],
+    isFeatured: false,
+  },
+  {
+    id: 16,
+    name: "Palestine AF1",
+    price: 160,
+    image: "/images/palestine-af1-side.jpeg",
+    images: ["/images/palestine-af1-side.jpeg", "/images/palestine-af1-pair.jpeg"],
+    slug: "palestine-af1",
+    sizes: allSizes,
+    inStockSizes: allSizes,
+    description: "White Nike Air Force 1s featuring a Palestinian flag and kuffiyeh design.",
     details: ["Sticker price: $160"],
     isFeatured: false,
   },
