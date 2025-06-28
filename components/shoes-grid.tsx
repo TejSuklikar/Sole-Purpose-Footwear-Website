@@ -5,6 +5,9 @@ import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
+//
+// ─── TYPES ──────────────────────────────────────────────────────────────────────
+//
 interface Shoe {
   id: number
   name: string
@@ -19,9 +22,24 @@ interface Shoe {
   isFeatured: boolean
 }
 
-// CORRECTED sizing system - exactly 73 sizes INCLUDING 7.5C
-const allSizes = [
-  // Men's sizes (17 sizes: 7-15, including half sizes)
+type Filters = {
+  priceRange: [number, number]
+  sizes: string[]
+  featured: boolean | null
+}
+
+//
+// ─── CONSTANTS ─────────────────────────────────────────────────────────────────
+//
+const DEFAULT_FILTERS: Filters = {
+  priceRange: [0, Number.POSITIVE_INFINITY],
+  sizes: [],
+  featured: null,
+}
+
+// master size list (re-used for every shoe)
+const allSizes: string[] = [
+  // Men
   "7",
   "7.5",
   "8",
@@ -39,7 +57,7 @@ const allSizes = [
   "14",
   "14.5",
   "15",
-  // Women's sizes (15 sizes: 5W-12W, including half sizes)
+  // Women
   "5W",
   "5.5W",
   "6W",
@@ -55,7 +73,7 @@ const allSizes = [
   "11W",
   "11.5W",
   "12W",
-  // Infant sizes (14 sizes: 1C-7.5C, including half sizes) - INCLUDES 7.5C
+  // Infant 1C-7.5C
   "1C",
   "1.5C",
   "2C",
@@ -70,7 +88,7 @@ const allSizes = [
   "6.5C",
   "7C",
   "7.5C",
-  // Toddler sizes (12 sizes: 8C-13.5C, including half sizes)
+  // Toddler 8C-13.5C
   "8C",
   "8.5C",
   "9C",
@@ -83,7 +101,7 @@ const allSizes = [
   "12.5C",
   "13C",
   "13.5C",
-  // Youth (10 sizes: 1Y-5.5Y, including half sizes)
+  // Youth 1Y-5.5Y
   "1Y",
   "1.5Y",
   "2Y",
@@ -94,7 +112,7 @@ const allSizes = [
   "4.5Y",
   "5Y",
   "5.5Y",
-  // Big Kids (5 sizes: 6Y-8Y, including 8Y to get exactly 73 total)
+  // Big kids 6Y-8Y
   "6Y",
   "6.5Y",
   "7Y",
@@ -102,7 +120,7 @@ const allSizes = [
   "8Y",
 ]
 
-// Default shoes data with $160 sticker price
+// 12 shoes including the new Palestine Heel Kuffiyeh AF1
 const defaultShoes: Shoe[] = [
   {
     id: 1,
@@ -154,7 +172,7 @@ const defaultShoes: Shoe[] = [
     inStockSizes: allSizes,
     description: "A design featuring the Jordanian flag.",
     details: ["Sticker price: $160"],
-    isFeatured: true,
+    isFeatured: false,
   },
   {
     id: 5,
@@ -167,7 +185,7 @@ const defaultShoes: Shoe[] = [
     inStockSizes: allSizes,
     description: "A classic black and white checkered design.",
     details: ["Sticker price: $160"],
-    isFeatured: true,
+    isFeatured: false,
   },
   {
     id: 6,
@@ -180,7 +198,7 @@ const defaultShoes: Shoe[] = [
     inStockSizes: allSizes,
     description: "A design featuring the Chinese flag.",
     details: ["Sticker price: $160"],
-    isFeatured: true,
+    isFeatured: false,
   },
   {
     id: 7,
@@ -193,7 +211,7 @@ const defaultShoes: Shoe[] = [
     inStockSizes: allSizes,
     description: "A checkered drip design.",
     details: ["Sticker price: $160"],
-    isFeatured: true,
+    isFeatured: false,
   },
   {
     id: 8,
@@ -206,7 +224,7 @@ const defaultShoes: Shoe[] = [
     inStockSizes: allSizes,
     description: "A design featuring the map of Palestine.",
     details: ["Sticker price: $160"],
-    isFeatured: true,
+    isFeatured: false,
   },
   {
     id: 9,
@@ -219,7 +237,7 @@ const defaultShoes: Shoe[] = [
     inStockSizes: allSizes,
     description: "A design featuring the Lebanese cedar.",
     details: ["Sticker price: $160"],
-    isFeatured: true,
+    isFeatured: false,
   },
   {
     id: 10,
@@ -232,126 +250,133 @@ const defaultShoes: Shoe[] = [
     inStockSizes: allSizes,
     description: "A design featuring the Filipino sun.",
     details: ["Sticker price: $160"],
+    isFeatured: false,
+  },
+  {
+    id: 11,
+    name: "Kuffiyeh Dunks",
+    price: 160,
+    image: "/images/kuffiyeh-dunk-single.jpeg",
+    images: ["/images/kuffiyeh-dunk-single.jpeg", "/images/kuffiyeh-dunk-pair.jpeg"],
+    slug: "kuffiyeh-dunks",
+    sizes: allSizes,
+    inStockSizes: allSizes,
+    description: "Traditional Kuffiyeh patterns on black Nike Dunks.",
+    details: ["Sticker price: $160"],
+    isFeatured: false,
+  },
+  {
+    id: 12,
+    name: "Palestine Heel Kuffiyeh AF1",
+    price: 160,
+    image: "/images/palestine-heel-af1-side.jpeg",
+    images: ["/images/palestine-heel-af1-side.jpeg", "/images/palestine-heel-af1-back.jpeg"],
+    slug: "palestine-heel-kuffiyeh-af1",
+    sizes: allSizes,
+    inStockSizes: allSizes,
+    description: "White Nike Air Force 1 with Palestinian flag heel design and traditional Kuffiyeh pattern.",
+    details: [
+      "Hand-painted Palestinian flag on heel",
+      "Traditional Kuffiyeh geometric strip",
+      "Palestinian colors on Nike AIR branding",
+      "Sticker price: $160",
+    ],
     isFeatured: true,
   },
 ]
 
-export function ShoesGrid() {
+//
+// ─── COMPONENT ──────────────────────────────────────────────────────────────────
+//
+export function ShoesGrid({ filters }: { filters?: Partial<Filters> }) {
   const [shoes, setShoes] = useState<Shoe[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const [loading, setLoading] = useState(true)
 
-  // Load shoes data
+  // merge provided filters with defaults
+  const mergedFilters: Filters = { ...DEFAULT_FILTERS, ...filters }
+
   useEffect(() => {
     const loadShoes = async () => {
       try {
-        console.log("🔄 Loading shoes data...")
-
-        // Try to fetch from live data
-        const response = await fetch("/data/shoes.json")
-
-        if (response.ok) {
-          const liveShoes = await response.json()
-          if (Array.isArray(liveShoes) && liveShoes.length > 0) {
-            console.log("✅ Loaded live shoes data:", liveShoes.length, "shoes")
-
-            // Update shoes with live data
-            const updatedShoes = liveShoes.map((shoe: Shoe) => ({
-              ...shoe,
-              sizes: shoe.sizes || allSizes,
-              inStockSizes: shoe.inStockSizes || allSizes,
-            }))
-
-            setShoes(updatedShoes)
-            setIsLoading(false)
-            return
-          }
-        } else {
-          console.log("❌ Failed to fetch live shoes data:", response.status, response.statusText)
+        const res = await fetch("/data/shoes.json")
+        if (res.ok) {
+          const liveShoes: Shoe[] = await res.json()
+          setShoes(liveShoes.length ? liveShoes : defaultShoes)
         }
-      } catch (error) {
-        console.log("⚠️ Live shoes data not available:", error)
+      } catch {
+        setShoes(defaultShoes)
+      } finally {
+        setLoading(false)
       }
-
-      // Fallback to default shoes
-      console.log("🔄 Using default shoes data")
-      setShoes(defaultShoes)
-      setIsLoading(false)
     }
-
     loadShoes()
   }, [])
 
-  if (isLoading) {
+  const filtered = shoes.filter((shoe) => {
+    // price
+    if (shoe.price < mergedFilters.priceRange[0] || shoe.price > mergedFilters.priceRange[1]) return false
+    // sizes
+    if (mergedFilters.sizes.length) {
+      const match = mergedFilters.sizes.some((sz) => shoe.inStockSizes.includes(sz))
+      if (!match) return false
+    }
+    // featured
+    if (mergedFilters.featured !== null) {
+      if (mergedFilters.featured && !shoe.isFeatured) return false
+      if (!mergedFilters.featured && shoe.isFeatured) return false
+    }
+    return true
+  })
+
+  if (loading) {
     return (
-      <div className="text-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-4"></div>
-        <p className="text-white">Loading shoes...</p>
+      <div className="py-12 text-center">
+        <div className="h-8 w-8 mx-auto mb-4 border-b-2 border-white rounded-full animate-spin" />
+        <p className="text-white">Loading shoes…</p>
       </div>
     )
   }
 
-  if (shoes.length === 0) {
+  if (!filtered.length) {
     return (
-      <div className="text-center py-12">
-        <p className="text-white text-lg mb-4">No shoes available at the moment.</p>
-        <p className="text-neutral-400">Check back later for new designs!</p>
-        <Button
-          onClick={() => {
-            window.location.reload()
-          }}
-          className="mt-4 bg-white text-black"
-        >
-          Refresh Data
-        </Button>
+      <div className="py-12 text-center">
+        <p className="text-white mb-2">No shoes match your filters.</p>
+        <Button onClick={() => window.location.reload()}>Reset filters</Button>
       </div>
     )
   }
 
   return (
-    <div>
-      <div className="mb-6 flex justify-between items-center">
-        <p className="text-neutral-400 text-sm">Showing {shoes.length} custom designs</p>
-        <Button
-          onClick={() => {
-            window.location.reload()
-          }}
-          variant="outline"
-          size="sm"
-          className="text-xs"
-        >
-          Refresh
-        </Button>
-      </div>
+    <>
+      <div className="mb-6 text-center text-neutral-400">Showing {filtered.length} custom designs</div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {shoes.map((shoe) => (
-          <div key={shoe.id}>
-            <Link href={`/shoes/${shoe.slug}`}>
-              <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-                <div className="aspect-[4/3] relative">
-                  <Image
-                    src={shoe.image || "/placeholder.svg?height=400&width=400&text=Shoe+Image"}
-                    alt={shoe.name}
-                    fill
-                    className="object-cover object-center"
-                    crossOrigin="anonymous"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement
-                      target.src = "/placeholder.svg?height=400&width=400&text=Shoe+Image"
-                    }}
-                  />
-                </div>
-                <div className="p-6">
-                  <h3 className="font-semibold text-lg mb-2 text-neutral-900">{shoe.name}</h3>
-                  <p className="text-2xl font-bold text-neutral-900 mb-2">${shoe.price}</p>
-                  <p className="text-sm text-neutral-600 mb-4">Available in {shoe.inStockSizes.length} sizes</p>
-                  <Button className="w-full bg-neutral-700 text-white">View Details</Button>
-                </div>
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+        {filtered.map((shoe) => (
+          <Link key={shoe.id} href={`/shoes/${shoe.slug}`}>
+            <div className="overflow-hidden rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow">
+              <div className="relative aspect-[4/3]">
+                <Image
+                  src={shoe.image || "/placeholder.svg"}
+                  alt={shoe.name}
+                  fill
+                  className="object-cover"
+                  crossOrigin="anonymous"
+                  onError={(e) => {
+                    const tgt = e.target as HTMLImageElement
+                    tgt.src = "/placeholder.svg?height=400&width=400"
+                  }}
+                />
               </div>
-            </Link>
-          </div>
+              <div className="p-6">
+                <h3 className="mb-2 text-lg font-semibold text-neutral-900">{shoe.name}</h3>
+                <p className="mb-1 text-2xl font-bold text-neutral-900">${shoe.price}</p>
+                <p className="mb-4 text-sm text-neutral-600">Available in {shoe.inStockSizes.length} sizes</p>
+                <Button className="w-full bg-neutral-700 text-white">View Details</Button>
+              </div>
+            </div>
+          </Link>
         ))}
       </div>
-    </div>
+    </>
   )
 }

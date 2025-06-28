@@ -234,6 +234,22 @@ const shoes = [
       "Traditional eight-rayed sun design",
     ],
   },
+  {
+    id: 11,
+    name: "Kuffiyeh Dunks",
+    price: 160,
+    images: ["/images/kuffiyeh-dunk-single.jpeg", "/images/kuffiyeh-dunk-pair.jpeg"],
+    slug: "kuffiyeh-dunks",
+    sizes: allSizes,
+    description:
+      "Traditional Kuffiyeh patterns hand-painted on black Nike Dunks with white geometric details. A modern take on the classic Palestinian pattern, featuring intricate checkered designs that celebrate cultural heritage with contemporary street style.",
+    details: [
+      "Hand-painted with premium acrylic paints",
+      "Traditional Palestinian Kuffiyeh patterns",
+      "Black leather base with white accents",
+      "Based on Nike Dunk silhouette",
+    ],
+  },
 ]
 
 export function generateStaticParams() {
