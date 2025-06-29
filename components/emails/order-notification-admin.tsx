@@ -1,13 +1,18 @@
-import { Html, Head, Body, Container, Section, Text, Heading, Hr } from "@react-email/components"
+import {
+  Body,
+  Container,
+  Head,
+  Heading,
+  Hr,
+  Html,
+  Img,
+  Preview,
+  Section,
+  Text,
+  Row,
+  Column,
+} from "@react-email/components"
 import type { CartItem } from "@/components/cart-provider"
-
-interface ShippingAddress {
-  street: string
-  city: string
-  state: string
-  zip: string
-  country?: string
-}
 
 interface OrderNotificationAdminProps {
   customerEmail: string
@@ -16,8 +21,15 @@ interface OrderNotificationAdminProps {
   shippingCost: number
   total: number
   isBayArea: boolean
-  shippingAddress: ShippingAddress
+  shippingAddress: {
+    street: string
+    city: string
+    state: string
+    zip: string
+  }
 }
+
+const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000"
 
 export default function OrderNotificationAdmin({
   customerEmail,
@@ -31,192 +43,99 @@ export default function OrderNotificationAdmin({
   return (
     <Html>
       <Head />
+      <Preview>New Order Received!</Preview>
       <Body style={main}>
         <Container style={container}>
-          <Heading style={h1}>🎨 New Order Received!</Heading>
+          <Section style={logoContainer}>
+            <Img src={`${baseUrl}/favicon.png`} width="40" height="40" alt="Sole Purpose Logo" />
+          </Section>
+          <Heading style={h1}>You've Got a New Order!</Heading>
+          <Text style={text}>Payment proof is attached to this email.</Text>
 
-          <Section style={customer_section}>
-            <Text style={customer_info}>
-              <strong>Customer Email:</strong> {customerEmail}
+          <Section style={box}>
+            <Heading as="h2" style={h2}>
+              Customer Details
+            </Heading>
+            <Text style={detailText}>
+              <strong>Email:</strong> {customerEmail}
             </Text>
-            <Text style={customer_info}>
-              <strong>Order Total:</strong> ${total.toFixed(2)}
-            </Text>
-            <Text style={customer_info}>
-              <strong>Bay Area Customer:</strong> {isBayArea ? "Yes (FREE delivery)" : "No"}
+            <Text style={detailText}>
+              <strong>Bay Area Order:</strong> {isBayArea ? "Yes" : "No"}
             </Text>
           </Section>
 
-          <Section style={section}>
-            <Heading style={h2}>Order Details</Heading>
-            {cartItems.map((item, index) => (
-              <div key={index} style={item_container}>
-                <Text style={item_name}>{item.name}</Text>
-                <Text style={item_details}>
-                  Size: {item.size} | Quantity: {item.quantity} | Price: ${item.price.toFixed(2)}
-                </Text>
-                {item.type === "custom" && item.customDetails && (
-                  <div style={custom_details}>
-                    <Text style={custom_text}>🎨 Custom Design Details:</Text>
-                    {item.customDetails.designDescription && (
-                      <Text style={custom_text}>Description: {item.customDetails.designDescription}</Text>
-                    )}
-                    {item.customDetails.additionalNotes && (
-                      <Text style={custom_text}>Notes: {item.customDetails.additionalNotes}</Text>
-                    )}
-                  </div>
-                )}
-              </div>
-            ))}
-
-            <Hr style={hr} />
-
-            <Text style={total_line}>Subtotal: ${subtotal.toFixed(2)}</Text>
-            <Text style={total_line}>Shipping: {isBayArea ? "FREE (Bay Area)" : `$${shippingCost.toFixed(2)}`}</Text>
-            <Text style={total_final}>Total Paid: ${total.toFixed(2)}</Text>
-          </Section>
-
-          <Section style={section}>
-            <Heading style={h2}>📦 Shipping Information</Heading>
-            <Text style={address}>
-              <strong>Ship to:</strong>
-              <br />
+          <Section style={box}>
+            <Heading as="h2" style={h2}>
+              Shipping Address
+            </Heading>
+            <Text style={addressText}>
               {shippingAddress.street}
               <br />
               {shippingAddress.city}, {shippingAddress.state} {shippingAddress.zip}
             </Text>
           </Section>
 
-          <Section style={section}>
-            <Heading style={h2}>📎 Payment Proof</Heading>
-            <Text style={text}>
-              Payment proof is attached to this email. Please verify payment before beginning production.
-            </Text>
+          <Section style={box}>
+            <Heading as="h2" style={h2}>
+              Order Summary
+            </Heading>
+            {cartItems.map((item) => (
+              <Row key={item.id} style={itemRow}>
+                <Column>
+                  <Text style={itemText}>
+                    {item.name} (Size: {item.size})
+                  </Text>
+                </Column>
+                <Column align="right">
+                  <Text style={itemText}>${item.price.toFixed(2)}</Text>
+                </Column>
+              </Row>
+            ))}
+            <Hr style={hr} />
+            <Row>
+              <Column>
+                <Text style={summaryText}>Subtotal</Text>
+              </Column>
+              <Column align="right">
+                <Text style={summaryText}>${subtotal.toFixed(2)}</Text>
+              </Column>
+            </Row>
+            <Row>
+              <Column>
+                <Text style={summaryText}>Shipping</Text>
+              </Column>
+              <Column align="right">
+                <Text style={summaryText}>${shippingCost.toFixed(2)}</Text>
+              </Column>
+            </Row>
+            <Hr style={hr} />
+            <Row>
+              <Column>
+                <Text style={totalText}>Total</Text>
+              </Column>
+              <Column align="right">
+                <Text style={totalText}>${total.toFixed(2)}</Text>
+              </Column>
+            </Row>
           </Section>
-
-          <Text style={footer}>Reply to this email to contact the customer directly: {customerEmail}</Text>
         </Container>
       </Body>
     </Html>
   )
 }
 
-const main = {
-  backgroundColor: "#f8f9fa",
-  fontFamily: "Arial, sans-serif",
-}
-
-const container = {
-  backgroundColor: "#ffffff",
-  margin: "0 auto",
-  padding: "20px",
-  maxWidth: "600px",
-  border: "1px solid #dddddd",
-}
-
-const h1 = {
-  color: "#333333",
-  fontSize: "24px",
-  fontWeight: "bold",
-  textAlign: "center" as const,
-  margin: "0 0 20px 0",
-}
-
-const h2 = {
-  color: "#333333",
-  fontSize: "18px",
-  fontWeight: "bold",
-  margin: "20px 0 10px 0",
-}
-
-const text = {
-  color: "#555555",
-  fontSize: "16px",
-  lineHeight: "24px",
-  margin: "0 0 15px 0",
-}
-
-const customer_section = {
-  backgroundColor: "#fff3cd",
-  padding: "15px",
-  borderRadius: "5px",
-  margin: "0 0 20px 0",
-}
-
-const customer_info = {
-  color: "#856404",
-  fontSize: "16px",
-  margin: "0 0 8px 0",
-}
-
-const section = {
-  margin: "20px 0",
-}
-
-const item_container = {
-  backgroundColor: "#f8f9fa",
-  padding: "15px",
-  borderRadius: "5px",
-  margin: "0 0 15px 0",
-}
-
-const item_name = {
-  color: "#333333",
-  fontSize: "16px",
-  fontWeight: "bold",
-  margin: "0 0 5px 0",
-}
-
-const item_details = {
-  color: "#666666",
-  fontSize: "14px",
-  margin: "0 0 10px 0",
-}
-
-const custom_details = {
-  backgroundColor: "#e7f3ff",
-  padding: "10px",
-  borderRadius: "3px",
-  margin: "10px 0 0 0",
-}
-
-const custom_text = {
-  color: "#0c5460",
-  fontSize: "14px",
-  margin: "0 0 5px 0",
-}
-
-const hr = {
-  border: "none",
-  borderTop: "2px solid #333333",
-  margin: "15px 0",
-}
-
-const total_line = {
-  color: "#555555",
-  fontSize: "16px",
-  margin: "5px 0",
-}
-
-const total_final = {
-  color: "#333333",
-  fontSize: "18px",
-  fontWeight: "bold",
-  margin: "10px 0 0 0",
-}
-
-const address = {
-  color: "#555555",
-  fontSize: "16px",
-  lineHeight: "22px",
-  margin: "0",
-}
-
-const footer = {
-  color: "#888888",
-  fontSize: "14px",
-  textAlign: "center" as const,
-  margin: "30px 0 0 0",
-  borderTop: "1px solid #eeeeee",
-  paddingTop: "20px",
-}
+// Styles
+const main = { backgroundColor: "#f0f0f0", fontFamily: "Helvetica,Arial,sans-serif" }
+const container = { padding: "40px", margin: "0 auto", width: "100%", maxWidth: "600px", backgroundColor: "#fff" }
+const logoContainer = { textAlign: "center" as const, paddingBottom: "20px" }
+const h1 = { fontSize: "28px", fontWeight: "bold", margin: "0 0 20px", color: "#000" }
+const h2 = { fontSize: "20px", fontWeight: "bold", margin: "0 0 15px", color: "#000" }
+const text = { fontSize: "16px", lineHeight: "1.5", color: "#333" }
+const box = { border: "1px solid #ddd", padding: "25px", borderRadius: "8px", marginBottom: "20px" }
+const detailText = { fontSize: "16px", margin: "5px 0", color: "#333" }
+const addressText = { fontSize: "16px", lineHeight: "1.5", color: "#333", margin: 0 }
+const itemRow = { padding: "5px 0" }
+const itemText = { fontSize: "16px", margin: 0, color: "#000" }
+const summaryText = { fontSize: "16px", margin: 0, color: "#555" }
+const totalText = { fontSize: "18px", fontWeight: "bold", margin: 0, color: "#000" }
+const hr = { borderColor: "#ccc", margin: "15px 0" }

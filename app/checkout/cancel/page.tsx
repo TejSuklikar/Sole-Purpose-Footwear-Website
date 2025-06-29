@@ -1,24 +1,29 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { X } from "lucide-react"
 
 export default function CheckoutCancelPage() {
   return (
-    <div className="min-h-screen bg-black text-white flex items-center justify-center">
-      <div className="text-center space-y-6">
-        <h1 className="text-4xl font-bold">Order Cancelled</h1>
-        <p className="text-xl text-neutral-400">Your order was cancelled. No payment was processed.</p>
-        <div className="space-x-4">
-          <Button asChild className="bg-white text-black hover:bg-neutral-200">
-            <Link href="/shoes">Continue Shopping</Link>
-          </Button>
-          <Button
-            asChild
-            variant="outline"
-            className="border-white text-white hover:bg-white hover:text-black bg-transparent"
-          >
-            <Link href="/">Go Home</Link>
-          </Button>
-        </div>
+    <div className="py-20">
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+        <Card>
+          <CardContent className="text-center py-12">
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <X className="w-8 h-8 text-red-600" />
+            </div>
+            <h1 className="font-playfair text-2xl font-bold mb-4">Payment Cancelled</h1>
+            <p className="text-neutral-600 mb-6">Your payment was cancelled. No charges were made to your account.</p>
+            <div className="space-y-4">
+              <Button asChild>
+                <Link href="/shoes">Continue Shopping</Link>
+              </Button>
+              <Button variant="outline" asChild>
+                <Link href="/order">Place Custom Order</Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )
