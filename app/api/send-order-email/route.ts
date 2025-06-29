@@ -181,7 +181,7 @@ export async function POST(request: Request) {
       const customerResult = await resend.emails.send({
         from: fromEmail,
         to: [customerEmail],
-        subject: "Your Soul Purpose Footwear Order Confirmation",
+        subject: "Your Sole Purpose Footwear Order Confirmation",
         react: OrderConfirmationCustomer({
           cartItems,
           subtotal,
