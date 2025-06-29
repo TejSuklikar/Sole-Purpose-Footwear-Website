@@ -1,18 +1,13 @@
-import {
-  Body,
-  Container,
-  Head,
-  Heading,
-  Hr,
-  Html,
-  Img,
-  Preview,
-  Section,
-  Text,
-  Row,
-  Column,
-} from "@react-email/components"
+import { Body, Container, Head, Heading, Html, Preview, Section, Text, Hr } from "@react-email/components"
 import type { CartItem } from "@/components/cart-provider"
+
+interface ShippingAddress {
+  street: string
+  city: string
+  state: string
+  zip: string
+  country?: string
+}
 
 interface OrderConfirmationCustomerProps {
   cartItems: CartItem[]
@@ -20,15 +15,8 @@ interface OrderConfirmationCustomerProps {
   shippingCost: number
   total: number
   isBayArea: boolean
-  shippingAddress: {
-    street: string
-    city: string
-    state: string
-    zip: string
-  }
+  shippingAddress: ShippingAddress
 }
-
-const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000"
 
 export default function OrderConfirmationCustomer({
   cartItems,
@@ -41,95 +29,189 @@ export default function OrderConfirmationCustomer({
   return (
     <Html>
       <Head />
-      <Preview>Your Sole Purpose Order Confirmation</Preview>
+      <Preview>Your Soul Purpose Footwear order has been received!</Preview>
       <Body style={main}>
         <Container style={container}>
-          <Section style={logoContainer}>
-            <Img src={`${baseUrl}/favicon.png`} width="40" height="40" alt="Sole Purpose Logo" />
-          </Section>
           <Heading style={h1}>Thank you for your order!</Heading>
+
           <Text style={text}>
-            We've received your order and will begin processing it shortly. You'll receive another email once your
-            customs are ready to ship.
+            We've received your order and will begin processing it shortly. You'll receive another email when your
+            custom shoes are ready for pickup/delivery.
           </Text>
-          <Section style={box}>
-            <Heading as="h2" style={h2}>
-              Order Summary
-            </Heading>
-            {cartItems.map((item) => (
-              <Row key={item.id} style={itemRow}>
-                <Column>
-                  <Text style={itemText}>
-                    {item.name} (Size: {item.size})
-                  </Text>
-                </Column>
-                <Column align="right">
-                  <Text style={itemText}>${item.price.toFixed(2)}</Text>
-                </Column>
-              </Row>
+
+          <Section style={orderSection}>
+            <Heading style={h2}>Order Summary</Heading>
+
+            {cartItems.map((item, index) => (
+              <div key={index} style={itemRow}>
+                <Text style={itemName}>{item.name}</Text>
+                <Text style={itemDetails}>
+                  Size: {item.size} | Quantity: {item.quantity}
+                </Text>
+                <Text style={itemPrice}>${item.price.toFixed(2)}</Text>
+              </div>
             ))}
+
             <Hr style={hr} />
-            <Row>
-              <Column>
-                <Text style={summaryText}>Subtotal</Text>
-              </Column>
-              <Column align="right">
-                <Text style={summaryText}>${subtotal.toFixed(2)}</Text>
-              </Column>
-            </Row>
-            <Row>
-              <Column>
-                <Text style={summaryText}>Shipping</Text>
-              </Column>
-              <Column align="right">
-                <Text style={summaryText}>{isBayArea ? "FREE" : `$${shippingCost.toFixed(2)}`}</Text>
-              </Column>
-            </Row>
-            <Hr style={hr} />
-            <Row>
-              <Column>
-                <Text style={totalText}>Total</Text>
-              </Column>
-              <Column align="right">
-                <Text style={totalText}>${total.toFixed(2)}</Text>
-              </Column>
-            </Row>
+
+            <div style={totalRow}>
+              <Text style={totalLabel}>Subtotal:</Text>
+              <Text style={totalValue}>${subtotal.toFixed(2)}</Text>
+            </div>
+
+            <div style={totalRow}>
+              <Text style={totalLabel}>Shipping:</Text>
+              <Text style={totalValue}>{isBayArea ? "FREE (Bay Area Pickup)" : `$${shippingCost.toFixed(2)}`}</Text>
+            </div>
+
+            <div style={totalRow}>
+              <Text style={totalLabelFinal}>Total:</Text>
+              <Text style={totalValueFinal}>${total.toFixed(2)}</Text>
+            </div>
           </Section>
 
-          <Section style={box}>
-            <Heading as="h2" style={h2}>
-              Shipping To
-            </Heading>
-            <Text style={addressText}>
+          <Section style={shippingSection}>
+            <Heading style={h2}>{isBayArea ? "Pickup Address" : "Shipping Address"}</Heading>
+            <Text style={address}>
               {shippingAddress.street}
               <br />
               {shippingAddress.city}, {shippingAddress.state} {shippingAddress.zip}
+              {shippingAddress.country && (
+                <>
+                  <br />
+                  {shippingAddress.country}
+                </>
+              )}
             </Text>
           </Section>
 
-          <Text style={footerText}>
-            Sole Purpose Footwear | Custom Kicks, Endless Soul
-            <br />
-            Questions? Contact us at solepurposefootwear813@gmail.com
-          </Text>
+          <Text style={footer}>Questions? Reply to this email or contact us at solepurposefootwear813@gmail.com</Text>
         </Container>
       </Body>
     </Html>
   )
 }
 
-// Styles
-const main = { backgroundColor: "#000", fontFamily: "Helvetica,Arial,sans-serif", color: "#fff" }
-const container = { padding: "40px", margin: "0 auto", width: "100%", maxWidth: "600px" }
-const logoContainer = { textAlign: "center" as const, paddingBottom: "20px" }
-const h1 = { fontSize: "28px", fontWeight: "bold", margin: "0 0 20px" }
-const h2 = { fontSize: "20px", fontWeight: "bold", margin: "0 0 15px" }
-const text = { fontSize: "16px", lineHeight: "1.5", color: "#ccc" }
-const box = { backgroundColor: "#111", padding: "25px", borderRadius: "8px", marginBottom: "20px" }
-const itemRow = { padding: "5px 0" }
-const itemText = { fontSize: "16px", margin: 0, color: "#fff" }
-const summaryText = { fontSize: "16px", margin: 0, color: "#ccc" }
-const totalText = { fontSize: "18px", fontWeight: "bold", margin: 0, color: "#fff" }
-const addressText = { fontSize: "16px", lineHeight: "1.5", color: "#ccc", margin: 0 }
-const hr = { borderColor: "#333", margin: "15px 0" }
-const footerText = { fontSize: "12px", color: "#777", textAlign: "center" as const, paddingTop: "20px" }
+const main = {
+  backgroundColor: "#f6f9fc",
+  fontFamily: '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Ubuntu,sans-serif',
+}
+
+const container = {
+  backgroundColor: "#ffffff",
+  margin: "0 auto",
+  padding: "20px 0 48px",
+  marginBottom: "64px",
+}
+
+const h1 = {
+  color: "#333",
+  fontSize: "24px",
+  fontWeight: "bold",
+  margin: "40px 0",
+  padding: "0",
+  textAlign: "center" as const,
+}
+
+const h2 = {
+  color: "#333",
+  fontSize: "18px",
+  fontWeight: "bold",
+  margin: "30px 0 15px",
+}
+
+const text = {
+  color: "#333",
+  fontSize: "16px",
+  lineHeight: "26px",
+  textAlign: "center" as const,
+  margin: "0 40px",
+}
+
+const orderSection = {
+  margin: "40px 40px",
+}
+
+const itemRow = {
+  borderBottom: "1px solid #eee",
+  padding: "15px 0",
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+}
+
+const itemName = {
+  fontSize: "16px",
+  fontWeight: "bold",
+  color: "#333",
+  margin: "0",
+}
+
+const itemDetails = {
+  fontSize: "14px",
+  color: "#666",
+  margin: "5px 0 0 0",
+}
+
+const itemPrice = {
+  fontSize: "16px",
+  fontWeight: "bold",
+  color: "#333",
+  margin: "0",
+}
+
+const hr = {
+  borderColor: "#ddd",
+  margin: "20px 0",
+}
+
+const totalRow = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  padding: "10px 0",
+}
+
+const totalLabel = {
+  fontSize: "16px",
+  color: "#333",
+  margin: "0",
+}
+
+const totalValue = {
+  fontSize: "16px",
+  color: "#333",
+  margin: "0",
+}
+
+const totalLabelFinal = {
+  fontSize: "18px",
+  fontWeight: "bold",
+  color: "#333",
+  margin: "0",
+}
+
+const totalValueFinal = {
+  fontSize: "18px",
+  fontWeight: "bold",
+  color: "#333",
+  margin: "0",
+}
+
+const shippingSection = {
+  margin: "40px 40px",
+}
+
+const address = {
+  fontSize: "16px",
+  color: "#333",
+  lineHeight: "24px",
+  margin: "0",
+}
+
+const footer = {
+  color: "#666",
+  fontSize: "14px",
+  textAlign: "center" as const,
+  margin: "40px 40px 0",
+}

@@ -9,65 +9,76 @@ const fromEmail = "orders@orders.solepurpose.shop"
 const adminEmail = "solepurposefootwear813@gmail.com"
 const MAX_FILE_SIZE_BYTES = 8 * 1024 * 1024 // 8MB
 
+interface ShippingAddress {
+  street: string
+  city: string
+  state: string
+  zip: string
+  country?: string
+}
+
 export async function POST(request: Request) {
-  if (!fromEmail || !adminEmail) {
-    console.error("Missing FROM_EMAIL or ADMIN_EMAIL environment variables.")
-    return NextResponse.json({ error: "Server configuration error. Please contact support." }, { status: 500 })
+  // Debug logging for API key
+  console.log("API Key exists:", !!process.env.RESEND_API_KEY)
+  console.log("API Key prefix:", process.env.RESEND_API_KEY?.substring(0, 3))
+
+  if (!process.env.RESEND_API_KEY) {
+    console.error("RESEND_API_KEY environment variable is not set")
+    return NextResponse.json({ error: "Server configuration error: Missing API key" }, { status: 500 })
   }
 
   try {
     const formData = await request.formData()
     const customerEmail = formData.get("customerEmail") as string
-    const cartItems = JSON.parse(formData.get("cartItems") as string) as CartItem[]
-    const subtotal = Number.parseFloat(formData.get("subtotal") as string)
-    const shippingCost = Number.parseFloat(formData.get("shippingCost") as string)
-    const total = Number.parseFloat(formData.get("total") as string)
-    const isBayArea = formData.get("isBayArea") === "true"
-    const shippingAddress = JSON.parse(formData.get("shippingAddress") as string)
+    const cartItemsString = formData.get("cartItems") as string | null
     const paymentProof = formData.get("paymentProof") as File | null
+    const subtotalString = formData.get("subtotal") as string | null
+    const shippingCostString = formData.get("shippingCost") as string | null
+    const totalString = formData.get("total") as string | null
+    const isBayAreaString = formData.get("isBayArea") as string | null
+    const shippingAddressString = formData.get("shippingAddress") as string | null
 
-    // --- Validation ---
-    if (!customerEmail || !cartItems || !shippingAddress || !paymentProof) {
+    if (
+      !customerEmail ||
+      !cartItemsString ||
+      !paymentProof ||
+      !totalString ||
+      !subtotalString ||
+      !shippingCostString ||
+      !isBayAreaString ||
+      !shippingAddressString
+    ) {
       return NextResponse.json({ error: "Missing required fields." }, { status: 400 })
     }
 
     if (paymentProof.size > MAX_FILE_SIZE_BYTES) {
-      return NextResponse.json({ error: "Payment proof file is too large." }, { status: 400 })
+      return NextResponse.json(
+        { error: `File size cannot exceed ${MAX_FILE_SIZE_BYTES / (1024 * 1024)}MB.` },
+        { status: 413 },
+      )
     }
+
+    const cartItems = JSON.parse(cartItemsString) as CartItem[]
+    const subtotal = Number.parseFloat(subtotalString)
+    const shippingCost = Number.parseFloat(shippingCostString)
+    const total = Number.parseFloat(totalString)
+    const isBayArea = isBayAreaString === "true"
+    const shippingAddress = JSON.parse(shippingAddressString) as ShippingAddress
 
     const buffer = Buffer.from(await paymentProof.arrayBuffer())
 
-    // --- Email to Admin ---
-    const adminEmailData = await resend.emails.send({
-      from: fromEmail,
-      to: adminEmail,
-      subject: `New Order Received - ${customerEmail}`,
-      react: OrderNotificationAdmin({
-        customerEmail,
-        cartItems,
-        subtotal,
-        shippingCost,
-        total,
-        isBayArea,
-        shippingAddress,
-      }),
-      attachments: [
-        {
-          filename: paymentProof.name,
-          content: buffer,
-        },
-      ],
-    })
+    const attachments = [
+      {
+        filename: paymentProof.name,
+        content: buffer,
+      },
+    ]
 
-    if (adminEmailData.error) {
-      throw new Error(`Error sending admin email: ${adminEmailData.error.message}`)
-    }
-
-    // --- Email to Customer ---
-    const customerEmailData = await resend.emails.send({
-      from: fromEmail,
-      to: customerEmail,
-      subject: "Your Sole Purpose Order Confirmation",
+    // --- Send Email to Customer ---
+    const customerEmailPromise = resend.emails.send({
+      from: `Soul Purpose Footwear <${fromEmail}>`,
+      to: [customerEmail],
+      subject: "Your Soul Purpose Footwear Order Confirmation",
       react: OrderConfirmationCustomer({
         cartItems,
         subtotal,
@@ -78,14 +89,37 @@ export async function POST(request: Request) {
       }),
     })
 
-    if (customerEmailData.error) {
-      // If this fails, we don't need to fail the whole request, but we should log it.
-      console.error(`Failed to send confirmation to ${customerEmail}: ${customerEmailData.error.message}`)
+    // --- Send Email to Admin ---
+    const adminEmailPromise = resend.emails.send({
+      from: `New Order <${fromEmail}>`,
+      to: [adminEmail],
+      subject: `New Order Received - ${customerEmail}`,
+      react: OrderNotificationAdmin({
+        customerEmail,
+        cartItems,
+        subtotal,
+        shippingCost,
+        total,
+        isBayArea,
+        shippingAddress,
+      }),
+      attachments: attachments,
+    })
+
+    const [customerResult, adminResult] = await Promise.allSettled([customerEmailPromise, adminEmailPromise])
+
+    if (adminResult.status === "rejected") {
+      console.error("CRITICAL: Failed to send order notification to admin:", adminResult.reason)
+      return NextResponse.json({ error: "Failed to process order. Please contact support." }, { status: 500 })
     }
 
-    return NextResponse.json({ success: true })
-  } catch (error: any) {
-    console.error("Error in send-order-email route:", error)
-    return NextResponse.json({ error: error.message || "An internal server error occurred." }, { status: 500 })
+    if (customerResult.status === "rejected") {
+      console.error("Failed to send email to customer:", customerResult.reason)
+    }
+
+    return NextResponse.json({ message: "Emails sent successfully!" })
+  } catch (error) {
+    console.error("Unhandled error in send-order-email route:", error)
+    return NextResponse.json({ error: "An unexpected error occurred." }, { status: 500 })
   }
 }
