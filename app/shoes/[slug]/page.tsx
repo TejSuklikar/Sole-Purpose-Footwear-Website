@@ -94,7 +94,7 @@ const shoes = [
     slug: "red-kuffiyeh-af1",
     sizes: allSizes,
     description:
-      "Traditional Kuffiyeh patterns hand-painted in bold red on premium white canvas. Each pair celebrates Jordanian heritage with intricate geometric designs that honor cultural pride and identity.",
+      "Traditional Kuffiyeh patterns hand-painted in bold red on premium white canvas. Each pair celebrates Jordanian heritage with intricate designs that honor cultural pride and identity.",
     details: [
       "Hand-painted with premium acrylic paints",
       "Sealed with protective coating for durability",

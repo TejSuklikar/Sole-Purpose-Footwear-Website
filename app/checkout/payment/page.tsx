@@ -14,6 +14,9 @@ import { CheckCircle, Phone, FileText, AlertCircle, Upload } from "lucide-react"
 import Image from "next/image"
 import { useToast } from "@/hooks/use-toast"
 
+const MAX_FILE_SIZE_MB = 8
+const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
+
 // Function to determine shipping cost based on size
 function getShippingForSize(size: string): number {
   if (size.toUpperCase().includes("C") || size.toUpperCase().includes("Y")) {
@@ -21,15 +24,6 @@ function getShippingForSize(size: string): number {
   }
   return 20
 }
-
-// Helper to read file as base64
-const toBase64 = (file: File): Promise<string> =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.readAsDataURL(file)
-    reader.onload = () => resolve(reader.result as string)
-    reader.onerror = (error) => reject(error)
-  })
 
 export default function PaymentPage() {
   const router = useRouter()
@@ -64,9 +58,13 @@ export default function PaymentPage() {
     return true
   }
 
-  const validateProof = () => {
-    if (!paymentProof) {
+  const validateProof = (file: File | null) => {
+    if (!file) {
       setProofError("Payment proof is required.")
+      return false
+    }
+    if (file.size > MAX_FILE_SIZE_BYTES) {
+      setProofError(`File is too large. Max size is ${MAX_FILE_SIZE_MB}MB.`)
       return false
     }
     setProofError("")
@@ -81,11 +79,9 @@ export default function PaymentPage() {
   }
 
   const handlePaymentProofUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (file) {
-      setPaymentProof(file)
-      setProofError("") // Clear error when file is selected
-    }
+    const file = event.target.files?.[0] || null
+    setPaymentProof(file)
+    validateProof(file)
   }
 
   const shippingCost = isBayArea
@@ -98,39 +94,31 @@ export default function PaymentPage() {
 
   const handleSubmitOrder = async () => {
     const isEmailValid = validateEmail(customerEmail)
-    const isProofValid = validateProof()
-    if (!isEmailValid || !isProofValid) {
+    const isProofValid = validateProof(paymentProof)
+    if (!isEmailValid || !isProofValid || !paymentProof) {
       return
     }
 
     setIsLoading(true)
 
-    try {
-      const paymentProofBase64 = paymentProof ? await toBase64(paymentProof) : null
+    const formData = new FormData()
+    formData.append("customerEmail", customerEmail)
+    formData.append("cartItems", JSON.stringify(cartItems))
+    formData.append("subtotal", subtotal.toString())
+    formData.append("shippingCost", shippingCost.toString())
+    formData.append("total", total.toString())
+    formData.append("isBayArea", isBayArea.toString())
+    formData.append("paymentProof", paymentProof)
 
+    try {
       const response = await fetch("/api/send-order-email", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          customerEmail,
-          cartItems,
-          subtotal,
-          shippingCost,
-          total,
-          isBayArea,
-          paymentProof: paymentProofBase64
-            ? {
-                filename: paymentProof.name,
-                content: paymentProofBase64,
-              }
-            : null,
-        }),
+        body: formData,
       })
 
       if (!response.ok) {
-        throw new Error("Failed to send confirmation email.")
+        const errorData = await response.json()
+        throw new Error(errorData.error || "An unknown error occurred.")
       }
 
       toast({
@@ -141,11 +129,11 @@ export default function PaymentPage() {
 
       clearCart()
       router.push("/checkout/success")
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error submitting order:", error)
       toast({
         title: "Submission Error",
-        description: "There was a problem submitting your order. Please contact us directly.",
+        description: error.message || "There was a problem submitting your order. Please contact us directly.",
         variant: "destructive",
       })
     } finally {
@@ -337,6 +325,7 @@ export default function PaymentPage() {
                     <p className="text-neutral-400 text-sm">
                       {paymentProof ? paymentProof.name : "Click to upload screenshot or receipt"}
                     </p>
+                    <p className="text-xs text-neutral-500 mt-1">Max file size: {MAX_FILE_SIZE_MB}MB</p>
                   </Label>
                 </div>
                 {proofError && (
