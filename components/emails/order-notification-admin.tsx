@@ -1,225 +1,141 @@
-import { Body, Container, Head, Heading, Hr, Html, Preview, Section, Text, Row, Column } from "@react-email/components"
-import * as React from "react"
+import {
+  Body,
+  Container,
+  Head,
+  Heading,
+  Hr,
+  Html,
+  Img,
+  Preview,
+  Section,
+  Text,
+  Row,
+  Column,
+} from "@react-email/components"
+import type { CartItem } from "@/components/cart-provider"
 
-interface EmailProps {
+interface OrderNotificationAdminProps {
   customerEmail: string
-  cartItems: any[]
+  cartItems: CartItem[]
   subtotal: number
   shippingCost: number
   total: number
   isBayArea: boolean
-  hasAttachment: boolean
+  shippingAddress: {
+    street: string
+    city: string
+    state: string
+    zip: string
+  }
 }
 
 const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000"
 
-export const OrderNotificationAdminEmail = ({
+export default function OrderNotificationAdmin({
   customerEmail,
   cartItems,
   subtotal,
   shippingCost,
   total,
   isBayArea,
-  hasAttachment,
-}: EmailProps) => (
-  <Html>
-    <Head />
-    <Preview>New Order Received from {customerEmail}</Preview>
-    <Body style={main}>
-      <Container style={container}>
-        <Heading style={h1}>New Order Received!</Heading>
-        <Text style={text}>
-          You've received a new order from <strong>{customerEmail}</strong>.
-        </Text>
-        {hasAttachment && (
-          <Text style={text}>
-            <strong>A payment proof file has been attached to this email.</strong>
-          </Text>
-        )}
-        <Hr style={hr} />
-        <Heading as="h2" style={h2}>
-          Customer Details
-        </Heading>
-        <Text style={text}>
-          <strong>Email:</strong> {customerEmail}
-        </Text>
-        {cartItems
-          .filter((item) => item.type === "custom" && item.customDetails)
-          .map((item, index) => (
-            <React.Fragment key={item.id}>
-              <Text style={text}>
-                <strong>Name:</strong> {item.customDetails.firstName} {item.customDetails.lastName}
-              </Text>
-              <Text style={text}>
-                <strong>Phone:</strong> {item.customDetails.phone}
-              </Text>
-            </React.Fragment>
-          ))}
-        <Hr style={hr} />
-        <Heading as="h2" style={h2}>
-          Order Details
-        </Heading>
-        {cartItems.map((item) => (
-          <Section key={item.id} style={itemSection}>
+  shippingAddress,
+}: OrderNotificationAdminProps) {
+  return (
+    <Html>
+      <Head />
+      <Preview>New Order Received!</Preview>
+      <Body style={main}>
+        <Container style={container}>
+          <Section style={logoContainer}>
+            <Img src={`${baseUrl}/favicon.png`} width="40" height="40" alt="Sole Purpose Logo" />
+          </Section>
+          <Heading style={h1}>You've Got a New Order!</Heading>
+          <Text style={text}>Payment proof is attached to this email.</Text>
+
+          <Section style={box}>
+            <Heading as="h2" style={h2}>
+              Customer Details
+            </Heading>
+            <Text style={detailText}>
+              <strong>Email:</strong> {customerEmail}
+            </Text>
+            <Text style={detailText}>
+              <strong>Bay Area Order:</strong> {isBayArea ? "Yes" : "No"}
+            </Text>
+          </Section>
+
+          <Section style={box}>
+            <Heading as="h2" style={h2}>
+              Shipping Address
+            </Heading>
+            <Text style={addressText}>
+              {shippingAddress.street}
+              <br />
+              {shippingAddress.city}, {shippingAddress.state} {shippingAddress.zip}
+            </Text>
+          </Section>
+
+          <Section style={box}>
+            <Heading as="h2" style={h2}>
+              Order Summary
+            </Heading>
+            {cartItems.map((item) => (
+              <Row key={item.id} style={itemRow}>
+                <Column>
+                  <Text style={itemText}>
+                    {item.name} (Size: {item.size})
+                  </Text>
+                </Column>
+                <Column align="right">
+                  <Text style={itemText}>${item.price.toFixed(2)}</Text>
+                </Column>
+              </Row>
+            ))}
+            <Hr style={hr} />
             <Row>
               <Column>
-                <Text style={itemTitle}>{item.name}</Text>
-                <Text style={itemDescription}>Size: {item.size}</Text>
-                <Text style={itemDescription}>Price: ${(item.price * item.quantity).toFixed(2)}</Text>
+                <Text style={summaryText}>Subtotal</Text>
+              </Column>
+              <Column align="right">
+                <Text style={summaryText}>${subtotal.toFixed(2)}</Text>
               </Column>
             </Row>
-            {item.type === "custom" && item.customDetails && (
-              <Section style={customDetailsSection}>
-                <Text style={customDetailsTitle}>Custom Design Details:</Text>
-                <Text style={customDetailsText}>
-                  <strong>Base Shoe:</strong> {item.customDetails.shoeModel}
-                </Text>
-                <Text style={customDetailsText}>
-                  <strong>Description:</strong> {item.customDetails.designDescription}
-                </Text>
-                {item.customDetails.additionalNotes && (
-                  <Text style={customDetailsText}>
-                    <strong>Notes:</strong> {item.customDetails.additionalNotes}
-                  </Text>
-                )}
-              </Section>
-            )}
+            <Row>
+              <Column>
+                <Text style={summaryText}>Shipping</Text>
+              </Column>
+              <Column align="right">
+                <Text style={summaryText}>${shippingCost.toFixed(2)}</Text>
+              </Column>
+            </Row>
+            <Hr style={hr} />
+            <Row>
+              <Column>
+                <Text style={totalText}>Total</Text>
+              </Column>
+              <Column align="right">
+                <Text style={totalText}>${total.toFixed(2)}</Text>
+              </Column>
+            </Row>
           </Section>
-        ))}
-        <Hr style={hr} />
-        <Section style={pricingSection}>
-          <Row>
-            <Column style={pricingText}>Subtotal</Column>
-            <Column style={pricingValue}>${subtotal.toFixed(2)}</Column>
-          </Row>
-          <Row>
-            <Column style={pricingText}>Shipping</Column>
-            <Column style={pricingValue}>{isBayArea ? "FREE (Bay Area)" : `$${shippingCost.toFixed(2)}`}</Column>
-          </Row>
-          <Hr style={hr} />
-          <Row>
-            <Column style={pricingTextTotal}>Total</Column>
-            <Column style={pricingValueTotal}>${total.toFixed(2)}</Column>
-          </Row>
-        </Section>
-        <Hr style={hr} />
-        <Section style={{ textAlign: "center" }}>
-          <Text style={footerText}>This is an automated notification. Please process this order.</Text>
-        </Section>
-      </Container>
-    </Body>
-  </Html>
-)
-
-export default OrderNotificationAdminEmail
-
-const main = {
-  backgroundColor: "#f6f9fc",
-  fontFamily: '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Ubuntu,sans-serif',
+        </Container>
+      </Body>
+    </Html>
+  )
 }
 
-const container = {
-  backgroundColor: "#ffffff",
-  margin: "0 auto",
-  padding: "20px 0 48px",
-  marginBottom: "64px",
-  border: "1px solid #eee",
-  borderRadius: "5px",
-}
-
-const h1 = {
-  color: "#333",
-  fontSize: "24px",
-  fontWeight: "bold",
-  textAlign: "center" as const,
-  margin: "30px 0",
-}
-
-const h2 = {
-  color: "#333",
-  fontSize: "20px",
-  fontWeight: "bold",
-  margin: "20px 0 10px",
-  padding: "0 20px",
-}
-
-const text = {
-  color: "#555",
-  fontSize: "16px",
-  lineHeight: "26px",
-  padding: "0 20px",
-}
-
-const hr = {
-  borderColor: "#cccccc",
-  margin: "20px 0",
-}
-
-const itemSection = {
-  padding: "0 20px",
-}
-
-const itemTitle = {
-  fontSize: "18px",
-  fontWeight: "bold",
-  color: "#333",
-}
-
-const itemDescription = {
-  fontSize: "14px",
-  color: "#555",
-}
-
-const customDetailsSection = {
-  backgroundColor: "#f6f9fc",
-  padding: "10px",
-  margin: "10px 0",
-  borderRadius: "4px",
-}
-
-const customDetailsTitle = {
-  fontWeight: "bold",
-  color: "#333",
-  margin: "0 0 5px 0",
-}
-
-const customDetailsText = {
-  fontSize: "14px",
-  color: "#555",
-  margin: "0 0 5px 0",
-}
-
-const pricingSection = {
-  padding: "0 20px",
-}
-
-const pricingText = {
-  fontSize: "16px",
-  color: "#555",
-}
-
-const pricingValue = {
-  fontSize: "16px",
-  fontWeight: "bold",
-  textAlign: "right" as const,
-  color: "#333",
-}
-
-const pricingTextTotal = {
-  fontSize: "18px",
-  fontWeight: "bold",
-  color: "#333",
-}
-
-const pricingValueTotal = {
-  fontSize: "18px",
-  fontWeight: "bold",
-  textAlign: "right" as const,
-  color: "#333",
-}
-
-const footerText = {
-  fontSize: "12px",
-  color: "#888",
-  lineHeight: "1.5",
-}
+// Styles
+const main = { backgroundColor: "#f0f0f0", fontFamily: "Helvetica,Arial,sans-serif" }
+const container = { padding: "40px", margin: "0 auto", width: "100%", maxWidth: "600px", backgroundColor: "#fff" }
+const logoContainer = { textAlign: "center" as const, paddingBottom: "20px" }
+const h1 = { fontSize: "28px", fontWeight: "bold", margin: "0 0 20px", color: "#000" }
+const h2 = { fontSize: "20px", fontWeight: "bold", margin: "0 0 15px", color: "#000" }
+const text = { fontSize: "16px", lineHeight: "1.5", color: "#333" }
+const box = { border: "1px solid #ddd", padding: "25px", borderRadius: "8px", marginBottom: "20px" }
+const detailText = { fontSize: "16px", margin: "5px 0", color: "#333" }
+const addressText = { fontSize: "16px", lineHeight: "1.5", color: "#333", margin: 0 }
+const itemRow = { padding: "5px 0" }
+const itemText = { fontSize: "16px", margin: 0, color: "#000" }
+const summaryText = { fontSize: "16px", margin: 0, color: "#555" }
+const totalText = { fontSize: "18px", fontWeight: "bold", margin: 0, color: "#000" }
+const hr = { borderColor: "#ccc", margin: "15px 0" }

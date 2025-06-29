@@ -10,14 +10,13 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
-import { CheckCircle, Phone, FileText, AlertCircle, Upload } from "lucide-react"
+import { CheckCircle, Phone, AlertCircle, Upload, Home } from "lucide-react"
 import Image from "next/image"
 import { useToast } from "@/hooks/use-toast"
 
 const MAX_FILE_SIZE_MB = 8
 const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
 
-// Function to determine shipping cost based on size
 function getShippingForSize(size: string): number {
   if (size.toUpperCase().includes("C") || size.toUpperCase().includes("Y")) {
     return 15
@@ -35,6 +34,13 @@ export default function PaymentPage() {
   const [emailError, setEmailError] = useState("")
   const [paymentProof, setPaymentProof] = useState<File | null>(null)
   const [proofError, setProofError] = useState("")
+  const [shippingAddress, setShippingAddress] = useState({
+    street: "",
+    city: "",
+    state: "",
+    zip: "",
+  })
+  const [addressError, setAddressError] = useState("")
   const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
@@ -45,43 +51,42 @@ export default function PaymentPage() {
     }
   }, [cartItems])
 
-  const validateEmail = (email: string) => {
-    if (!email) {
-      setEmailError("Email is required.")
-      return false
+  const validate = () => {
+    let isValid = true
+    if (!customerEmail || !/\S+@\S+\.\S+/.test(customerEmail)) {
+      setEmailError("A valid email is required.")
+      isValid = false
+    } else {
+      setEmailError("")
     }
-    if (!/\S+@\S+\.\S+/.test(email)) {
-      setEmailError("Please enter a valid email address.")
-      return false
-    }
-    setEmailError("")
-    return true
-  }
 
-  const validateProof = (file: File | null) => {
-    if (!file) {
+    if (!paymentProof) {
       setProofError("Payment proof is required.")
-      return false
-    }
-    if (file.size > MAX_FILE_SIZE_BYTES) {
+      isValid = false
+    } else if (paymentProof.size > MAX_FILE_SIZE_BYTES) {
       setProofError(`File is too large. Max size is ${MAX_FILE_SIZE_MB}MB.`)
-      return false
+      isValid = false
+    } else {
+      setProofError("")
     }
-    setProofError("")
-    return true
+
+    if (!shippingAddress.street || !shippingAddress.city || !shippingAddress.state || !shippingAddress.zip) {
+      setAddressError("Please complete all address fields.")
+      isValid = false
+    } else {
+      setAddressError("")
+    }
+
+    return isValid
   }
 
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCustomerEmail(e.target.value)
-    if (emailError) {
-      validateEmail(e.target.value)
-    }
+  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setShippingAddress((prev) => ({ ...prev, [e.target.name]: e.target.value }))
   }
 
   const handlePaymentProofUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] || null
     setPaymentProof(file)
-    validateProof(file)
   }
 
   const shippingCost = isBayArea
@@ -93,9 +98,7 @@ export default function PaymentPage() {
   const total = subtotal + shippingCost
 
   const handleSubmitOrder = async () => {
-    const isEmailValid = validateEmail(customerEmail)
-    const isProofValid = validateProof(paymentProof)
-    if (!isEmailValid || !isProofValid || !paymentProof) {
+    if (!validate()) {
       return
     }
 
@@ -108,7 +111,10 @@ export default function PaymentPage() {
     formData.append("shippingCost", shippingCost.toString())
     formData.append("total", total.toString())
     formData.append("isBayArea", isBayArea.toString())
-    formData.append("paymentProof", paymentProof)
+    formData.append("shippingAddress", JSON.stringify(shippingAddress))
+    if (paymentProof) {
+      formData.append("paymentProof", paymentProof)
+    }
 
     try {
       const response = await fetch("/api/send-order-email", {
@@ -172,77 +178,165 @@ export default function PaymentPage() {
           <p className="text-neutral-400">Review your items and submit your order</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Order Summary */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+          {/* Left Column */}
+          <div className="space-y-8">
+            {/* Order Summary */}
+            <Card className="bg-neutral-900 border-neutral-800">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center">
+                  <CheckCircle className="mr-2 h-5 w-5 text-green-500" />
+                  Order Summary
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-3">
+                  {cartItems.map((item) => (
+                    <div
+                      key={`${item.id}-${item.size}`}
+                      className="flex items-center space-x-4 p-3 bg-neutral-800 rounded-lg"
+                    >
+                      <div className="w-16 h-16 relative rounded-lg overflow-hidden">
+                        <Image
+                          src={item.image || "/placeholder.svg"}
+                          alt={item.name}
+                          fill
+                          className="object-cover"
+                          crossOrigin="anonymous"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="text-white font-medium">{item.name}</h4>
+                        <p className="text-neutral-400 text-sm">Size: {item.size}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-white font-semibold">${(item.price * item.quantity).toFixed(2)}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <Separator className="bg-neutral-700" />
+                <div className="space-y-2">
+                  <div className="flex justify-between text-neutral-300">
+                    <span>Subtotal</span>
+                    <span>${subtotal.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-neutral-300">
+                    <span>Shipping</span>
+                    <span>{isBayArea ? "FREE" : `$${shippingCost.toFixed(2)}`}</span>
+                  </div>
+                  <Separator className="bg-neutral-700" />
+                  <div className="flex justify-between text-white text-lg font-semibold">
+                    <span>Total</span>
+                    <span>${total.toFixed(2)}</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Payment Methods */}
+            <Card className="bg-neutral-900 border-neutral-800">
+              <CardHeader>
+                <CardTitle className="text-white">Payment Methods</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="p-3 bg-neutral-800 rounded-lg">
+                  <h4 className="text-white font-medium mb-2">Zelle (Preferred)</h4>
+                  <p className="text-neutral-300 text-sm mb-2">Send ${total.toFixed(2)} to:</p>
+                  <div className="flex items-center space-x-2">
+                    <Phone className="h-4 w-4 text-blue-400" />
+                    <span className="text-blue-400 font-mono">+1 (415) 939-8270</span>
+                  </div>
+                </div>
+                <div className="p-3 bg-neutral-800 rounded-lg">
+                  <h4 className="text-white font-medium mb-2">Venmo</h4>
+                  <p className="text-neutral-300 text-sm mb-2">Send ${total.toFixed(2)} to:</p>
+                  <a
+                    href="https://venmo.com/u/Drew-Alaraj"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center space-x-2 text-green-400 hover:text-green-300 transition-colors"
+                  >
+                    <span className="font-mono">@Drew-Alaraj</span>
+                  </a>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Right Column */}
           <Card className="bg-neutral-900 border-neutral-800">
             <CardHeader>
-              <CardTitle className="text-white flex items-center">
-                <CheckCircle className="mr-2 h-5 w-5 text-green-500" />
-                Order Summary
-              </CardTitle>
+              <CardTitle className="text-white">Confirmation Details</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="space-y-3">
-                {cartItems.map((item) => (
-                  <div
-                    key={`${item.id}-${item.size}`}
-                    className="flex items-center space-x-4 p-3 bg-neutral-800 rounded-lg"
-                  >
-                    <div className="w-16 h-16 relative rounded-lg overflow-hidden">
-                      <Image
-                        src={item.image || "/placeholder.svg"}
-                        alt={item.name}
-                        fill
-                        className="object-cover"
-                        crossOrigin="anonymous"
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="text-white font-medium">{item.name}</h4>
-                      <p className="text-neutral-400 text-sm">Size: {item.size}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-white font-semibold">${(item.price * item.quantity).toFixed(2)}</p>
-                    </div>
+              {/* Shipping Address */}
+              <div className="space-y-4">
+                <h3 className="text-white font-semibold flex items-center">
+                  <Home className="mr-2 h-5 w-5" />
+                  Shipping Address <span className="text-red-500 ml-1">*</span>
+                </h3>
+                <div className="space-y-2">
+                  <Label htmlFor="street" className="text-sm text-neutral-400">
+                    Street Address
+                  </Label>
+                  <Input
+                    id="street"
+                    name="street"
+                    value={shippingAddress.street}
+                    onChange={handleAddressChange}
+                    className="bg-neutral-800 border-neutral-700 text-white"
+                  />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="city" className="text-sm text-neutral-400">
+                      City
+                    </Label>
+                    <Input
+                      id="city"
+                      name="city"
+                      value={shippingAddress.city}
+                      onChange={handleAddressChange}
+                      className="bg-neutral-800 border-neutral-700 text-white"
+                    />
                   </div>
-                ))}
+                  <div className="space-y-2">
+                    <Label htmlFor="state" className="text-sm text-neutral-400">
+                      State
+                    </Label>
+                    <Input
+                      id="state"
+                      name="state"
+                      value={shippingAddress.state}
+                      onChange={handleAddressChange}
+                      className="bg-neutral-800 border-neutral-700 text-white"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="zip" className="text-sm text-neutral-400">
+                      ZIP Code
+                    </Label>
+                    <Input
+                      id="zip"
+                      name="zip"
+                      value={shippingAddress.zip}
+                      onChange={handleAddressChange}
+                      className="bg-neutral-800 border-neutral-700 text-white"
+                    />
+                  </div>
+                </div>
+                {addressError && (
+                  <p className="text-sm text-red-500 flex items-center">
+                    <AlertCircle className="h-4 w-4 mr-1" />
+                    {addressError}
+                  </p>
+                )}
               </div>
 
               <Separator className="bg-neutral-700" />
 
-              <div className="space-y-2">
-                <div className="flex justify-between text-neutral-300">
-                  <span>Subtotal</span>
-                  <span>${subtotal.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-neutral-300">
-                  <span>Shipping</span>
-                  <span>{isBayArea ? "FREE" : `$${shippingCost.toFixed(2)}`}</span>
-                </div>
-                <Separator className="bg-neutral-700" />
-                <div className="flex justify-between text-white text-lg font-semibold">
-                  <span>Total</span>
-                  <span>${total.toFixed(2)}</span>
-                </div>
-              </div>
-
-              {cartItems.some((item) => item.type === "custom") && (
-                <div className="p-3 bg-blue-900/20 border border-blue-800 rounded-lg">
-                  <p className="text-blue-300 text-sm flex items-center">
-                    <FileText className="mr-2 h-4 w-4" />
-                    Custom designs include consultation and 2-4 week creation time
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Payment Instructions */}
-          <Card className="bg-neutral-900 border-neutral-800">
-            <CardHeader>
-              <CardTitle className="text-white">Payment & Confirmation</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
+              {/* Email */}
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-white font-medium">
                   Confirmation Email <span className="text-red-500">*</span>
@@ -252,12 +346,9 @@ export default function PaymentPage() {
                   type="email"
                   placeholder="your.email@example.com"
                   value={customerEmail}
-                  onChange={handleEmailChange}
-                  onBlur={() => validateEmail(customerEmail)}
+                  onChange={(e) => setCustomerEmail(e.target.value)}
                   required
-                  className={`bg-neutral-800 border-neutral-700 text-white focus:border-purple-500 focus:ring-purple-500 ${
-                    emailError ? "border-red-500 focus:border-red-500" : ""
-                  }`}
+                  className={`bg-neutral-800 border-neutral-700 text-white ${emailError ? "border-red-500" : ""}`}
                 />
                 {emailError && (
                   <p className="text-sm text-red-500 flex items-center">
@@ -267,6 +358,7 @@ export default function PaymentPage() {
                 )}
               </div>
 
+              {/* Bay Area Checkbox */}
               <div className="flex items-center space-x-2 p-3 bg-green-900/20 border border-green-800 rounded-lg">
                 <Checkbox
                   id="bayArea"
@@ -278,40 +370,13 @@ export default function PaymentPage() {
                 </Label>
               </div>
 
-              <div className="space-y-4">
-                <h3 className="text-white font-semibold">Payment Methods</h3>
-                <div className="space-y-3">
-                  <div className="p-3 bg-neutral-800 rounded-lg">
-                    <h4 className="text-white font-medium mb-2">Zelle (Preferred)</h4>
-                    <p className="text-neutral-300 text-sm mb-2">Send ${total.toFixed(2)} to:</p>
-                    <div className="flex items-center space-x-2">
-                      <Phone className="h-4 w-4 text-blue-400" />
-                      <span className="text-blue-400 font-mono">+1 (415) 939-8270</span>
-                    </div>
-                  </div>
-                  <div className="p-3 bg-neutral-800 rounded-lg">
-                    <h4 className="text-white font-medium mb-2">Venmo</h4>
-                    <p className="text-neutral-300 text-sm mb-2">Send ${total.toFixed(2)} to:</p>
-                    <a
-                      href="https://venmo.com/u/Drew-Alaraj"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center space-x-2 text-green-400 hover:text-green-300 transition-colors"
-                    >
-                      <span className="font-mono">@Drew-Alaraj</span>
-                    </a>
-                  </div>
-                </div>
-              </div>
-
+              {/* Payment Proof */}
               <div className="space-y-2">
                 <Label htmlFor="paymentProof" className="text-white font-medium">
                   Upload Payment Proof <span className="text-red-500">*</span>
                 </Label>
                 <div
-                  className={`border-2 border-dashed border-neutral-600 rounded-lg p-4 text-center ${
-                    proofError ? "border-red-500" : ""
-                  }`}
+                  className={`border-2 border-dashed border-neutral-600 rounded-lg p-4 text-center ${proofError ? "border-red-500" : ""}`}
                 >
                   <input
                     id="paymentProof"
@@ -343,10 +408,6 @@ export default function PaymentPage() {
               >
                 {isLoading ? "Submitting Order..." : "Submit Order"}
               </Button>
-
-              <p className="text-neutral-400 text-xs text-center">
-                By submitting, you agree to our terms and confirm payment will be sent within 24 hours.
-              </p>
             </CardContent>
           </Card>
         </div>
