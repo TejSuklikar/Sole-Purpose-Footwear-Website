@@ -116,30 +116,49 @@ export default function PaymentPage() {
       formData.append("paymentProof", paymentProof)
     }
 
+    // Create an AbortController for timeout
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 30000) // 30 second timeout
+
     try {
       const response = await fetch("/api/send-order-email", {
         method: "POST",
         body: formData,
+        signal: controller.signal,
       })
 
+      clearTimeout(timeoutId)
+
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || "An unknown error occurred.")
+        const errorData = await response.json().catch(() => ({ error: "Unknown error occurred" }))
+        throw new Error(errorData.error || `Server error: ${response.status}`)
       }
 
+      const result = await response.json().catch(() => ({ message: "Order processed" }))
+
       toast({
-        title: "Order Submitted!",
-        description: "Your confirmation is on its way. Please check your email.",
+        title: "Order Submitted Successfully!",
+        description: "Your confirmation emails are on their way. Please check your inbox.",
         variant: "default",
       })
 
       clearCart()
       router.push("/checkout/success")
     } catch (error: any) {
+      clearTimeout(timeoutId)
       console.error("Error submitting order:", error)
+
+      let errorMessage = "There was a problem submitting your order. Please try again."
+
+      if (error.name === "AbortError") {
+        errorMessage = "Request timed out. Please try again with a smaller file or check your connection."
+      } else if (error.message) {
+        errorMessage = error.message
+      }
+
       toast({
         title: "Submission Error",
-        description: error.message || "There was a problem submitting your order. Please contact us directly.",
+        description: errorMessage,
         variant: "destructive",
       })
     } finally {
@@ -406,7 +425,7 @@ export default function PaymentPage() {
                 disabled={isLoading}
                 className="w-full bg-white text-black hover:bg-neutral-200 py-3 disabled:bg-neutral-400 disabled:cursor-not-allowed"
               >
-                {isLoading ? "Submitting Order..." : "Submit Order"}
+                {isLoading ? "Processing Order..." : "Submit Order"}
               </Button>
             </CardContent>
           </Card>

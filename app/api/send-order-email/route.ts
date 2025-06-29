@@ -18,7 +18,7 @@ interface ShippingAddress {
 }
 
 export async function POST(request: Request) {
-  // Debug logging for API key
+  console.log("=== ORDER EMAIL API CALLED ===")
   console.log("API Key exists:", !!process.env.RESEND_API_KEY)
   console.log("API Key prefix:", process.env.RESEND_API_KEY?.substring(0, 3))
 
@@ -38,6 +38,14 @@ export async function POST(request: Request) {
     const isBayAreaString = formData.get("isBayArea") as string | null
     const shippingAddressString = formData.get("shippingAddress") as string | null
 
+    console.log("Received data:", {
+      customerEmail,
+      hasCartItems: !!cartItemsString,
+      hasPaymentProof: !!paymentProof,
+      paymentProofSize: paymentProof?.size,
+      hasShippingAddress: !!shippingAddressString,
+    })
+
     if (
       !customerEmail ||
       !cartItemsString ||
@@ -48,10 +56,12 @@ export async function POST(request: Request) {
       !isBayAreaString ||
       !shippingAddressString
     ) {
+      console.error("Missing required fields")
       return NextResponse.json({ error: "Missing required fields." }, { status: 400 })
     }
 
     if (paymentProof.size > MAX_FILE_SIZE_BYTES) {
+      console.error("File too large:", paymentProof.size)
       return NextResponse.json(
         { error: `File size cannot exceed ${MAX_FILE_SIZE_BYTES / (1024 * 1024)}MB.` },
         { status: 413 },
@@ -74,23 +84,11 @@ export async function POST(request: Request) {
       },
     ]
 
-    // --- Send Email to Customer ---
-    const customerEmailPromise = resend.emails.send({
-      from: `Soul Purpose Footwear <${fromEmail}>`,
-      to: [customerEmail],
-      subject: "Your Soul Purpose Footwear Order Confirmation",
-      react: OrderConfirmationCustomer({
-        cartItems,
-        subtotal,
-        shippingCost,
-        total,
-        isBayArea,
-        shippingAddress,
-      }),
-    })
+    console.log("Sending emails...")
 
-    // --- Send Email to Admin ---
-    const adminEmailPromise = resend.emails.send({
+    // --- Send Email to Admin (Priority) ---
+    console.log("Sending admin email...")
+    const adminResult = await resend.emails.send({
       from: `New Order <${fromEmail}>`,
       to: [adminEmail],
       subject: `New Order Received - ${customerEmail}`,
@@ -106,20 +104,52 @@ export async function POST(request: Request) {
       attachments: attachments,
     })
 
-    const [customerResult, adminResult] = await Promise.allSettled([customerEmailPromise, adminEmailPromise])
-
-    if (adminResult.status === "rejected") {
-      console.error("CRITICAL: Failed to send order notification to admin:", adminResult.reason)
+    if (adminResult.error) {
+      console.error("CRITICAL: Failed to send admin email:", adminResult.error)
       return NextResponse.json({ error: "Failed to process order. Please contact support." }, { status: 500 })
     }
 
-    if (customerResult.status === "rejected") {
-      console.error("Failed to send email to customer:", customerResult.reason)
+    console.log("Admin email sent successfully:", adminResult.data?.id)
+
+    // --- Send Email to Customer (Best effort) ---
+    console.log("Sending customer email...")
+    try {
+      const customerResult = await resend.emails.send({
+        from: `Soul Purpose Footwear <${fromEmail}>`,
+        to: [customerEmail],
+        subject: "Your Soul Purpose Footwear Order Confirmation",
+        react: OrderConfirmationCustomer({
+          cartItems,
+          subtotal,
+          shippingCost,
+          total,
+          isBayArea,
+          shippingAddress,
+        }),
+      })
+
+      if (customerResult.error) {
+        console.error("Failed to send customer email:", customerResult.error)
+      } else {
+        console.log("Customer email sent successfully:", customerResult.data?.id)
+      }
+    } catch (customerError) {
+      console.error("Error sending customer email:", customerError)
     }
 
-    return NextResponse.json({ message: "Emails sent successfully!" })
+    console.log("=== ORDER PROCESSING COMPLETE ===")
+    return NextResponse.json({
+      success: true,
+      message: "Order processed successfully",
+      adminEmailId: adminResult.data?.id,
+    })
   } catch (error) {
     console.error("Unhandled error in send-order-email route:", error)
-    return NextResponse.json({ error: "An unexpected error occurred." }, { status: 500 })
+    return NextResponse.json(
+      {
+        error: "An unexpected error occurred. Please try again.",
+      },
+      { status: 500 },
+    )
   }
 }

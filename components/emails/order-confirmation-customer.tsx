@@ -1,4 +1,4 @@
-import { Body, Container, Head, Heading, Html, Preview, Section, Text, Hr } from "@react-email/components"
+import { Body, Container, Head, Heading, Html, Preview, Section, Text, Row, Column } from "@react-email/components"
 import type { CartItem } from "@/components/cart-provider"
 
 interface ShippingAddress {
@@ -29,63 +29,75 @@ export default function OrderConfirmationCustomer({
   return (
     <Html>
       <Head />
-      <Preview>Your Soul Purpose Footwear order has been received!</Preview>
+      <Preview>Your Soul Purpose Footwear order confirmation</Preview>
       <Body style={main}>
         <Container style={container}>
-          <Heading style={h1}>Thank you for your order!</Heading>
-
-          <Text style={text}>
-            We've received your order and will begin processing it shortly. You'll receive another email when your
-            custom shoes are ready for pickup/delivery.
-          </Text>
+          <Section style={header}>
+            <Heading style={h1}>Order Confirmation</Heading>
+            <Text style={text}>
+              Thank you for your order! We've received your payment and will begin working on your custom footwear.
+            </Text>
+          </Section>
 
           <Section style={orderSection}>
             <Heading style={h2}>Order Summary</Heading>
-
             {cartItems.map((item, index) => (
-              <div key={index} style={itemRow}>
-                <Text style={itemName}>{item.name}</Text>
-                <Text style={itemDetails}>
-                  Size: {item.size} | Quantity: {item.quantity}
-                </Text>
-                <Text style={itemPrice}>${item.price.toFixed(2)}</Text>
-              </div>
+              <Row key={index} style={itemRow}>
+                <Column style={itemColumn}>
+                  <Text style={itemName}>{item.name}</Text>
+                  <Text style={itemDetails}>Size: {item.size}</Text>
+                  {item.type === "custom" && item.customDetails && <Text style={itemDetails}>Custom Design</Text>}
+                </Column>
+                <Column style={priceColumn}>
+                  <Text style={price}>${(item.price * item.quantity).toFixed(2)}</Text>
+                </Column>
+              </Row>
             ))}
 
-            <Hr style={hr} />
+            <Row style={totalRow}>
+              <Column>
+                <Text style={totalLabel}>Subtotal:</Text>
+              </Column>
+              <Column style={priceColumn}>
+                <Text style={totalValue}>${subtotal.toFixed(2)}</Text>
+              </Column>
+            </Row>
 
-            <div style={totalRow}>
-              <Text style={totalLabel}>Subtotal:</Text>
-              <Text style={totalValue}>${subtotal.toFixed(2)}</Text>
-            </div>
+            <Row style={totalRow}>
+              <Column>
+                <Text style={totalLabel}>Shipping:</Text>
+              </Column>
+              <Column style={priceColumn}>
+                <Text style={totalValue}>{isBayArea ? "FREE" : `$${shippingCost.toFixed(2)}`}</Text>
+              </Column>
+            </Row>
 
-            <div style={totalRow}>
-              <Text style={totalLabel}>Shipping:</Text>
-              <Text style={totalValue}>{isBayArea ? "FREE (Bay Area Pickup)" : `$${shippingCost.toFixed(2)}`}</Text>
-            </div>
-
-            <div style={totalRow}>
-              <Text style={totalLabelFinal}>Total:</Text>
-              <Text style={totalValueFinal}>${total.toFixed(2)}</Text>
-            </div>
+            <Row style={finalTotalRow}>
+              <Column>
+                <Text style={finalTotalLabel}>Total:</Text>
+              </Column>
+              <Column style={priceColumn}>
+                <Text style={finalTotalValue}>${total.toFixed(2)}</Text>
+              </Column>
+            </Row>
           </Section>
 
           <Section style={shippingSection}>
-            <Heading style={h2}>{isBayArea ? "Pickup Address" : "Shipping Address"}</Heading>
+            <Heading style={h2}>Shipping Address</Heading>
             <Text style={address}>
               {shippingAddress.street}
               <br />
               {shippingAddress.city}, {shippingAddress.state} {shippingAddress.zip}
-              {shippingAddress.country && (
-                <>
-                  <br />
-                  {shippingAddress.country}
-                </>
-              )}
             </Text>
           </Section>
 
-          <Text style={footer}>Questions? Reply to this email or contact us at solepurposefootwear813@gmail.com</Text>
+          <Section style={footer}>
+            <Text style={footerText}>
+              We'll keep you updated on your order progress. If you have any questions, please contact us at
+              solepurposefootwear813@gmail.com
+            </Text>
+            <Text style={footerText}>Thank you for choosing Soul Purpose Footwear!</Text>
+          </Section>
         </Container>
       </Body>
     </Html>
@@ -104,114 +116,125 @@ const container = {
   marginBottom: "64px",
 }
 
+const header = {
+  padding: "32px 24px",
+  textAlign: "center" as const,
+}
+
 const h1 = {
   color: "#333",
   fontSize: "24px",
   fontWeight: "bold",
-  margin: "40px 0",
-  padding: "0",
-  textAlign: "center" as const,
+  margin: "0 0 16px",
 }
 
 const h2 = {
   color: "#333",
   fontSize: "18px",
   fontWeight: "bold",
-  margin: "30px 0 15px",
+  margin: "24px 0 16px",
 }
 
 const text = {
-  color: "#333",
+  color: "#555",
   fontSize: "16px",
-  lineHeight: "26px",
-  textAlign: "center" as const,
-  margin: "0 40px",
+  lineHeight: "24px",
+  margin: "0 0 16px",
 }
 
 const orderSection = {
-  margin: "40px 40px",
+  padding: "0 24px",
 }
 
 const itemRow = {
   borderBottom: "1px solid #eee",
-  padding: "15px 0",
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
+  padding: "12px 0",
+}
+
+const itemColumn = {
+  verticalAlign: "top" as const,
+}
+
+const priceColumn = {
+  textAlign: "right" as const,
+  verticalAlign: "top" as const,
+  width: "100px",
 }
 
 const itemName = {
+  color: "#333",
   fontSize: "16px",
   fontWeight: "bold",
-  color: "#333",
-  margin: "0",
+  margin: "0 0 4px",
 }
 
 const itemDetails = {
-  fontSize: "14px",
   color: "#666",
-  margin: "5px 0 0 0",
-}
-
-const itemPrice = {
-  fontSize: "16px",
-  fontWeight: "bold",
-  color: "#333",
+  fontSize: "14px",
   margin: "0",
 }
 
-const hr = {
-  borderColor: "#ddd",
-  margin: "20px 0",
+const price = {
+  color: "#333",
+  fontSize: "16px",
+  fontWeight: "bold",
+  margin: "0",
 }
 
 const totalRow = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  padding: "10px 0",
+  padding: "8px 0",
 }
 
 const totalLabel = {
+  color: "#666",
   fontSize: "16px",
-  color: "#333",
   margin: "0",
 }
 
 const totalValue = {
+  color: "#333",
   fontSize: "16px",
-  color: "#333",
   margin: "0",
 }
 
-const totalLabelFinal = {
+const finalTotalRow = {
+  borderTop: "2px solid #333",
+  padding: "12px 0",
+}
+
+const finalTotalLabel = {
+  color: "#333",
   fontSize: "18px",
   fontWeight: "bold",
-  color: "#333",
   margin: "0",
 }
 
-const totalValueFinal = {
+const finalTotalValue = {
+  color: "#333",
   fontSize: "18px",
   fontWeight: "bold",
-  color: "#333",
   margin: "0",
 }
 
 const shippingSection = {
-  margin: "40px 40px",
+  padding: "0 24px",
 }
 
 const address = {
+  color: "#555",
   fontSize: "16px",
-  color: "#333",
   lineHeight: "24px",
   margin: "0",
 }
 
 const footer = {
+  padding: "24px",
+  textAlign: "center" as const,
+}
+
+const footerText = {
   color: "#666",
   fontSize: "14px",
-  textAlign: "center" as const,
-  margin: "40px 40px 0",
+  lineHeight: "20px",
+  margin: "0 0 12px",
 }
