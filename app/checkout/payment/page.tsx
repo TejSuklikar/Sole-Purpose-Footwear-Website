@@ -8,9 +8,11 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
-import { CheckCircle, Phone, Mail, Upload, FileText } from "lucide-react"
+import { CheckCircle, Phone, FileText, AlertCircle, Upload } from "lucide-react"
 import Image from "next/image"
+import { useToast } from "@/hooks/use-toast"
 
 // Function to determine shipping cost based on size
 function getShippingForSize(size: string): number {
@@ -20,19 +22,72 @@ function getShippingForSize(size: string): number {
   return 20
 }
 
+// Helper to read file as base64
+const toBase64 = (file: File): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onload = () => resolve(reader.result as string)
+    reader.onerror = (error) => reject(error)
+  })
+
 export default function PaymentPage() {
   const router = useRouter()
+  const { toast } = useToast()
   const { items: cartItems, total: subtotal, clearCart } = useCart()
   const [isBayArea, setIsBayArea] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [customerEmail, setCustomerEmail] = useState("")
+  const [emailError, setEmailError] = useState("")
   const [paymentProof, setPaymentProof] = useState<File | null>(null)
+  const [proofError, setProofError] = useState("")
   const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
     setIsClient(true)
-  }, [])
+    const customOrderItem = cartItems.find((item) => item.type === "custom" && item.customDetails?.email)
+    if (customOrderItem && customOrderItem.customDetails) {
+      setCustomerEmail(customOrderItem.customDetails.email)
+    }
+  }, [cartItems])
 
-  // Calculate shipping - use the highest shipping rate in the order
+  const validateEmail = (email: string) => {
+    if (!email) {
+      setEmailError("Email is required.")
+      return false
+    }
+    if (!/\S+@\S+\.\S+/.test(email)) {
+      setEmailError("Please enter a valid email address.")
+      return false
+    }
+    setEmailError("")
+    return true
+  }
+
+  const validateProof = () => {
+    if (!paymentProof) {
+      setProofError("Payment proof is required.")
+      return false
+    }
+    setProofError("")
+    return true
+  }
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCustomerEmail(e.target.value)
+    if (emailError) {
+      validateEmail(e.target.value)
+    }
+  }
+
+  const handlePaymentProofUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file) {
+      setPaymentProof(file)
+      setProofError("") // Clear error when file is selected
+    }
+  }
+
   const shippingCost = isBayArea
     ? 0
     : cartItems.length > 0
@@ -41,57 +96,58 @@ export default function PaymentPage() {
 
   const total = subtotal + shippingCost
 
-  const handlePaymentProofUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (file) {
-      setPaymentProof(file)
-    }
-  }
-
   const handleSubmitOrder = async () => {
+    const isEmailValid = validateEmail(customerEmail)
+    const isProofValid = validateProof()
+    if (!isEmailValid || !isProofValid) {
+      return
+    }
+
     setIsLoading(true)
 
     try {
-      const emailSubject = `New Order - ${cartItems.length} item${cartItems.length !== 1 ? "s" : ""} - $${total.toFixed(2)}`
+      const paymentProofBase64 = paymentProof ? await toBase64(paymentProof) : null
 
-      let emailBody = `New order received!\n\n`
-      emailBody += `Order Details:\n`
-      emailBody += `=============\n\n`
-
-      cartItems.forEach((item, index) => {
-        emailBody += `${index + 1}. ${item.name}\n`
-        emailBody += `   Size: ${item.size}, Qty: ${item.quantity}\n`
-        emailBody += `   Price: $${(item.price * item.quantity).toFixed(2)}\n`
-        if (item.type === "custom" && item.customDetails) {
-          emailBody += `   --- Custom Details ---\n`
-          Object.entries(item.customDetails).forEach(([key, value]) => {
-            emailBody += `   ${key}: ${value}\n`
-          })
-        }
-        emailBody += `\n`
+      const response = await fetch("/api/send-order-email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          customerEmail,
+          cartItems,
+          subtotal,
+          shippingCost,
+          total,
+          isBayArea,
+          paymentProof: paymentProofBase64
+            ? {
+                filename: paymentProof.name,
+                content: paymentProofBase64,
+              }
+            : null,
+        }),
       })
 
-      emailBody += `Order Summary:\n`
-      emailBody += `=============\n`
-      emailBody += `Subtotal: $${subtotal.toFixed(2)}\n`
-      emailBody += `Shipping: ${isBayArea ? "FREE (Bay Area)" : `$${shippingCost.toFixed(2)}`}\n`
-      emailBody += `Total: $${total.toFixed(2)}\n\n`
-
-      if (paymentProof) {
-        emailBody += `Payment proof attached: ${paymentProof.name}\n\n`
+      if (!response.ok) {
+        throw new Error("Failed to send confirmation email.")
       }
 
-      emailBody += `Please process this order and contact the customer for next steps.\n`
-      emailBody += `Order placed at: ${new Date().toLocaleString()}`
-
-      const mailtoLink = `mailto:solepurposefootwear813@gmail.com?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`
-      window.open(mailtoLink)
+      toast({
+        title: "Order Submitted!",
+        description: "Your confirmation is on its way. Please check your email.",
+        variant: "default",
+      })
 
       clearCart()
       router.push("/checkout/success")
     } catch (error) {
       console.error("Error submitting order:", error)
-      alert("There was an error submitting your order. Please try again.")
+      toast({
+        title: "Submission Error",
+        description: "There was a problem submitting your order. Please contact us directly.",
+        variant: "destructive",
+      })
     } finally {
       setIsLoading(false)
     }
@@ -166,7 +222,6 @@ export default function PaymentPage() {
 
               <Separator className="bg-neutral-700" />
 
-              {/* Pricing Breakdown */}
               <div className="space-y-2">
                 <div className="flex justify-between text-neutral-300">
                   <span>Subtotal</span>
@@ -197,21 +252,43 @@ export default function PaymentPage() {
           {/* Payment Instructions */}
           <Card className="bg-neutral-900 border-neutral-800">
             <CardHeader>
-              <CardTitle className="text-white">Payment Instructions</CardTitle>
+              <CardTitle className="text-white">Payment & Confirmation</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              {cartItems.some((item) => item.type === "custom") && (
-                <div className="flex items-center space-x-2 p-3 bg-green-900/20 border border-green-800 rounded-lg">
-                  <Checkbox
-                    id="bayArea"
-                    checked={isBayArea}
-                    onCheckedChange={(checked) => setIsBayArea(Boolean(checked))}
-                  />
-                  <Label htmlFor="bayArea" className="text-green-300 text-sm cursor-pointer">
-                    I'm in the Bay Area (FREE pickup/dropoff for custom orders)
-                  </Label>
-                </div>
-              )}
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-white font-medium">
+                  Confirmation Email <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="your.email@example.com"
+                  value={customerEmail}
+                  onChange={handleEmailChange}
+                  onBlur={() => validateEmail(customerEmail)}
+                  required
+                  className={`bg-neutral-800 border-neutral-700 text-white focus:border-purple-500 focus:ring-purple-500 ${
+                    emailError ? "border-red-500 focus:border-red-500" : ""
+                  }`}
+                />
+                {emailError && (
+                  <p className="text-sm text-red-500 flex items-center">
+                    <AlertCircle className="h-4 w-4 mr-1" />
+                    {emailError}
+                  </p>
+                )}
+              </div>
+
+              <div className="flex items-center space-x-2 p-3 bg-green-900/20 border border-green-800 rounded-lg">
+                <Checkbox
+                  id="bayArea"
+                  checked={isBayArea}
+                  onCheckedChange={(checked) => setIsBayArea(Boolean(checked))}
+                />
+                <Label htmlFor="bayArea" className="text-green-300 text-sm cursor-pointer">
+                  I'm in the Bay Area (FREE pickup/dropoff)
+                </Label>
+              </div>
 
               <div className="space-y-4">
                 <h3 className="text-white font-semibold">Payment Methods</h3>
@@ -239,11 +316,15 @@ export default function PaymentPage() {
                 </div>
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-2">
                 <Label htmlFor="paymentProof" className="text-white font-medium">
-                  Upload Payment Proof (Optional)
+                  Upload Payment Proof <span className="text-red-500">*</span>
                 </Label>
-                <div className="border-2 border-dashed border-neutral-600 rounded-lg p-4 text-center">
+                <div
+                  className={`border-2 border-dashed border-neutral-600 rounded-lg p-4 text-center ${
+                    proofError ? "border-red-500" : ""
+                  }`}
+                >
                   <input
                     id="paymentProof"
                     type="file"
@@ -258,26 +339,18 @@ export default function PaymentPage() {
                     </p>
                   </Label>
                 </div>
-              </div>
-
-              <div className="p-3 bg-neutral-800 rounded-lg">
-                <h4 className="text-white font-medium mb-2">Questions?</h4>
-                <div className="space-y-1 text-sm">
-                  <div className="flex items-center space-x-2">
-                    <Phone className="h-4 w-4 text-neutral-400" />
-                    <span className="text-neutral-300">(415) 939-8270</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Mail className="h-4 w-4 text-neutral-400" />
-                    <span className="text-neutral-300">solepurposefootwear813@gmail.com</span>
-                  </div>
-                </div>
+                {proofError && (
+                  <p className="text-sm text-red-500 flex items-center">
+                    <AlertCircle className="h-4 w-4 mr-1" />
+                    {proofError}
+                  </p>
+                )}
               </div>
 
               <Button
                 onClick={handleSubmitOrder}
                 disabled={isLoading}
-                className="w-full bg-white text-black hover:bg-neutral-200 py-3"
+                className="w-full bg-white text-black hover:bg-neutral-200 py-3 disabled:bg-neutral-400 disabled:cursor-not-allowed"
               >
                 {isLoading ? "Submitting Order..." : "Submit Order"}
               </Button>
