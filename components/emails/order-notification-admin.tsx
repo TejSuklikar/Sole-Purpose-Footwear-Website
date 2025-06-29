@@ -1,4 +1,4 @@
-import { Body, Container, Head, Heading, Html, Preview, Section, Text, Row, Column } from "@react-email/components"
+import { Html, Head, Body, Container, Section, Text, Heading, Hr } from "@react-email/components"
 import type { CartItem } from "@/components/cart-provider"
 
 interface ShippingAddress {
@@ -31,75 +31,52 @@ export default function OrderNotificationAdmin({
   return (
     <Html>
       <Head />
-      <Preview>New order received from {customerEmail}</Preview>
       <Body style={main}>
         <Container style={container}>
-          <Section style={header}>
-            <Heading style={h1}>🎨 New Order Received!</Heading>
-            <Text style={customerInfo}>
-              <strong>Customer:</strong> {customerEmail}
+          <Heading style={h1}>🎨 New Order Received!</Heading>
+
+          <Section style={customer_section}>
+            <Text style={customer_info}>
+              <strong>Customer Email:</strong> {customerEmail}
             </Text>
-            <Text style={customerInfo}>
+            <Text style={customer_info}>
               <strong>Order Total:</strong> ${total.toFixed(2)}
+            </Text>
+            <Text style={customer_info}>
+              <strong>Bay Area Customer:</strong> {isBayArea ? "Yes (FREE delivery)" : "No"}
             </Text>
           </Section>
 
-          <Section style={orderSection}>
+          <Section style={section}>
             <Heading style={h2}>Order Details</Heading>
             {cartItems.map((item, index) => (
-              <div key={index} style={itemContainer}>
-                <Row style={itemRow}>
-                  <Column style={itemColumn}>
-                    <Text style={itemName}>{item.name}</Text>
-                    <Text style={itemDetails}>Size: {item.size}</Text>
-                    <Text style={itemDetails}>Quantity: {item.quantity}</Text>
-                    {item.type === "custom" && item.customDetails && (
-                      <>
-                        <Text style={customLabel}>🎨 Custom Design Details:</Text>
-                        <Text style={customDetails}>Design: {item.customDetails.design}</Text>
-                        <Text style={customDetails}>Colors: {item.customDetails.colors}</Text>
-                        <Text style={customDetails}>
-                          Special Requests: {item.customDetails.specialRequests || "None"}
-                        </Text>
-                      </>
+              <div key={index} style={item_container}>
+                <Text style={item_name}>{item.name}</Text>
+                <Text style={item_details}>
+                  Size: {item.size} | Quantity: {item.quantity} | Price: ${item.price.toFixed(2)}
+                </Text>
+                {item.type === "custom" && item.customDetails && (
+                  <div style={custom_details}>
+                    <Text style={custom_text}>🎨 Custom Design Details:</Text>
+                    {item.customDetails.designDescription && (
+                      <Text style={custom_text}>Description: {item.customDetails.designDescription}</Text>
                     )}
-                  </Column>
-                  <Column style={priceColumn}>
-                    <Text style={price}>${(item.price * item.quantity).toFixed(2)}</Text>
-                  </Column>
-                </Row>
+                    {item.customDetails.additionalNotes && (
+                      <Text style={custom_text}>Notes: {item.customDetails.additionalNotes}</Text>
+                    )}
+                  </div>
+                )}
               </div>
             ))}
 
-            <Row style={totalRow}>
-              <Column>
-                <Text style={totalLabel}>Subtotal:</Text>
-              </Column>
-              <Column style={priceColumn}>
-                <Text style={totalValue}>${subtotal.toFixed(2)}</Text>
-              </Column>
-            </Row>
+            <Hr style={hr} />
 
-            <Row style={totalRow}>
-              <Column>
-                <Text style={totalLabel}>Shipping:</Text>
-              </Column>
-              <Column style={priceColumn}>
-                <Text style={totalValue}>{isBayArea ? "FREE (Bay Area)" : `$${shippingCost.toFixed(2)}`}</Text>
-              </Column>
-            </Row>
-
-            <Row style={finalTotalRow}>
-              <Column>
-                <Text style={finalTotalLabel}>Total Paid:</Text>
-              </Column>
-              <Column style={priceColumn}>
-                <Text style={finalTotalValue}>${total.toFixed(2)}</Text>
-              </Column>
-            </Row>
+            <Text style={total_line}>Subtotal: ${subtotal.toFixed(2)}</Text>
+            <Text style={total_line}>Shipping: {isBayArea ? "FREE (Bay Area)" : `$${shippingCost.toFixed(2)}`}</Text>
+            <Text style={total_final}>Total Paid: ${total.toFixed(2)}</Text>
           </Section>
 
-          <Section style={shippingSection}>
+          <Section style={section}>
             <Heading style={h2}>📦 Shipping Information</Heading>
             <Text style={address}>
               <strong>Ship to:</strong>
@@ -108,23 +85,16 @@ export default function OrderNotificationAdmin({
               <br />
               {shippingAddress.city}, {shippingAddress.state} {shippingAddress.zip}
             </Text>
-            {isBayArea && (
-              <Text style={bayAreaNote}>
-                ✅ <strong>Bay Area Customer</strong> - Free pickup/dropoff available
-              </Text>
-            )}
           </Section>
 
-          <Section style={actionSection}>
+          <Section style={section}>
             <Heading style={h2}>📎 Payment Proof</Heading>
             <Text style={text}>
-              Payment proof is attached to this email. Please verify the payment before beginning production.
+              Payment proof is attached to this email. Please verify payment before beginning production.
             </Text>
           </Section>
 
-          <Section style={footer}>
-            <Text style={footerText}>Reply to this email to contact the customer directly at: {customerEmail}</Text>
-          </Section>
+          <Text style={footer}>Reply to this email to contact the customer directly: {customerEmail}</Text>
         </Container>
       </Body>
     </Html>
@@ -132,176 +102,121 @@ export default function OrderNotificationAdmin({
 }
 
 const main = {
-  backgroundColor: "#f6f9fc",
-  fontFamily: '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Ubuntu,sans-serif',
+  backgroundColor: "#f8f9fa",
+  fontFamily: "Arial, sans-serif",
 }
 
 const container = {
   backgroundColor: "#ffffff",
   margin: "0 auto",
-  padding: "20px 0 48px",
-  marginBottom: "64px",
-}
-
-const header = {
-  padding: "32px 24px",
-  textAlign: "center" as const,
-  backgroundColor: "#f8f9fa",
+  padding: "20px",
+  maxWidth: "600px",
+  border: "1px solid #dddddd",
 }
 
 const h1 = {
-  color: "#333",
+  color: "#333333",
   fontSize: "24px",
   fontWeight: "bold",
-  margin: "0 0 16px",
+  textAlign: "center" as const,
+  margin: "0 0 20px 0",
 }
 
 const h2 = {
-  color: "#333",
+  color: "#333333",
   fontSize: "18px",
   fontWeight: "bold",
-  margin: "24px 0 16px",
-}
-
-const customerInfo = {
-  color: "#555",
-  fontSize: "16px",
-  lineHeight: "24px",
-  margin: "0 0 8px",
+  margin: "20px 0 10px 0",
 }
 
 const text = {
-  color: "#555",
+  color: "#555555",
   fontSize: "16px",
   lineHeight: "24px",
-  margin: "0 0 16px",
+  margin: "0 0 15px 0",
 }
 
-const orderSection = {
-  padding: "0 24px",
+const customer_section = {
+  backgroundColor: "#fff3cd",
+  padding: "15px",
+  borderRadius: "5px",
+  margin: "0 0 20px 0",
 }
 
-const itemContainer = {
+const customer_info = {
+  color: "#856404",
+  fontSize: "16px",
+  margin: "0 0 8px 0",
+}
+
+const section = {
+  margin: "20px 0",
+}
+
+const item_container = {
   backgroundColor: "#f8f9fa",
-  borderRadius: "8px",
-  margin: "0 0 16px",
-  padding: "16px",
+  padding: "15px",
+  borderRadius: "5px",
+  margin: "0 0 15px 0",
 }
 
-const itemRow = {
-  margin: "0",
-}
-
-const itemColumn = {
-  verticalAlign: "top" as const,
-}
-
-const priceColumn = {
-  textAlign: "right" as const,
-  verticalAlign: "top" as const,
-  width: "120px",
-}
-
-const itemName = {
-  color: "#333",
+const item_name = {
+  color: "#333333",
   fontSize: "16px",
   fontWeight: "bold",
-  margin: "0 0 8px",
+  margin: "0 0 5px 0",
 }
 
-const itemDetails = {
-  color: "#666",
+const item_details = {
+  color: "#666666",
   fontSize: "14px",
-  margin: "0 0 4px",
+  margin: "0 0 10px 0",
 }
 
-const customLabel = {
-  color: "#e67e22",
+const custom_details = {
+  backgroundColor: "#e7f3ff",
+  padding: "10px",
+  borderRadius: "3px",
+  margin: "10px 0 0 0",
+}
+
+const custom_text = {
+  color: "#0c5460",
   fontSize: "14px",
-  fontWeight: "bold",
-  margin: "8px 0 4px",
+  margin: "0 0 5px 0",
 }
 
-const customDetails = {
-  color: "#666",
-  fontSize: "14px",
-  margin: "0 0 4px",
-  paddingLeft: "16px",
+const hr = {
+  border: "none",
+  borderTop: "2px solid #333333",
+  margin: "15px 0",
 }
 
-const price = {
-  color: "#333",
+const total_line = {
+  color: "#555555",
   fontSize: "16px",
-  fontWeight: "bold",
-  margin: "0",
+  margin: "5px 0",
 }
 
-const totalRow = {
-  padding: "8px 0",
-}
-
-const totalLabel = {
-  color: "#666",
-  fontSize: "16px",
-  margin: "0",
-}
-
-const totalValue = {
-  color: "#333",
-  fontSize: "16px",
-  margin: "0",
-}
-
-const finalTotalRow = {
-  borderTop: "2px solid #333",
-  padding: "12px 0",
-}
-
-const finalTotalLabel = {
-  color: "#333",
+const total_final = {
+  color: "#333333",
   fontSize: "18px",
   fontWeight: "bold",
-  margin: "0",
-}
-
-const finalTotalValue = {
-  color: "#333",
-  fontSize: "18px",
-  fontWeight: "bold",
-  margin: "0",
-}
-
-const shippingSection = {
-  padding: "0 24px",
+  margin: "10px 0 0 0",
 }
 
 const address = {
-  color: "#555",
+  color: "#555555",
   fontSize: "16px",
-  lineHeight: "24px",
-  margin: "0 0 16px",
-}
-
-const bayAreaNote = {
-  color: "#27ae60",
-  fontSize: "16px",
-  fontWeight: "bold",
+  lineHeight: "22px",
   margin: "0",
-}
-
-const actionSection = {
-  padding: "0 24px",
 }
 
 const footer = {
-  padding: "24px",
-  textAlign: "center" as const,
-  backgroundColor: "#f8f9fa",
-}
-
-const footerText = {
-  color: "#666",
+  color: "#888888",
   fontSize: "14px",
-  lineHeight: "20px",
-  margin: "0",
+  textAlign: "center" as const,
+  margin: "30px 0 0 0",
+  borderTop: "1px solid #eeeeee",
+  paddingTop: "20px",
 }

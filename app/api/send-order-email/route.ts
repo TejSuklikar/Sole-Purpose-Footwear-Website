@@ -88,28 +88,43 @@ export async function POST(request: Request) {
 
     // --- Send Email to Admin (Priority) ---
     console.log("Sending admin email...")
-    const adminResult = await resend.emails.send({
-      from: `New Order <${fromEmail}>`,
-      to: [adminEmail],
-      subject: `New Order Received - ${customerEmail}`,
-      react: OrderNotificationAdmin({
-        customerEmail,
-        cartItems,
-        subtotal,
-        shippingCost,
-        total,
-        isBayArea,
-        shippingAddress,
-      }),
-      attachments: attachments,
-    })
+    try {
+      const adminResult = await resend.emails.send({
+        from: `New Order <${fromEmail}>`,
+        to: [adminEmail],
+        subject: `New Order Received - ${customerEmail}`,
+        react: OrderNotificationAdmin({
+          customerEmail,
+          cartItems,
+          subtotal,
+          shippingCost,
+          total,
+          isBayArea,
+          shippingAddress,
+        }),
+        attachments: attachments,
+      })
 
-    if (adminResult.error) {
-      console.error("CRITICAL: Failed to send admin email:", adminResult.error)
-      return NextResponse.json({ error: "Failed to process order. Please contact support." }, { status: 500 })
+      if (adminResult.error) {
+        console.error("Admin email error:", adminResult.error)
+        return NextResponse.json(
+          {
+            error: `Failed to send order notification: ${adminResult.error.message || "Unknown error"}`,
+          },
+          { status: 500 },
+        )
+      }
+
+      console.log("Admin email sent successfully:", adminResult.data?.id)
+    } catch (adminError: any) {
+      console.error("Admin email exception:", adminError)
+      return NextResponse.json(
+        {
+          error: `Failed to send order notification: ${adminError.message || "Unknown error"}`,
+        },
+        { status: 500 },
+      )
     }
-
-    console.log("Admin email sent successfully:", adminResult.data?.id)
 
     // --- Send Email to Customer (Best effort) ---
     console.log("Sending customer email...")
@@ -129,25 +144,24 @@ export async function POST(request: Request) {
       })
 
       if (customerResult.error) {
-        console.error("Failed to send customer email:", customerResult.error)
+        console.error("Customer email error:", customerResult.error)
       } else {
         console.log("Customer email sent successfully:", customerResult.data?.id)
       }
     } catch (customerError) {
-      console.error("Error sending customer email:", customerError)
+      console.error("Customer email exception:", customerError)
     }
 
     console.log("=== ORDER PROCESSING COMPLETE ===")
     return NextResponse.json({
       success: true,
       message: "Order processed successfully",
-      adminEmailId: adminResult.data?.id,
     })
-  } catch (error) {
+  } catch (error: any) {
     console.error("Unhandled error in send-order-email route:", error)
     return NextResponse.json(
       {
-        error: "An unexpected error occurred. Please try again.",
+        error: `An unexpected error occurred: ${error.message || "Unknown error"}`,
       },
       { status: 500 },
     )
