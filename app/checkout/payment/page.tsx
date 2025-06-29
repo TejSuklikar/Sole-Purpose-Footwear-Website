@@ -1,60 +1,36 @@
 "use client"
 
 import type React from "react"
-
-import { useEffect, useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { useCart } from "@/components/cart-provider"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
-import { CheckCircle, Package, Phone, Mail, Upload, FileText } from "lucide-react"
+import { CheckCircle, Phone, Mail, Upload, FileText } from "lucide-react"
 import Image from "next/image"
-
-interface CartItem {
-  id: string
-  name: string
-  price: number
-  size: string
-  image: string
-  isCustom?: boolean
-  customDetails?: {
-    shoeType: string
-    designDescription: string
-    colorPreferences: string
-    additionalNotes: string
-  }
-}
 
 // Function to determine shipping cost based on size
 function getShippingForSize(size: string): number {
-  // Kids sizes (C and Y) get $15 shipping
-  if (size.includes("C") || size.includes("Y")) {
+  if (size.toUpperCase().includes("C") || size.toUpperCase().includes("Y")) {
     return 15
   }
-  // Adult sizes (Men's and Women's) get $20 shipping
   return 20
 }
 
 export default function PaymentPage() {
   const router = useRouter()
-  const [cartItems, setCartItems] = useState<CartItem[]>([])
+  const { items: cartItems, total: subtotal, clearCart } = useCart()
   const [isBayArea, setIsBayArea] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [paymentProof, setPaymentProof] = useState<File | null>(null)
+  const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
-    const savedCart = localStorage.getItem("sp_cart")
-    if (savedCart) {
-      setCartItems(JSON.parse(savedCart))
-    } else {
-      router.push("/shoes")
-    }
-  }, [router])
-
-  // Calculate pricing
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price, 0)
+    setIsClient(true)
+  }, [])
 
   // Calculate shipping - use the highest shipping rate in the order
   const shippingCost = isBayArea
@@ -76,59 +52,30 @@ export default function PaymentPage() {
     setIsLoading(true)
 
     try {
-      // Create order summary
-      const orderSummary = {
-        items: cartItems,
-        subtotal,
-        shipping: shippingCost,
-        total,
-        isBayArea,
-        timestamp: new Date().toISOString(),
-      }
-
-      // Create email content
-      const emailSubject = `New Order - ${cartItems.length} item${cartItems.length !== 1 ? "s" : ""} - $${total}`
+      const emailSubject = `New Order - ${cartItems.length} item${cartItems.length !== 1 ? "s" : ""} - $${total.toFixed(2)}`
 
       let emailBody = `New order received!\n\n`
       emailBody += `Order Details:\n`
       emailBody += `=============\n\n`
 
-      // Regular shoes
-      const regularItems = cartItems.filter((item) => !item.isCustom)
-      if (regularItems.length > 0) {
-        emailBody += `Regular Shoes:\n`
-        regularItems.forEach((item, index) => {
-          emailBody += `${index + 1}. ${item.name}\n`
-          emailBody += `   Size: ${item.size}\n`
-          emailBody += `   Price: $${item.price}\n\n`
-        })
-      }
-
-      // Custom orders
-      const customItems = cartItems.filter((item) => item.isCustom)
-      if (customItems.length > 0) {
-        emailBody += `Custom Orders:\n`
-        customItems.forEach((item, index) => {
-          emailBody += `${index + 1}. ${item.name}\n`
-          emailBody += `   Size: ${item.size}\n`
-          emailBody += `   Price: $${item.price}\n`
-          if (item.customDetails) {
-            emailBody += `   Shoe Type: ${item.customDetails.shoeType}\n`
-            emailBody += `   Design: ${item.customDetails.designDescription}\n`
-            emailBody += `   Colors: ${item.customDetails.colorPreferences}\n`
-            if (item.customDetails.additionalNotes) {
-              emailBody += `   Notes: ${item.customDetails.additionalNotes}\n`
-            }
-          }
-          emailBody += `\n`
-        })
-      }
+      cartItems.forEach((item, index) => {
+        emailBody += `${index + 1}. ${item.name}\n`
+        emailBody += `   Size: ${item.size}, Qty: ${item.quantity}\n`
+        emailBody += `   Price: $${(item.price * item.quantity).toFixed(2)}\n`
+        if (item.type === "custom" && item.customDetails) {
+          emailBody += `   --- Custom Details ---\n`
+          Object.entries(item.customDetails).forEach(([key, value]) => {
+            emailBody += `   ${key}: ${value}\n`
+          })
+        }
+        emailBody += `\n`
+      })
 
       emailBody += `Order Summary:\n`
       emailBody += `=============\n`
-      emailBody += `Subtotal: $${subtotal}\n`
-      emailBody += `Shipping: ${isBayArea ? "FREE (Bay Area)" : `$${shippingCost}`}\n`
-      emailBody += `Total: $${total}\n\n`
+      emailBody += `Subtotal: $${subtotal.toFixed(2)}\n`
+      emailBody += `Shipping: ${isBayArea ? "FREE (Bay Area)" : `$${shippingCost.toFixed(2)}`}\n`
+      emailBody += `Total: $${total.toFixed(2)}\n\n`
 
       if (paymentProof) {
         emailBody += `Payment proof attached: ${paymentProof.name}\n\n`
@@ -137,14 +84,10 @@ export default function PaymentPage() {
       emailBody += `Please process this order and contact the customer for next steps.\n`
       emailBody += `Order placed at: ${new Date().toLocaleString()}`
 
-      // Create mailto link
       const mailtoLink = `mailto:solepurposefootwear813@gmail.com?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`
-
-      // Open email client
       window.open(mailtoLink)
 
-      // Clear cart and redirect
-      localStorage.removeItem("sp_cart")
+      clearCart()
       router.push("/checkout/success")
     } catch (error) {
       console.error("Error submitting order:", error)
@@ -152,6 +95,16 @@ export default function PaymentPage() {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  if (!isClient) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Loading...</h1>
+        </div>
+      </div>
+    )
   }
 
   if (cartItems.length === 0) {
@@ -185,80 +138,31 @@ export default function PaymentPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Regular Shoes */}
-              {cartItems.filter((item) => !item.isCustom).length > 0 && (
-                <div>
-                  <h3 className="text-white font-semibold mb-3 flex items-center">
-                    <Package className="mr-2 h-4 w-4 text-blue-500" />
-                    Regular Shoes
-                  </h3>
-                  <div className="space-y-3">
-                    {cartItems
-                      .filter((item) => !item.isCustom)
-                      .map((item) => (
-                        <div key={item.id} className="flex items-center space-x-4 p-3 bg-neutral-800 rounded-lg">
-                          <div className="w-16 h-16 relative rounded-lg overflow-hidden">
-                            <Image
-                              src={item.image || "/placeholder.svg"}
-                              alt={item.name}
-                              fill
-                              className="object-cover"
-                              crossOrigin="anonymous"
-                            />
-                          </div>
-                          <div className="flex-1">
-                            <h4 className="text-white font-medium">{item.name}</h4>
-                            <p className="text-neutral-400 text-sm">Size: {item.size}</p>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-white font-semibold">${item.price}</p>
-                          </div>
-                        </div>
-                      ))}
+              <div className="space-y-3">
+                {cartItems.map((item) => (
+                  <div
+                    key={`${item.id}-${item.size}`}
+                    className="flex items-center space-x-4 p-3 bg-neutral-800 rounded-lg"
+                  >
+                    <div className="w-16 h-16 relative rounded-lg overflow-hidden">
+                      <Image
+                        src={item.image || "/placeholder.svg"}
+                        alt={item.name}
+                        fill
+                        className="object-cover"
+                        crossOrigin="anonymous"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="text-white font-medium">{item.name}</h4>
+                      <p className="text-neutral-400 text-sm">Size: {item.size}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-white font-semibold">${(item.price * item.quantity).toFixed(2)}</p>
+                    </div>
                   </div>
-                </div>
-              )}
-
-              {/* Custom Orders */}
-              {cartItems.filter((item) => item.isCustom).length > 0 && (
-                <div>
-                  <h3 className="text-white font-semibold mb-3 flex items-center">
-                    <Package className="mr-2 h-4 w-4 text-purple-500" />
-                    Custom Orders
-                  </h3>
-                  <div className="space-y-3">
-                    {cartItems
-                      .filter((item) => item.isCustom)
-                      .map((item) => (
-                        <div key={item.id} className="p-4 bg-blue-900/20 border border-blue-800 rounded-lg">
-                          <div className="flex justify-between items-start mb-3">
-                            <h4 className="text-white font-medium">{item.name}</h4>
-                            <p className="text-white font-semibold">${item.price}</p>
-                          </div>
-                          <p className="text-blue-300 text-sm mb-2">Size: {item.size}</p>
-                          {item.customDetails && (
-                            <div className="text-sm text-neutral-300 space-y-1">
-                              <p>
-                                <span className="text-neutral-400">Shoe:</span> {item.customDetails.shoeType}
-                              </p>
-                              <p>
-                                <span className="text-neutral-400">Design:</span> {item.customDetails.designDescription}
-                              </p>
-                              <p>
-                                <span className="text-neutral-400">Colors:</span> {item.customDetails.colorPreferences}
-                              </p>
-                              {item.customDetails.additionalNotes && (
-                                <p>
-                                  <span className="text-neutral-400">Notes:</span> {item.customDetails.additionalNotes}
-                                </p>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                  </div>
-                </div>
-              )}
+                ))}
+              </div>
 
               <Separator className="bg-neutral-700" />
 
@@ -266,21 +170,20 @@ export default function PaymentPage() {
               <div className="space-y-2">
                 <div className="flex justify-between text-neutral-300">
                   <span>Subtotal</span>
-                  <span>${subtotal}</span>
+                  <span>${subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-neutral-300">
                   <span>Shipping</span>
-                  <span>{isBayArea ? "FREE" : `$${shippingCost}`}</span>
+                  <span>{isBayArea ? "FREE" : `$${shippingCost.toFixed(2)}`}</span>
                 </div>
                 <Separator className="bg-neutral-700" />
                 <div className="flex justify-between text-white text-lg font-semibold">
                   <span>Total</span>
-                  <span>${total}</span>
+                  <span>${total.toFixed(2)}</span>
                 </div>
               </div>
 
-              {/* Custom Order Notice */}
-              {cartItems.some((item) => item.isCustom) && (
+              {cartItems.some((item) => item.type === "custom") && (
                 <div className="p-3 bg-blue-900/20 border border-blue-800 rounded-lg">
                   <p className="text-blue-300 text-sm flex items-center">
                     <FileText className="mr-2 h-4 w-4" />
@@ -297,31 +200,33 @@ export default function PaymentPage() {
               <CardTitle className="text-white">Payment Instructions</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Bay Area Checkbox */}
-              <div className="flex items-center space-x-2 p-3 bg-green-900/20 border border-green-800 rounded-lg">
-                <Checkbox id="bayArea" checked={isBayArea} onCheckedChange={setIsBayArea} />
-                <Label htmlFor="bayArea" className="text-green-300 text-sm cursor-pointer">
-                  I'm in the Bay Area (FREE pickup/dropoff)
-                </Label>
-              </div>
+              {cartItems.some((item) => item.type === "custom") && (
+                <div className="flex items-center space-x-2 p-3 bg-green-900/20 border border-green-800 rounded-lg">
+                  <Checkbox
+                    id="bayArea"
+                    checked={isBayArea}
+                    onCheckedChange={(checked) => setIsBayArea(Boolean(checked))}
+                  />
+                  <Label htmlFor="bayArea" className="text-green-300 text-sm cursor-pointer">
+                    I'm in the Bay Area (FREE pickup/dropoff for custom orders)
+                  </Label>
+                </div>
+              )}
 
-              {/* Payment Methods */}
               <div className="space-y-4">
                 <h3 className="text-white font-semibold">Payment Methods</h3>
-
                 <div className="space-y-3">
                   <div className="p-3 bg-neutral-800 rounded-lg">
                     <h4 className="text-white font-medium mb-2">Zelle (Preferred)</h4>
-                    <p className="text-neutral-300 text-sm mb-2">Send ${total} to:</p>
+                    <p className="text-neutral-300 text-sm mb-2">Send ${total.toFixed(2)} to:</p>
                     <div className="flex items-center space-x-2">
                       <Phone className="h-4 w-4 text-blue-400" />
                       <span className="text-blue-400 font-mono">+1 (415) 939-8270</span>
                     </div>
                   </div>
-
                   <div className="p-3 bg-neutral-800 rounded-lg">
                     <h4 className="text-white font-medium mb-2">Venmo</h4>
-                    <p className="text-neutral-300 text-sm mb-2">Send ${total} to:</p>
+                    <p className="text-neutral-300 text-sm mb-2">Send ${total.toFixed(2)} to:</p>
                     <a
                       href="https://venmo.com/u/Drew-Alaraj"
                       target="_blank"
@@ -334,7 +239,6 @@ export default function PaymentPage() {
                 </div>
               </div>
 
-              {/* Payment Proof Upload */}
               <div className="space-y-3">
                 <Label htmlFor="paymentProof" className="text-white font-medium">
                   Upload Payment Proof (Optional)
@@ -356,7 +260,6 @@ export default function PaymentPage() {
                 </div>
               </div>
 
-              {/* Contact Info */}
               <div className="p-3 bg-neutral-800 rounded-lg">
                 <h4 className="text-white font-medium mb-2">Questions?</h4>
                 <div className="space-y-1 text-sm">
@@ -371,7 +274,6 @@ export default function PaymentPage() {
                 </div>
               </div>
 
-              {/* Submit Button */}
               <Button
                 onClick={handleSubmitOrder}
                 disabled={isLoading}
