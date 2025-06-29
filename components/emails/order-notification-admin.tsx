@@ -72,7 +72,7 @@ export default function OrderNotificationAdmin({
 
           <Section style={box}>
             <Heading as="h2" style={h2}>
-              Shipping Address
+              📦 Shipping Address
             </Heading>
             <Text style={addressText}>
               {shippingAddress.street}
