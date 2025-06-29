@@ -4,9 +4,26 @@ import OrderConfirmationCustomer from "@/components/emails/order-confirmation-cu
 import OrderNotificationAdmin from "@/components/emails/order-notification-admin"
 import type { CartItem } from "@/components/cart-provider"
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-const fromEmail = "orders@orders.solepurpose.shop"
-const adminEmail = "solepurposefootwear813@gmail.com"
+// Debug function to safely log API key info
+function debugApiKey(apiKey: string | undefined) {
+  if (!apiKey) {
+    return {
+      exists: false,
+      length: 0,
+      prefix: "N/A",
+      hasWhitespace: false,
+    }
+  }
+
+  return {
+    exists: true,
+    length: apiKey.length,
+    prefix: apiKey.substring(0, 5),
+    hasWhitespace: apiKey !== apiKey.trim(),
+    endsWithNewline: apiKey.endsWith("\n") || apiKey.endsWith("\r"),
+  }
+}
+
 const MAX_FILE_SIZE_BYTES = 8 * 1024 * 1024 // 8MB
 
 interface ShippingAddress {
@@ -19,15 +36,47 @@ interface ShippingAddress {
 
 export async function POST(request: Request) {
   console.log("=== ORDER EMAIL API CALLED ===")
-  console.log("API Key exists:", !!process.env.RESEND_API_KEY)
-  console.log("API Key prefix:", process.env.RESEND_API_KEY?.substring(0, 3))
 
-  if (!process.env.RESEND_API_KEY) {
-    console.error("RESEND_API_KEY environment variable is not set")
+  // Get and clean the API key
+  const rawApiKey = process.env.RESEND_API_KEY
+  const apiKey = rawApiKey?.trim()
+
+  const debugInfo = debugApiKey(rawApiKey)
+  console.log("API Key Debug Info:", debugInfo)
+
+  if (!apiKey) {
+    console.error("RESEND_API_KEY environment variable is not set or empty")
     return NextResponse.json({ error: "Server configuration error: Missing API key" }, { status: 500 })
   }
 
+  // Validate API key format
+  if (!apiKey.startsWith("re_")) {
+    console.error("API key does not start with 're_'")
+    return NextResponse.json({ error: "Server configuration error: Invalid API key format" }, { status: 500 })
+  }
+
+  // Initialize Resend with cleaned API key
+  const resend = new Resend(apiKey)
+  const fromEmail = "orders@orders.solepurpose.shop"
+  const adminEmail = "solepurposefootwear813@gmail.com"
+
   try {
+    // Test the API key first with a simple call
+    console.log("Testing API key with Resend...")
+    try {
+      // This is a simple test to validate the API key
+      const testResult = await resend.domains.list()
+      console.log("API key test successful:", !!testResult)
+    } catch (testError: any) {
+      console.error("API key test failed:", testError.message)
+      return NextResponse.json(
+        {
+          error: `API key validation failed: ${testError.message}`,
+        },
+        { status: 500 },
+      )
+    }
+
     const formData = await request.formData()
     const customerEmail = formData.get("customerEmail") as string
     const cartItemsString = formData.get("cartItems") as string | null
@@ -90,7 +139,7 @@ export async function POST(request: Request) {
     console.log("Sending admin email...")
     try {
       const adminResult = await resend.emails.send({
-        from: `New Order <${fromEmail}>`,
+        from: fromEmail,
         to: [adminEmail],
         subject: `New Order Received - ${customerEmail}`,
         react: OrderNotificationAdmin({
@@ -130,7 +179,7 @@ export async function POST(request: Request) {
     console.log("Sending customer email...")
     try {
       const customerResult = await resend.emails.send({
-        from: `Soul Purpose Footwear <${fromEmail}>`,
+        from: fromEmail,
         to: [customerEmail],
         subject: "Your Soul Purpose Footwear Order Confirmation",
         react: OrderConfirmationCustomer({

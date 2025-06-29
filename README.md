@@ -1,30 +1,39 @@
-# SoulPurposeFootwear
+# Soul Purpose Footwear
 
-*Automatically synced with your [v0.dev](https://v0.dev) deployments*
+A custom footwear e-commerce platform built with Next.js, featuring custom shoe designs and order management.
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/tej-suklikars-projects-0d4992dc/v0-soul-purpose-footwear)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.dev-black?style=for-the-badge)](https://v0.dev/chat/projects/MwEXdZEpFTa)
+## Features
 
-## Overview
+- Custom shoe design ordering
+- Shopping cart functionality
+- Email order confirmations
+- Admin panel for order management
+- Responsive design
 
-This repository will stay in sync with your deployed chats on [v0.dev](https://v0.dev).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.dev](https://v0.dev).
+## Getting Started
+
+1. Install dependencies:
+\`\`\`bash
+npm install
+\`\`\`
+
+2. Set up environment variables:
+\`\`\`bash
+cp .env.example .env
+\`\`\`
+
+3. Run the development server:
+\`\`\`bash
+npm run dev
+\`\`\`
+
+## Environment Variables
+
+- `RESEND_API_KEY` - Your Resend API key for email functionality
+- `GITHUB_TOKEN` - GitHub token for data synchronization
+- `GITHUB_OWNER` - GitHub repository owner
+- `GITHUB_REPO` - GitHub repository name
 
 ## Deployment
 
-Your project is live at:
-
-**[https://vercel.com/tej-suklikars-projects-0d4992dc/v0-soul-purpose-footwear](https://vercel.com/tej-suklikars-projects-0d4992dc/v0-soul-purpose-footwear)**
-
-## Build your app
-
-Continue building your app on:
-
-**[https://v0.dev/chat/projects/MwEXdZEpFTa](https://v0.dev/chat/projects/MwEXdZEpFTa)**
-
-## How It Works
-
-1. Create and modify your project using [v0.dev](https://v0.dev)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
+This project is optimized for deployment on Vercel.
