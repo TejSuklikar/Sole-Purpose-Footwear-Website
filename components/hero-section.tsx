@@ -42,7 +42,7 @@ const defaultFeaturedShoes = [
     price: 160,
     image: "/images/black-red-geometric-hero.jpg",
     slug: "black-red-kuffiyeh",
-    description: "Sleek black forces with striking red geometric patterns.",
+    description: "Sleek black forces with striking red patterns.",
     isFeatured: true,
   },
 ]

@@ -86,9 +86,10 @@ export function CartSidebar() {
                       <Plus className="h-3 w-3" />
                     </Button>
                     <Button
+                      variant="ghost"
                       size="sm"
                       onClick={() => removeItem(item.id, item.size)}
-                      className="h-8 w-8 p-0 bg-red-100 text-red-600 hover:bg-red-200 hover:text-red-700"
+                      className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
                     >
                       <Trash2 className="h-3 w-3" />
                     </Button>
@@ -126,9 +127,10 @@ export function CartSidebar() {
                     <div className="flex items-center space-x-2">
                       <span className="text-sm font-medium text-blue-900">Qty: {item.quantity}</span>
                       <Button
+                        variant="ghost"
                         size="sm"
                         onClick={() => removeItem(item.id, item.size)}
-                        className="h-8 w-8 p-0 bg-red-100 text-red-600 hover:bg-red-200 hover:text-red-700"
+                        className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
                       >
                         <Trash2 className="h-3 w-3" />
                       </Button>

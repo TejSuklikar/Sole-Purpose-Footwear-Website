@@ -15,20 +15,9 @@ export default function AboutPage() {
 
           {/* Each paragraph is now completely closed before the next starts */}
           <p className="text-xl text-neutral-300 leading-relaxed">
-            At SolePurpose, we believe what you wear should speak louder than words. What started as one hand-painted
-            gift for a friend turned into a movement—rooted in culture, not in capital. We specialize in custom footwear
-            that's all about you—your culture, your passion, your story. Each design is made with care, turning where
-            you come from into something you can step into.
+            At SolePurpose, we believe what you wear should speak louder than words. What started as one hand-painted gift for a friend turned into a movement rooted in culture, not in capital. We specialize in custom footwear that’s all about you your culture, your passion, your story. Each design is made with care, turning where you come from into something you can step into.
           </p>
-          <p className="text-xl text-neutral-300 leading-relaxed mt-4">
-            We represent all cultures and walks of life. Want your flag on the toe box? A personal quote? Something the
-            world's never seen? Say less, we got you. You bring the idea, we'll bring it to life with precision,
-            passion, and top-tier service.
-          </p>
-          <p className="text-xl text-neutral-300 leading-relaxed mt-4">
-            Because this isn't just about shoes, it's about making a statement, standing out, and putting your story on
-            the map.
-          </p>
+
           <p className="text-xl text-white font-bold mt-6">Make your mark. Wear your purpose.</p>
         </div>
 
