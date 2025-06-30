@@ -111,7 +111,7 @@ export default function Header() {
                 <X className="h-5 w-5" />
               </Button>
             </div>
-            <CartSidebar />
+            <CartSidebar onClose={() => setIsCartOpen(false)} />
           </div>
         </div>
       )}
