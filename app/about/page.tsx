@@ -12,8 +12,13 @@ export default function AboutPage() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h1 className="font-playfair text-4xl md:text-5xl font-bold text-white mb-6">Our Story</h1>
+
+          {/* Each paragraph is now completely closed before the next starts */}
           <p className="text-xl text-neutral-300 leading-relaxed">
-            At SolePurpose, we believe what you wear should speak louder than words. What started as one hand-painted gift for a friend turned into a movement—rooted in culture, not in capital. We specialize in custom footwear that's all about you—your culture, your passion, your story. Each design is made with care, turning where you come from into something you can step into.
+            At SolePurpose, we believe what you wear should speak louder than words. What started as one hand-painted
+            gift for a friend turned into a movement—rooted in culture, not in capital. We specialize in custom footwear
+            that's all about you—your culture, your passion, your story. Each design is made with care, turning where
+            you come from into something you can step into.
           </p>
           <p className="text-xl text-neutral-300 leading-relaxed mt-4">
             We represent all cultures and walks of life. Want your flag on the toe box? A personal quote? Something the
@@ -49,8 +54,8 @@ export default function AboutPage() {
               </p>
             </div>
             <Image
-              src="/images/artist-at-work.jpg"
-              alt="Artist wearing custom Palestinian flag Air Force 1s, showcasing the craftsmanship and street style"
+              src="/images/artist-lifestyle-shot.jpeg"
+              alt="Artist wearing custom Air Force 1s in urban street setting, showcasing the lifestyle and street culture behind Sole Purpose"
               width={600}
               height={400}
               className="rounded-lg shadow-lg"

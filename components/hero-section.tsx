@@ -19,11 +19,12 @@ interface Shoe {
 const defaultFeaturedShoes = [
   {
     id: 1,
-    name: "Red Kuffiyeh AF1",
+    name: "Traditional Kuffiyeh Dunks",
     price: 160,
-    image: "/images/kuffiyeh-side-sunset.png",
-    slug: "red-kuffiyeh-af1",
-    description: "Traditional Kuffiyeh patterns hand-painted in bold red on premium white canvas.",
+    image: "/images/traditional-kuffiyeh-dunks-single.jpeg",
+    slug: "traditional-kuffiyeh-dunks",
+    description:
+      "Classic Kuffiyeh patterns hand-painted on premium Nike Dunks with traditional black and white design.",
     isFeatured: true,
   },
   {

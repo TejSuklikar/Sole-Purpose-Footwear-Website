@@ -32,7 +32,7 @@ const defaultEvents: Event[] = [
   {
     id: 3,
     title: "Palestine Day",
-    date: "October 1-8, 2025",
+    date: "October 18, 2025",
     time: "12:00 PM PST",
     location: "Redwood City",
     description: "Limited edition Palestinian-inspired designs",
