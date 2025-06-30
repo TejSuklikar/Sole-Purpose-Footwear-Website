@@ -115,7 +115,7 @@ const defaultShoes: Shoe[] = [
     inStockSizes: allSizes,
     description: "A vibrant red kuffiyeh design.",
     details: ["Sticker price: $160"],
-    isFeatured: true,
+    isFeatured: false,
   },
   {
     id: 2,
@@ -272,7 +272,7 @@ const defaultShoes: Shoe[] = [
     inStockSizes: allSizes,
     description: "Classic black and white Nike Dunks featuring a traditional black kuffiyeh pattern.",
     details: ["Sticker price: $160"],
-    isFeatured: false,
+    isFeatured: true,
   },
   {
     id: 14,
