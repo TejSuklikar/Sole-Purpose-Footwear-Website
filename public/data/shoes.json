@@ -20,7 +20,7 @@
     ],
     "availableSizes": [],
     "slug": "red-kuffiyeh-af1",
-    "isFeatured": true
+    "isFeatured": false
   },
   {
     "id": 2,
@@ -227,7 +227,7 @@
     "details": ["Hand-painted with premium acrylic paints", "Based on Nike Dunk silhouette"],
     "availableSizes": [],
     "slug": "traditional-kuffiyeh-dunks",
-    "isFeatured": false
+    "isFeatured": true
   },
   {
     "id": 14,
