@@ -47,7 +47,7 @@ export function FeaturedWork() {
         {/* Stats Section */}
         <div className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-8">
           <div className="text-center">
-            <div className="text-3xl font-bold text-white mb-2">500+</div>
+            <div className="text-3xl font-bold text-white mb-2">50+</div>
             <div className="text-sm text-neutral-400 uppercase tracking-wider">Custom Designs</div>
           </div>
           <div className="text-center">
