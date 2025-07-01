@@ -256,13 +256,18 @@ const shoes = [
   },
   {
     id: 13,
-    name: "Traditional Kuffiyeh Dunks",
+    name: "Kuffiyeh Dunks",
     price: 160,
-    images: ["/images/traditional-kuffiyeh-dunks-single.jpeg", "/images/traditional-kuffiyeh-dunks-pair.jpeg"],
-    slug: "traditional-kuffiyeh-dunks",
+    images: ["/images/kuffiyeh-dunk-single.jpeg", "/images/kuffiyeh-dunk-pair.jpeg"],
+    slug: "kuffiyeh-dunks",
     sizes: allSizes,
-    description: "Classic black and white Nike Dunks featuring a traditional black kuffiyeh pattern on the swoosh.",
-    details: ["Hand-painted with premium acrylic paints", "Based on Nike Dunk silhouette"],
+    description:
+      "Traditional Kuffiyeh patterns hand-painted on black Nike Dunks. A bold homage to heritage and street style.",
+    details: [
+      "Hand-painted with premium acrylic paints",
+      "Sealed with protective coating for durability",
+      "Based on Nike Dunk silhouette",
+    ],
   },
   {
     id: 14,
