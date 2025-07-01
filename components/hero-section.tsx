@@ -1,22 +1,11 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
-interface Shoe {
-  id: number
-  name: string
-  price: number
-  image: string
-  slug: string
-  description?: string
-  isFeatured?: boolean
-}
-
-// Default featured shoes (fallback)
-const defaultFeaturedShoes = [
+// Featured shoes - directly defined
+const featuredShoes = [
   {
     id: 5,
     name: "Black & White Checkered",
@@ -24,7 +13,6 @@ const defaultFeaturedShoes = [
     image: "/images/geometric-checkered-side.jpg",
     slug: "black-white-checkered",
     description: "Clean geometric checkered pattern in black and white.",
-    isFeatured: true,
   },
   {
     id: 14,
@@ -33,7 +21,6 @@ const defaultFeaturedShoes = [
     image: "/images/palestine-heel-kuffiyeh-af1-side-2.jpeg",
     slug: "palestine-heel-kuffiyeh-af1",
     description: "White AF1s with a Palestinian flag swoosh and Kuffiyeh heel.",
-    isFeatured: true,
   },
   {
     id: 11,
@@ -42,53 +29,10 @@ const defaultFeaturedShoes = [
     image: "/images/kuffiyeh-dunk-single.jpeg",
     slug: "kuffiyeh-dunks",
     description: "Traditional Kuffiyeh patterns hand-painted on black Nike Dunks.",
-    isFeatured: true,
   },
 ]
 
 export function HeroSection() {
-  const [featuredShoes, setFeaturedShoes] = useState<Shoe[]>(defaultFeaturedShoes)
-
-  // Load featured shoes from global storage
-  useEffect(() => {
-    const loadFeaturedShoes = () => {
-      const savedShoes = localStorage.getItem("sp_shoes_global")
-      if (savedShoes) {
-        const shoes = JSON.parse(savedShoes)
-        const featured = shoes.filter((shoe: Shoe) => shoe.isFeatured).slice(0, 3)
-
-        // If we have featured shoes from storage, use them; otherwise use defaults
-        if (featured.length > 0) {
-          setFeaturedShoes(featured)
-        } else {
-          setFeaturedShoes(defaultFeaturedShoes)
-        }
-      } else {
-        // No saved shoes, use defaults
-        setFeaturedShoes(defaultFeaturedShoes)
-      }
-    }
-
-    loadFeaturedShoes()
-
-    // Listen for storage changes to update when admin makes changes
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === "sp_shoes_global") {
-        loadFeaturedShoes()
-      }
-    }
-
-    window.addEventListener("storage", handleStorageChange)
-
-    // Also check for changes periodically (for same-tab updates)
-    const interval = setInterval(loadFeaturedShoes, 1000)
-
-    return () => {
-      window.removeEventListener("storage", handleStorageChange)
-      clearInterval(interval)
-    }
-  }, [])
-
   return (
     <section className="hero-gradient py-20 lg:py-32">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -118,7 +62,7 @@ export function HeroSection() {
                       src={shoe.image || "/placeholder.svg"}
                       alt={shoe.name}
                       fill
-                      className="object-cover object-center"
+                      className={`object-cover object-center ${shoe.slug === "kuffiyeh-dunks" ? "scale-110" : ""}`}
                       crossOrigin="anonymous"
                     />
                   </div>

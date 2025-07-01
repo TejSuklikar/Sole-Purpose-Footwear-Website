@@ -16,7 +16,7 @@
       "Hand-painted with premium acrylic paints",
       "Sealed with protective coating",
       "Based on Nike Air Force 1",
-      "Infant (1C-7.5C): $135 total | Toddler (8C-13.5C): $145 total | Youth: $145 total | Big Kids: $145-175 total | Adults: $230 total"
+      "Infant (1C-7.5C): $135 | Toddler (8C-13.5C): $145 | Youth: $145 | Big Kids: $145-175 | Adults: $230"
     ],
     "availableSizes": [],
     "slug": "red-kuffiyeh-af1",
@@ -36,31 +36,21 @@
       "/images/mexican-box-top.png"
     ],
     "description": "Detailed Mexican flag design featuring the iconic eagle and serpent coat of arms.",
-    "details": [
-      "Hand-painted Mexican coat of arms",
-      "Mexican flag colors on swoosh",
-      "Premium white leather base",
-      "Infant (1C-7.5C): $135 total | Toddler (8C-13.5C): $145 total | Youth: $145 total | Big Kids: $145-175 total | Adults: $230 total"
-    ],
+    "details": ["Hand-painted Mexican coat of arms", "Mexican flag colours on swoosh", "Premium white leather base"],
     "availableSizes": [],
     "slug": "mexican-eagle-af1",
-    "isFeatured": true
+    "isFeatured": false
   },
   {
     "id": 3,
     "name": "Black & Red Kuffiyeh",
     "price": 160,
     "images": ["/images/black-red-geometric-hero.jpg", "/images/black-red-af1.png", "/images/geometric-af1.png"],
-    "description": "Sleek black forces with striking red Kuffiyeh patterns.",
-    "details": [
-      "All-black leather base",
-      "Hand-painted red Kuffiyeh patterns",
-      "Matte finish",
-      "Infant (1C-7.5C): $135 total | Toddler (8C-13.5C): $145 total | Youth: $145 total | Big Kids: $145-175 total | Adults: $230 total"
-    ],
+    "description": "Sleek black Forces with striking red Kuffiyeh patterns.",
+    "details": ["All-black leather base", "Hand-painted red Kuffiyeh patterns", "Matte finish"],
     "availableSizes": [],
-    "slug": "black-red-kuffiyeh",
-    "isFeatured": true
+    "slug": "black-and-red-kuffiyeh-af1",
+    "isFeatured": false
   },
   {
     "id": 4,
@@ -72,12 +62,11 @@
       "/images/jordanian-af1.png",
       "/images/jordanian-detail.png"
     ],
-    "description": "Jordanian flag design with traditional colors and patterns.",
+    "description": "Jordanian flag design with traditional colours and patterns.",
     "details": [
       "Hand-painted Jordanian flag design",
-      "Traditional red, black, white, and green colors",
-      "Kuffiyeh pattern details",
-      "Infant (1C-7.5C): $135 total | Toddler (8C-13.5C): $145 total | Youth: $145 total | Big Kids: $145-175 total | Adults: $230 total"
+      "Traditional red, black, white and green",
+      "Kuffiyeh pattern details"
     ],
     "availableSizes": [],
     "slug": "jordanian-flag-af1",
@@ -91,20 +80,17 @@
       "/images/geometric-checkered-side.jpg",
       "/images/checkered-drip-af1.png",
       "/images/checkered-drip-heel.png",
-      "/images/checkered-drip-pair.png",
-      "/images/checkered-drip-sunset.png",
-      "/images/checkered-sunset.png"
+      "/images/checkered-drip-pair.png"
     ],
     "description": "Clean geometric checkered pattern in black and white.",
     "details": [
       "Hand-painted checkered pattern",
-      "Black and white minimalist design",
-      "Palestinian flag colors on branding",
-      "Infant (1C-7.5C): $135 total | Toddler (8C-13.5C): $145 total | Youth: $145 total | Big Kids: $145-175 total | Adults: $230 total"
+      "Black & white minimalist design",
+      "Palestinian flag colours on branding"
     ],
     "availableSizes": [],
-    "slug": "black-white-checkered",
-    "isFeatured": false
+    "slug": "black-and-white-checkered-af1",
+    "isFeatured": true
   },
   {
     "id": 6,
@@ -116,12 +102,11 @@
       "/images/chinese-collection.png",
       "/images/chinese-heel-view.png"
     ],
-    "description": "Chinese flag design featuring the iconic red and gold color scheme.",
+    "description": "Chinese flag design featuring the iconic red and gold colour scheme.",
     "details": [
       "Hand-painted Chinese flag design",
-      "Authentic red and gold colors",
-      "Flag elements integrated into swoosh",
-      "Infant (1C-7.5C): $135 total | Toddler (8C-13.5C): $145 total | Youth: $145 total | Big Kids: $145-175 total | Adults: $230 total"
+      "Authentic red and gold colours",
+      "Flag elements integrated into swoosh"
     ],
     "availableSizes": [],
     "slug": "chinese-flag-af1",
@@ -137,13 +122,8 @@
       "/images/checkered-drip-heel.png",
       "/images/checkered-drip-pair.png"
     ],
-    "description": "Bold checkered pattern with artistic paint drip design.",
-    "details": [
-      "Hand-painted checkered swoosh",
-      "Artistic paint drip effect",
-      "Street art aesthetic",
-      "Infant (1C-7.5C): $135 total | Toddler (8C-13.5C): $145 total | Youth: $145 total | Big Kids: $145-175 total | Adults: $230 total"
-    ],
+    "description": "Bold checkered pattern with artistic paint-drip design.",
+    "details": ["Hand-painted checkered swoosh", "Artistic paint-drip effect", "Street-art aesthetic"],
     "availableSizes": [],
     "slug": "checkered-drip-af1",
     "isFeatured": false
@@ -153,12 +133,11 @@
     "name": "Map of Palestine AF1",
     "price": 160,
     "images": ["/images/palestine-map-side.jpg", "/images/palestine-map-angle.jpg"],
-    "description": "Hand-painted map of Palestine in traditional flag colors.",
+    "description": "Hand-painted map of Palestine in traditional flag colours.",
     "details": [
       "Hand-painted map of Palestine",
       "Traditional Kuffiyeh geometric patterns",
-      "Palestinian flag colors throughout",
-      "Infant (1C-7.5C): $135 total | Toddler (8C-13.5C): $145 total | Youth: $145 total | Big Kids: $145-175 total | Adults: $230 total"
+      "Palestinian flag colours throughout"
     ],
     "availableSizes": [],
     "slug": "map-of-palestine-af1",
@@ -170,12 +149,7 @@
     "price": 160,
     "images": ["/images/lebanese-side-view.jpg", "/images/lebanese-heel-view.jpg"],
     "description": "Lebanese flag design featuring the iconic cedar tree symbol.",
-    "details": [
-      "Hand-painted Lebanese cedar tree",
-      "Traditional red and white flag stripes",
-      "Lebanese flag colors on branding",
-      "Infant (1C-7.5C): $135 total | Toddler (8C-13.5C): $145-175 total | Youth: $145 total | Big Kids: $145-175 total | Adults: $230 total"
-    ],
+    "details": ["Hand-painted Lebanese cedar tree", "Traditional red and white stripes", "Flag colours on branding"],
     "availableSizes": [],
     "slug": "lebanese-cedar-af1",
     "isFeatured": false
@@ -186,69 +160,75 @@
     "price": 160,
     "images": ["/images/filipino-side-view.jpg", "/images/filipino-heel-view.jpg"],
     "description": "Filipino flag design featuring the golden sun symbol.",
-    "details": [
-      "Hand-painted Filipino golden sun",
-      "Authentic blue, red, and yellow colors",
-      "Traditional eight-rayed sun design",
-      "Infant (1C-7.5C): $135 total | Toddler (8C-13.5C): $145 total | Youth: $145 total | Big Kids: $145-175 total | Adults: $230 total"
-    ],
+    "details": ["Hand-painted Filipino golden sun", "Authentic blue, red and yellow", "Traditional eight-rayed sun"],
     "availableSizes": [],
     "slug": "filipino-sun-af1",
     "isFeatured": false
   },
   {
     "id": 11,
-    "name": "Palestine AF1",
+    "name": "Kuffiyeh Dunks",
     "price": 160,
-    "images": ["/images/palestine-af1-side-v3.jpeg", "/images/palestine-af1-pair-v3.jpeg"],
-    "description": "White Nike Air Force 1s featuring a Palestinian flag and kuffiyeh design on the swoosh.",
-    "details": ["Hand-painted with premium acrylic paints", "Based on Nike Air Force 1 silhouette"],
+    "images": ["/images/kuffiyeh-dunk-single.jpeg", "/images/kuffiyeh-dunk-pair.jpeg"],
+    "description": "Traditional Kuffiyeh patterns hand-painted on black Nike Dunks.",
+    "details": ["Premium acrylic paints", "Traditional Palestinian Kuffiyeh patterns", "Based on Nike Dunk silhouette"],
     "availableSizes": [],
-    "slug": "palestine-af1",
-    "isFeatured": false
+    "slug": "kuffiyeh-dunks",
+    "isFeatured": true
   },
   {
     "id": 12,
-    "name": "Palestine Flag Dunks",
+    "name": "Palestine Dunks",
     "price": 160,
-    "images": ["/images/palestine-flag-dunks.jpeg"],
-    "description": "Nike Dunks featuring a Palestinian flag design on the swoosh and a traditional kuffiyeh pattern on the heel. A powerful statement of solidarity and style.",
-    "details": ["Hand-painted with premium acrylic paints", "Based on Nike Dunk silhouette"],
+    "images": ["/images/palestine-dunks-side.jpeg", "/images/palestine-dunks-pair.jpeg"],
+    "description": "Nike Dunks featuring a Palestinian flag heel and Kuffiyeh swoosh.",
+    "details": [],
     "availableSizes": [],
-    "slug": "palestine-flag-dunks",
+    "slug": "palestine-dunks",
     "isFeatured": false
   },
   {
     "id": 13,
-    "name": "Traditional Kuffiyeh Dunks",
+    "name": "Traditional Black Kuffiyeh Dunks",
     "price": 160,
-    "images": ["/images/traditional-kuffiyeh-dunks-single.jpeg", "/images/traditional-kuffiyeh-dunks-pair.jpeg"],
-    "description": "Classic black and white Nike Dunks featuring a traditional black kuffiyeh pattern on the swoosh.",
-    "details": ["Hand-painted with premium acrylic paints", "Based on Nike Dunk silhouette"],
+    "images": ["/images/traditional-black-kuffiyeh-dunks.jpeg"],
+    "description": "Classic black & white Nike Dunks featuring a traditional Kuffiyeh pattern.",
+    "details": [],
     "availableSizes": [],
-    "slug": "traditional-kuffiyeh-dunks",
-    "isFeatured": true
+    "slug": "traditional-black-kuffiyeh-dunks",
+    "isFeatured": false
   },
   {
     "id": 14,
     "name": "Palestine Heel Kuffiyeh AF1",
     "price": 160,
-    "images": ["/images/palestine-heel-kuffiyeh-af1-side.jpeg", "/images/palestine-heel-kuffiyeh-af1-back.jpeg"],
-    "description": "White Nike Air Force 1s with a Palestinian flag swoosh and kuffiyeh details on the heel.",
-    "details": ["Hand-painted with premium acrylic paints", "Based on Nike Air Force 1 silhouette"],
+    "images": ["/images/palestine-heel-kuffiyeh-af1-side-2.jpeg", "/images/palestine-heel-kuffiyeh-af1-back-2.jpeg"],
+    "description": "White AF1s with a Palestinian flag swoosh and Kuffiyeh heel.",
+    "details": [],
     "availableSizes": [],
     "slug": "palestine-heel-kuffiyeh-af1",
-    "isFeatured": false
+    "isFeatured": true
   },
   {
     "id": 15,
     "name": "Traditional Kuffiyeh AF1",
     "price": 160,
-    "images": ["/images/traditional-kuffiyeh-af1-side.jpeg", "/images/traditional-kuffiyeh-af1-heel.jpeg"],
-    "description": "Classic white Nike Air Force 1s featuring a traditional black kuffiyeh pattern on the swoosh and heel.",
-    "details": ["Hand-painted with premium acrylic paints", "Based on Nike Air Force 1 silhouette"],
+    "images": ["/images/traditional-kuffiyeh-af1-side-2.jpeg", "/images/traditional-kuffiyeh-af1-heel-2.jpeg"],
+    "description": "Classic white AF1s featuring a traditional black Kuffiyeh pattern.",
+    "details": [],
     "availableSizes": [],
     "slug": "traditional-kuffiyeh-af1",
+    "isFeatured": false
+  },
+  {
+    "id": 16,
+    "name": "Palestine AF1",
+    "price": 160,
+    "images": ["/images/palestine-af1-side.jpeg", "/images/palestine-af1-pair.jpeg"],
+    "description": "White AF1s featuring a Palestinian flag and Kuffiyeh design.",
+    "details": [],
+    "availableSizes": [],
+    "slug": "palestine-af1",
     "isFeatured": false
   }
 ]

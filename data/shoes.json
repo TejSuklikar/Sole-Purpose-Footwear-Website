@@ -39,7 +39,7 @@
     "details": ["Hand-painted Mexican coat of arms", "Mexican flag colours on swoosh", "Premium white leather base"],
     "availableSizes": [],
     "slug": "mexican-eagle-af1",
-    "isFeatured": true
+    "isFeatured": false
   },
   {
     "id": 3,
@@ -50,7 +50,7 @@
     "details": ["All-black leather base", "Hand-painted red Kuffiyeh patterns", "Matte finish"],
     "availableSizes": [],
     "slug": "black-and-red-kuffiyeh-af1",
-    "isFeatured": true
+    "isFeatured": false
   },
   {
     "id": 4,
@@ -90,7 +90,7 @@
     ],
     "availableSizes": [],
     "slug": "black-and-white-checkered-af1",
-    "isFeatured": false
+    "isFeatured": true
   },
   {
     "id": 6,
@@ -174,7 +174,7 @@
     "details": ["Premium acrylic paints", "Traditional Palestinian Kuffiyeh patterns", "Based on Nike Dunk silhouette"],
     "availableSizes": [],
     "slug": "kuffiyeh-dunks",
-    "isFeatured": false
+    "isFeatured": true
   },
   {
     "id": 12,
@@ -196,7 +196,7 @@
     "details": [],
     "availableSizes": [],
     "slug": "traditional-black-kuffiyeh-dunks",
-    "isFeatured": true
+    "isFeatured": false
   },
   {
     "id": 14,
@@ -207,7 +207,7 @@
     "details": [],
     "availableSizes": [],
     "slug": "palestine-heel-kuffiyeh-af1",
-    "isFeatured": false
+    "isFeatured": true
   },
   {
     "id": 15,
