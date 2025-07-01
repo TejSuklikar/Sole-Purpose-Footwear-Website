@@ -11,11 +11,11 @@ const featuredShoes = [
     name: "Black & White Checkered",
     price: 160,
     image: "/images/geometric-checkered-side.jpg",
-    slug: "black-white-checkered",
+    slug: "black-and-white-checkered-af1",
     description: "Clean geometric checkered pattern in black and white.",
   },
   {
-    id: 14,
+    id: 13,
     name: "Palestine Heel Kuffiyeh AF1",
     price: 160,
     image: "/images/palestine-heel-kuffiyeh-af1-side-2.jpeg",

@@ -121,7 +121,7 @@ const shoes = [
     name: "Black & Red Kuffiyeh",
     price: 160,
     images: ["/images/black-red-af1.png"],
-    slug: "black-red-kuffiyeh",
+    slug: "black-and-red-kuffiyeh-af1",
     sizes: allSizes,
     description:
       "Sleek black Forces with striking red Kuffiyeh detailing. Modern design meets traditional craftsmanship in this bold statement piece.",
@@ -148,7 +148,7 @@ const shoes = [
     name: "Black & White Checkered",
     price: 160,
     images: ["/images/geometric-checkered-side.jpg"],
-    slug: "black-white-checkered",
+    slug: "black-and-white-checkered-af1",
     sizes: allSizes,
     description:
       "Clean checkered pattern in black and white. Minimalist design with maximum impact, perfect for those who appreciate subtle artistry and Palestinian heritage elements.",

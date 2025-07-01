@@ -82,7 +82,7 @@
       "/images/checkered-drip-heel.png",
       "/images/checkered-drip-pair.png"
     ],
-    "description": "Clean geometric checkered pattern in black and white.",
+    "description": "Clean checkered pattern in black and white.",
     "details": [
       "Hand-painted checkered pattern",
       "Black & white minimalist design",
@@ -189,17 +189,6 @@
   },
   {
     "id": 13,
-    "name": "Traditional Black Kuffiyeh Dunks",
-    "price": 160,
-    "images": ["/images/traditional-black-kuffiyeh-dunks.jpeg"],
-    "description": "Classic black & white Nike Dunks featuring a traditional Kuffiyeh pattern.",
-    "details": [],
-    "availableSizes": [],
-    "slug": "traditional-black-kuffiyeh-dunks",
-    "isFeatured": false
-  },
-  {
-    "id": 14,
     "name": "Palestine Heel Kuffiyeh AF1",
     "price": 160,
     "images": ["/images/palestine-heel-kuffiyeh-af1-side-2.jpeg", "/images/palestine-heel-kuffiyeh-af1-back-2.jpeg"],
@@ -210,7 +199,7 @@
     "isFeatured": true
   },
   {
-    "id": 15,
+    "id": 14,
     "name": "Traditional Kuffiyeh AF1",
     "price": 160,
     "images": ["/images/traditional-kuffiyeh-af1-side-2.jpeg", "/images/traditional-kuffiyeh-af1-heel-2.jpeg"],
@@ -221,7 +210,7 @@
     "isFeatured": false
   },
   {
-    "id": 16,
+    "id": 15,
     "name": "Palestine AF1",
     "price": 160,
     "images": ["/images/palestine-af1-side.jpeg", "/images/palestine-af1-pair.jpeg"],
