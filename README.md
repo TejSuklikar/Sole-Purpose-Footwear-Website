@@ -1,36 +1,30 @@
-# **Tej Suklikar’s Portfolio**
+# SoulPurposeFootwear
 
-Welcome to my personal portfolio—a space where I showcase my latest work, technical skills, and the projects I’ve brought to life. Thanks for stopping by.
+*Automatically synced with your [v0.dev](https://v0.dev) deployments*
 
-## **About Me**
+[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/tej-suklikars-projects-0d4992dc/v0-soul-purpose-footwear)
+[![Built with v0](https://img.shields.io/badge/Built%20with-v0.dev-black?style=for-the-badge)](https://v0.dev/chat/projects/MwEXdZEpFTa)
 
-Hi, I'm **Tej Suklikar**. I’m passionate about using technology to create effective, real-world solutions that drive meaningful impact. Outside of coding, I enjoy soccer, golf, working out, and spending time with my dog, Beau.
+## Overview
 
-## **About This Website**
+This repository will stay in sync with your deployed chats on [v0.dev](https://v0.dev).
+Any changes you make to your deployed app will be automatically pushed to this repository from [v0.dev](https://v0.dev).
 
-This site offers a comprehensive view of my professional journey and the work I’ve done. Built with modern web technologies, it includes:
+## Deployment
 
-- **Responsive Design**: Optimized for seamless viewing across all devices.  
-- **Interactive Features**: Smooth transitions and animations for an engaging experience.  
-- **Project Portfolio**: Detailed breakdowns of my projects, including the technologies used and the challenges addressed.
+Your project is live at:
 
-## **Technologies Used**
+**[https://vercel.com/tej-suklikars-projects-0d4992dc/v0-soul-purpose-footwear](https://vercel.com/tej-suklikars-projects-0d4992dc/v0-soul-purpose-footwear)**
 
-- **Frontend**: React, Next.js  
-- **Styling**: Tailwind CSS  
-- **Deployment**: Vercel  
+## Build your app
 
-## **Skills**
+Continue building your app on:
 
-- **Languages**: TypeScript, JavaScript, CSS  
-- **Frameworks**: React, Next.js, Tailwind CSS  
-- **Tools**: Git, Vercel, Node.js  
+**[https://v0.dev/chat/projects/MwEXdZEpFTa](https://v0.dev/chat/projects/MwEXdZEpFTa)**
 
-## **Get in Touch**
+## How It Works
 
-I'm always open to connecting and discussing new opportunities. You can reach me here:
-
-- **Email**: [anitej@suklikar.org](mailto:anitej@suklikar.org)  
-- **LinkedIn**: [linkedin.com/in/tej-suklikar](https://www.linkedin.com/in/tej-suklikar/)  
-- **GitHub**: [github.com/TejSuklikar](https://github.com/TejSuklikar)  
-- **Website**: [tej.suklikar.org](https://tej.suklikar.org)
+1. Create and modify your project using [v0.dev](https://v0.dev)
+2. Deploy your chats from the v0 interface
+3. Changes are automatically pushed to this repository
+4. Vercel deploys the latest version from this repository
