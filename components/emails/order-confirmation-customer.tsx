@@ -60,7 +60,8 @@ export default function OrderConfirmationCustomer({
               <Row key={item.id} style={itemRow}>
                 <Column>
                   <Text style={itemText}>
-                    {item.name} (Size: {item.size})
+                    {item.name} (Size: {item.size}
+                    {item.sizeCategory ? ` - ${item.sizeCategory}` : ""})
                   </Text>
                 </Column>
                 <Column align="right">

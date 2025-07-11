@@ -58,12 +58,26 @@ const getShippingForSize = (size: string): number => {
   return 20
 }
 
+// Return a human-readable category for a given size
+const getSizeCategory = (size: string): string => {
+  if (size.includes("C")) {
+    const n = Number.parseFloat(size)
+    return n <= 7.5 ? "Infant" : "Toddler"
+  }
+  if (size.includes("Y")) {
+    const n = Number.parseFloat(size)
+    return n <= 5.5 ? "Youth" : "Big Kids"
+  }
+  if (size.includes("W")) return "Women"
+  return "Men"
+}
+
 export function ProductDetail({ shoe: initialShoe }: { shoe: Shoe }) {
   const [shoe, setShoe] = useState(initialShoe)
   const [selectedSize, setSelectedSize] = useState<string>("")
   const [isAdded, setIsAdded] = useState(false)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
-  const { dispatch } = useCart()
+  const { addItem } = useCart()
 
   // Load current shoe data from global storage to get latest inventory
   useEffect(() => {
@@ -104,15 +118,17 @@ export function ProductDetail({ shoe: initialShoe }: { shoe: Shoe }) {
     // Store base price in cart (shipping calculated at checkout)
     const basePrice = getBasePriceForSize(selectedSize)
 
-    dispatch({
-      type: "ADD_ITEM",
-      payload: {
-        id: `${shoe.id}-${selectedSize}`,
-        name: shoe.name,
-        price: basePrice, // Store base price only
-        size: selectedSize,
-        image: shoe.images[0],
-      },
+    const sizeCategory = getSizeCategory(selectedSize)
+
+    addItem({
+      id: `${shoe.id}-${selectedSize}`,
+      name: shoe.name,
+      price: basePrice, // base price only – shipping at checkout
+      size: selectedSize,
+      sizeCategory,
+      quantity: 1,
+      image: shoe.images[0],
+      type: "regular",
     })
 
     setIsAdded(true)

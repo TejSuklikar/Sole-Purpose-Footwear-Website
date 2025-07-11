@@ -90,7 +90,8 @@ export default function OrderNotificationAdmin({
                 <Row style={itemRow}>
                   <Column>
                     <Text style={itemText}>
-                      {item.name} (Size: {item.size})
+                      {item.name} (Size: {item.size}
+                      {item.sizeCategory ? ` - ${item.sizeCategory}` : ""})
                       {item.type === "custom" && <span style={customBadge}> 🎨 CUSTOM</span>}
                     </Text>
                   </Column>

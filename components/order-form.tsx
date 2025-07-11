@@ -14,27 +14,32 @@ import { Palette } from "lucide-react"
 
 const sizeCategories = [
   {
-    category: "Men's/Women's - $210",
+    category: "Men's/Women's",
+    display: "Men's/Women's - $210",
     sizes: ["7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11", "11.5", "12", "12.5", "13", "14", "15"],
     price: 210,
   },
   {
-    category: "Big Kids (6Y-8Y) - $160",
+    category: "Big Kids",
+    display: "Big Kids (6Y-8Y) - $160",
     sizes: ["6Y", "6.5Y", "7Y", "7.5Y", "8Y"],
     price: 160,
   },
   {
-    category: "Youth (1Y-5.5Y) - $130",
+    category: "Youth",
+    display: "Youth (1Y-5.5Y) - $130",
     sizes: ["1Y", "1.5Y", "2Y", "2.5Y", "3Y", "3.5Y", "4Y", "4.5Y", "5Y", "5.5Y"],
     price: 130,
   },
   {
-    category: "Toddler (8C-13.5C) - $130",
+    category: "Toddler",
+    display: "Toddler (8C-13.5C) - $130",
     sizes: ["8C", "8.5C", "9C", "9.5C", "10C", "10.5C", "11C", "11.5C", "12C", "12.5C", "13C", "13.5C"],
     price: 130,
   },
   {
-    category: "Infant (1C-7.5C) - $120",
+    category: "Infant",
+    display: "Infant (1C-7.5C) - $120",
     sizes: ["1C", "1.5C", "2C", "2.5C", "3C", "3.5C", "4C", "4.5C", "5C", "5.5C", "6C", "6.5C", "7C", "7.5C"],
     price: 120,
   },
@@ -54,15 +59,15 @@ export function OrderForm() {
     additionalNotes: "",
   })
 
-  const getSelectedPrice = () => {
-    if (!formData.size) return 0
+  const getSelectedPriceAndCategory = () => {
+    if (!formData.size) return { price: 0, category: "" }
 
     for (const category of sizeCategories) {
       if (category.sizes.includes(formData.size)) {
-        return category.price
+        return { price: category.price, category: category.category }
       }
     }
-    return 0
+    return { price: 0, category: "" }
   }
 
   const handleInputChange = (field: string, value: string) => {
@@ -77,7 +82,7 @@ export function OrderForm() {
     setIsSubmitting(true)
 
     try {
-      const price = getSelectedPrice()
+      const { price, category } = getSelectedPriceAndCategory()
 
       // Add custom order to cart
       const customOrderItem = {
@@ -85,6 +90,7 @@ export function OrderForm() {
         name: `Custom ${formData.shoeModel}`,
         price: price,
         size: formData.size,
+        sizeCategory: category, // Include the size category
         quantity: 1,
         type: "custom",
         customDetails: formData,
@@ -110,6 +116,8 @@ export function OrderForm() {
       setIsSubmitting(false)
     }
   }
+
+  const { price: currentPrice } = getSelectedPriceAndCategory()
 
   return (
     <div className="min-h-screen bg-black py-12 px-4">
@@ -220,7 +228,7 @@ export function OrderForm() {
                     <SelectContent className="bg-neutral-800 border-neutral-700">
                       {sizeCategories.map((category) => (
                         <div key={category.category}>
-                          <div className="px-2 py-1 text-sm font-semibold text-neutral-400">{category.category}</div>
+                          <div className="px-2 py-1 text-sm font-semibold text-neutral-400">{category.display}</div>
                           {category.sizes.map((size) => (
                             <SelectItem key={size} value={size} className="text-white focus:bg-neutral-700">
                               {size}
@@ -280,7 +288,7 @@ export function OrderForm() {
                 className="w-full bg-white text-black hover:bg-neutral-100"
                 disabled={isSubmitting || !formData.size}
               >
-                {isSubmitting ? "Adding to Cart..." : `Add to Cart - $${getSelectedPrice()}`}
+                {isSubmitting ? "Adding to Cart..." : `Add to Cart - $${currentPrice}`}
               </Button>
             </form>
           </CardContent>

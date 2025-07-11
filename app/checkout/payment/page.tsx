@@ -207,7 +207,9 @@ export default function PaymentPage() {
                       </div>
                       <div className="flex-1">
                         <h4 className="text-white font-medium">{item.name}</h4>
-                        <p className="text-neutral-400 text-sm">Size: {item.size}</p>
+                        <p className="text-neutral-400 text-sm">
+                          Size: {item.size} {item.sizeCategory ? `(${item.sizeCategory})` : ""}
+                        </p>
                       </div>
                       <div className="text-right">
                         <p className="text-white font-semibold">${(item.price * item.quantity).toFixed(2)}</p>
