@@ -12,7 +12,7 @@ const featuredShoes = [
     price: 160,
     image: "/images/geometric-checkered-side.jpg",
     slug: "black-and-white-checkered-af1",
-    description: "Clean geometric checkered pattern in black and white.",
+    description: "Clean checkered pattern in black and white.",
   },
   {
     id: 13,
