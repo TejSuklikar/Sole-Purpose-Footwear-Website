@@ -20,8 +20,8 @@ const config: Config = {
     },
     extend: {
       fontFamily: {
-        sans: ["Manrope", "ui-sans-serif", "system-ui", "sans-serif"],
-        heading: ["Outfit", "ui-sans-serif", "system-ui", "sans-serif"],
+        sans: ["var(--font-inter)"],
+        playfair: ["var(--font-playfair)"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -56,11 +56,6 @@ const config: Config = {
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
-        },
-        blue: {
-          300: "#7dd3fc", // Light blue for text
-          600: "#0ea5e9", // Main blue color
-          700: "#0284c7", // Darker blue for hover states
         },
       },
       borderRadius: {
