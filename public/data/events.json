@@ -1,26 +1,26 @@
 [
   {
     "id": 1,
-    "title": "Pop-Up Gallery Opening",
-    "date": "July 2-5, 2025",
+    "title": "Palestine Day",
+    "date": "October 18, 2025",
     "time": "2:00 PM - 10:00 PM",
-    "location": "Hyatt Regency Burlingame, San Francisco, CA",
-    "description": "Exclusive showcase of our latest custom designs at the 2025 Ramallah Convention"
+    "location": "Redwood City, CA",
+    "description": "Limited Edition Palestinian-Inspired Designs"
   },
   {
     "id": 2,
-    "title": "Custom Design Workshop",
-    "date": "July 28, 2025",
+    "title": "Thanksgiving Event",
+    "date": "November 28, 2025",
     "time": "2:00 PM - 5:00 PM",
-    "location": "Sole Purpose Studio, SF",
-    "description": "Learn the art of sneaker customization"
+    "location": "Burlingame, CA",
+    "description": "Black Friday Limited Event"
   },
   {
     "id": 3,
-    "title": "Palestine Day",
-    "date": "October 18, 2025",
-    "time": "12:00 PM PST",
-    "location": "Redwood City",
-    "description": "Limited edition Palestinian-inspired designs"
+    "title": "Christmas Event",
+    "date": "December 20, 2025",
+    "time": "3:00 PM - 7:00 PM",
+    "location": "San Francisco, CA",
+    "description": "Holiday Inspired Design Workshop"
   }
 ]

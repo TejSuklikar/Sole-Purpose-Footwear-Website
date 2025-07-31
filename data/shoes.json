@@ -132,7 +132,11 @@
     "id": 8,
     "name": "Map of Palestine AF1",
     "price": 160,
-    "images": ["/images/palestine-map-side.jpg", "/images/palestine-map-angle.jpg"],
+    "images": [
+      "/images/palestine-map-pair.png",
+      "/images/palestine-map-deck-side.png",
+      "/images/palestine-map-deck-angle.png"
+    ],
     "description": "Hand-painted map of Palestine in traditional flag colours.",
     "details": [
       "Hand-painted map of Palestine",

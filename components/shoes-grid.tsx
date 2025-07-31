@@ -102,7 +102,7 @@ const allSizes = [
   "8Y",
 ]
 
-// Default shoes data with $160 sticker price - Updated with Kuffiyeh Dunks
+// Default shoes data with updated Map of Palestine AF1 images
 const defaultShoes: Shoe[] = [
   {
     id: 1,
@@ -199,8 +199,12 @@ const defaultShoes: Shoe[] = [
     id: 8,
     name: "Map of Palestine AF1",
     price: 160,
-    image: "/images/palestine-map-side.jpg",
-    images: ["/images/palestine-map-side.jpg"],
+    image: "/images/palestine-map-pair.png",
+    images: [
+      "/images/palestine-map-pair.png",
+      "/images/palestine-map-deck-side.png",
+      "/images/palestine-map-deck-angle.png",
+    ],
     slug: "map-of-palestine-af1",
     sizes: allSizes,
     inStockSizes: allSizes,
@@ -344,7 +348,7 @@ export function ShoesGrid() {
     )
   }
 
-  if (shoes.length === 0) {
+  if (!shoes || shoes.length === 0) {
     return (
       <div className="text-center py-12">
         <p className="text-white text-lg mb-4">No shoes available at the moment.</p>
@@ -397,8 +401,8 @@ export function ShoesGrid() {
                 </div>
                 <div className="p-6">
                   <h3 className="font-semibold text-lg mb-2 text-neutral-900">{shoe.name}</h3>
-                  <p className="text-2xl font-bold text-neutral-900 mb-2">${shoe.price}</p>
-                  <p className="text-sm text-neutral-600 mb-4">Available in {shoe.inStockSizes.length} sizes</p>
+                  <p className="text-2xl font-bold text-neutral-900 mb-2">$120 - $210</p>
+                  <p className="text-sm text-neutral-600 mb-4">Available in {shoe.inStockSizes?.length || 73} sizes</p>
                   <Button className="w-full bg-neutral-700 text-white">View Details</Button>
                 </div>
               </div>

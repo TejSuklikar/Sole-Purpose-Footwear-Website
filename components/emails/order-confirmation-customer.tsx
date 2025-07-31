@@ -1,136 +1,200 @@
-import {
-  Body,
-  Container,
-  Head,
-  Heading,
-  Hr,
-  Html,
-  Img,
-  Preview,
-  Section,
-  Text,
-  Row,
-  Column,
-} from "@react-email/components"
-import type { CartItem } from "@/components/cart-provider"
+import { Body, Container, Head, Heading, Html, Preview, Section, Text, Hr } from "@react-email/components"
 
-interface OrderConfirmationCustomerProps {
-  cartItems: CartItem[]
-  subtotal: number
-  shippingCost: number
-  total: number
-  isBayArea: boolean
-  shippingAddress: {
-    street: string
+interface OrderData {
+  customer: {
+    firstName: string
+    lastName: string
+    email: string
+    phone: string
+    address: string
     city: string
     state: string
-    zip: string
+    zipCode: string
+    isBayArea: boolean
   }
+  items: Array<{
+    name: string
+    size: string
+    sizeCategory: string
+    price: number
+    customization?: string
+  }>
+  subtotal: number
+  shipping: number
+  total: number
+  orderDate: string
 }
 
-const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000"
-
-export default function OrderConfirmationCustomer({
-  cartItems,
-  subtotal,
-  shippingCost,
-  total,
-  isBayArea,
-  shippingAddress,
-}: OrderConfirmationCustomerProps) {
+export const OrderConfirmationCustomer = ({ orderData }: { orderData: OrderData }) => {
   return (
     <Html>
       <Head />
-      <Preview>Your Sole Purpose Order Confirmation</Preview>
+      <Preview>Your Sole Purpose Footwear order confirmation</Preview>
       <Body style={main}>
         <Container style={container}>
-          <Section style={logoContainer}>
-            <Img src={`${baseUrl}/favicon.png`} width="40" height="40" alt="Sole Purpose Logo" />
-          </Section>
-          <Heading style={h1}>Thank you for your order!</Heading>
+          <Heading style={h1}>Order Confirmation</Heading>
+
+          <Text style={text}>Hi {orderData.customer.firstName},</Text>
+
           <Text style={text}>
-            We've received your order and will begin processing it shortly. You'll receive another email once your
-            customs are ready to ship.
+            Thank you for your order! We've received your request and will begin working on your custom shoes soon.
           </Text>
-          <Section style={box}>
-            <Heading as="h2" style={h2}>
-              Order Summary
-            </Heading>
-            {cartItems.map((item) => (
-              <Row key={item.id} style={itemRow}>
-                <Column>
-                  <Text style={itemText}>
-                    {item.name} (Size: {item.size}
-                    {item.sizeCategory ? ` - ${item.sizeCategory}` : ""})
-                  </Text>
-                </Column>
-                <Column align="right">
-                  <Text style={itemText}>${item.price.toFixed(2)}</Text>
-                </Column>
-              </Row>
+
+          <Section style={orderSection}>
+            <Heading style={h2}>Order Details</Heading>
+
+            {orderData.items.map((item, index) => (
+              <div key={index} style={itemContainer}>
+                <Text style={itemName}>{item.name}</Text>
+                <Text style={itemDetails}>
+                  Size: {item.size} ({item.sizeCategory}) - ${item.price}
+                </Text>
+                {item.customization && <Text style={itemDetails}>Custom: {item.customization}</Text>}
+              </div>
             ))}
+
             <Hr style={hr} />
-            <Row>
-              <Column>
-                <Text style={summaryText}>Subtotal</Text>
-              </Column>
-              <Column align="right">
-                <Text style={summaryText}>${subtotal.toFixed(2)}</Text>
-              </Column>
-            </Row>
-            <Row>
-              <Column>
-                <Text style={summaryText}>Shipping</Text>
-              </Column>
-              <Column align="right">
-                <Text style={summaryText}>{isBayArea ? "FREE" : `$${shippingCost.toFixed(2)}`}</Text>
-              </Column>
-            </Row>
-            <Hr style={hr} />
-            <Row>
-              <Column>
-                <Text style={totalText}>Total</Text>
-              </Column>
-              <Column align="right">
-                <Text style={totalText}>${total.toFixed(2)}</Text>
-              </Column>
-            </Row>
+
+            <div style={totalsContainer}>
+              <Text style={totalsText}>Subtotal: ${orderData.subtotal}</Text>
+              <Text style={totalsText}>Shipping: ${orderData.shipping}</Text>
+              <Text style={totalText}>Total: ${orderData.total}</Text>
+            </div>
           </Section>
 
-          <Section style={box}>
-            <Heading as="h2" style={h2}>
-              Shipping To
-            </Heading>
-            <Text style={addressText}>
-              {shippingAddress.street}
+          <Section style={shippingSection}>
+            <Heading style={h2}>Shipping Address</Heading>
+            <Text style={text}>
+              {orderData.customer.firstName} {orderData.customer.lastName}
               <br />
-              {shippingAddress.city}, {shippingAddress.state} {shippingAddress.zip}
+              {orderData.customer.address}
+              <br />
+              {orderData.customer.city}, {orderData.customer.state} {orderData.customer.zipCode}
             </Text>
           </Section>
 
-          <Text style={footerText}>
-            Sole Purpose Footwear | Custom Kicks, Endless Soul
-            <br />
-            Questions? Contact us at solepurposefootwear813@gmail.com
+          <Section style={paymentSection}>
+            <Heading style={h2}>Payment Instructions</Heading>
+            <Text style={text}>
+              <strong>Zelle (Preferred):</strong> +1 (415) 939-8270
+            </Text>
+            <Text style={text}>
+              <strong>Venmo:</strong> @solepurposefootwear
+            </Text>
+            <Text style={text}>
+              Amount: <strong>${orderData.total}</strong>
+            </Text>
+          </Section>
+
+          <Text style={text}>
+            We'll keep you updated on your order progress. If you have any questions, please contact us at
+            solepurposefootwear813@gmail.com.
           </Text>
+
+          <Text style={footer}>Thank you for choosing Sole Purpose Footwear!</Text>
         </Container>
       </Body>
     </Html>
   )
 }
 
-// Styles
-const main = { backgroundColor: "#000", fontFamily: "Helvetica,Arial,sans-serif", color: "#fff" }
-const container = { padding: "40px", margin: "0 auto", width: "100%", maxWidth: "600px" }
-const logoContainer = { textAlign: "center" as const, paddingBottom: "20px" }
-const h1 = { fontSize: "28px", fontWeight: "bold", margin: "0 0 20px" }
-const h2 = { fontSize: "20px", fontWeight: "bold", margin: "0 0 15px" }
-const text = { fontSize: "16px", lineHeight: "1.5", color: "#ccc" }
-const box = { backgroundColor: "#111", padding: "25px", borderRadius: "8px", marginBottom: "20px" }
-const itemRow = { padding: "5px 0" }
-const itemText = { fontSize: "16px", margin: 0, color: "#fff" }
-const summaryText = { fontSize: "16px", margin: 0, color: "#ccc" }
-const totalText = { fontSize: "18px", fontWeight: "bold", margin: 0, color: "#fff" }
-const addressText = { fontSize: "16px", lineHeight: "1.5", color: "#ccc", margin: 0 }
-const hr = { borderColor: "#333", margin: "15px 0" }
-const footerText = { fontSize: "12px", color: "#777", textAlign: "center" as const, paddingTop: "20px" }
+const main = {
+  backgroundColor: "#f6f9fc",
+  fontFamily: '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Ubuntu,sans-serif',
+}
+
+const container = {
+  backgroundColor: "#ffffff",
+  margin: "0 auto",
+  padding: "20px 0 48px",
+  marginBottom: "64px",
+}
+
+const h1 = {
+  color: "#333",
+  fontSize: "24px",
+  fontWeight: "bold",
+  margin: "40px 0",
+  padding: "0",
+  textAlign: "center" as const,
+}
+
+const h2 = {
+  color: "#333",
+  fontSize: "18px",
+  fontWeight: "bold",
+  margin: "30px 0 15px",
+}
+
+const text = {
+  color: "#333",
+  fontSize: "14px",
+  lineHeight: "24px",
+  margin: "16px 0",
+}
+
+const orderSection = {
+  padding: "20px",
+  border: "1px solid #eee",
+  borderRadius: "5px",
+  margin: "20px 0",
+}
+
+const itemContainer = {
+  marginBottom: "15px",
+}
+
+const itemName = {
+  color: "#333",
+  fontSize: "16px",
+  fontWeight: "bold",
+  margin: "0 0 5px 0",
+}
+
+const itemDetails = {
+  color: "#666",
+  fontSize: "14px",
+  margin: "0 0 5px 0",
+}
+
+const hr = {
+  borderColor: "#e6ebf1",
+  margin: "20px 0",
+}
+
+const totalsContainer = {
+  textAlign: "right" as const,
+}
+
+const totalsText = {
+  color: "#333",
+  fontSize: "14px",
+  margin: "5px 0",
+}
+
+const totalText = {
+  color: "#333",
+  fontSize: "16px",
+  fontWeight: "bold",
+  margin: "10px 0 0 0",
+}
+
+const shippingSection = {
+  margin: "20px 0",
+}
+
+const paymentSection = {
+  padding: "20px",
+  backgroundColor: "#f8f9fa",
+  border: "1px solid #eee",
+  borderRadius: "5px",
+  margin: "20px 0",
+}
+
+const footer = {
+  color: "#8898aa",
+  fontSize: "12px",
+  lineHeight: "16px",
+  textAlign: "center" as const,
+  margin: "40px 0 0 0",
+}

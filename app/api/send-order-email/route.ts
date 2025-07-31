@@ -1,91 +1,47 @@
-import { NextResponse } from "next/server"
+import { type NextRequest, NextResponse } from "next/server"
 import { Resend } from "resend"
-import OrderConfirmationCustomer from "@/components/emails/order-confirmation-customer"
-import OrderNotificationAdmin from "@/components/emails/order-notification-admin"
-import type { CartItem } from "@/components/cart-provider"
+import { OrderConfirmationCustomer } from "@/components/emails/order-confirmation-customer"
+import { OrderNotificationAdmin } from "@/components/emails/order-notification-admin"
 
 const resend = new Resend(process.env.RESEND_API_KEY)
-const fromEmail = "orders@orders.solepurpose.shop"
-const adminEmail = "solepurposefootwear813@gmail.com"
-const MAX_FILE_SIZE_BYTES = 8 * 1024 * 1024 // 8MB
 
-export async function POST(request: Request) {
-  if (!fromEmail || !adminEmail) {
-    console.error("Missing FROM_EMAIL or ADMIN_EMAIL environment variables.")
-    return NextResponse.json({ error: "Server configuration error. Please contact support." }, { status: 500 })
-  }
-
+export async function POST(request: NextRequest) {
   try {
-    const formData = await request.formData()
-    const customerEmail = formData.get("customerEmail") as string
-    const cartItems = JSON.parse(formData.get("cartItems") as string) as CartItem[]
-    const subtotal = Number.parseFloat(formData.get("subtotal") as string)
-    const shippingCost = Number.parseFloat(formData.get("shippingCost") as string)
-    const total = Number.parseFloat(formData.get("total") as string)
-    const isBayArea = formData.get("isBayArea") === "true"
-    const shippingAddress = JSON.parse(formData.get("shippingAddress") as string)
-    const paymentProof = formData.get("paymentProof") as File | null
+    const orderData = await request.json()
 
-    // --- Validation ---
-    if (!customerEmail || !cartItems || !shippingAddress || !paymentProof) {
-      return NextResponse.json({ error: "Missing required fields." }, { status: 400 })
-    }
-
-    if (paymentProof.size > MAX_FILE_SIZE_BYTES) {
-      return NextResponse.json({ error: "Payment proof file is too large." }, { status: 400 })
-    }
-
-    const buffer = Buffer.from(await paymentProof.arrayBuffer())
-
-    // --- Email to Admin ---
-    const adminEmailData = await resend.emails.send({
-      from: fromEmail,
-      to: adminEmail,
-      subject: `New Order Received - ${customerEmail}`,
-      react: OrderNotificationAdmin({
-        customerEmail,
-        cartItems,
-        subtotal,
-        shippingCost,
-        total,
-        isBayArea,
-        shippingAddress,
-      }),
-      attachments: [
-        {
-          filename: paymentProof.name,
-          content: buffer,
-        },
-      ],
+    console.log("Processing order:", {
+      customer: orderData.customer.email,
+      items: orderData.items.length,
+      total: orderData.total,
     })
 
-    if (adminEmailData.error) {
-      throw new Error(`Error sending admin email: ${adminEmailData.error.message}`)
-    }
-
-    // --- Email to Customer ---
-    const customerEmailData = await resend.emails.send({
-      from: fromEmail,
-      to: customerEmail,
-      subject: "Your Sole Purpose Order Confirmation",
-      react: OrderConfirmationCustomer({
-        cartItems,
-        subtotal,
-        shippingCost,
-        total,
-        isBayArea,
-        shippingAddress,
-      }),
+    // Send confirmation email to customer
+    const customerEmail = await resend.emails.send({
+      from: "Sole Purpose Footwear <orders@solepurposefootwear.com>",
+      to: [orderData.customer.email],
+      subject: "Order Confirmation - Sole Purpose Footwear",
+      react: OrderConfirmationCustomer({ orderData }),
     })
 
-    if (customerEmailData.error) {
-      // If this fails, we don't need to fail the whole request, but we should log it.
-      console.error(`Failed to send confirmation to ${customerEmail}: ${customerEmailData.error.message}`)
-    }
+    console.log("Customer email sent:", customerEmail.data?.id)
 
-    return NextResponse.json({ success: true })
-  } catch (error: any) {
-    console.error("Error in send-order-email route:", error)
-    return NextResponse.json({ error: error.message || "An internal server error occurred." }, { status: 500 })
+    // Send notification email to admin
+    const adminEmail = await resend.emails.send({
+      from: "Sole Purpose Footwear <orders@solepurposefootwear.com>",
+      to: ["solepurposefootwear813@gmail.com"],
+      subject: `New Order from ${orderData.customer.firstName} ${orderData.customer.lastName}`,
+      react: OrderNotificationAdmin({ orderData }),
+    })
+
+    console.log("Admin email sent:", adminEmail.data?.id)
+
+    return NextResponse.json({
+      success: true,
+      customerEmailId: customerEmail.data?.id,
+      adminEmailId: adminEmail.data?.id,
+    })
+  } catch (error) {
+    console.error("Email sending error:", error)
+    return NextResponse.json({ error: "Failed to send order emails" }, { status: 500 })
   }
 }

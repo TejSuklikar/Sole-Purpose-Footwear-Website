@@ -192,11 +192,15 @@ const shoes = [
     id: 8,
     name: "Map of Palestine AF1",
     price: 160,
-    images: ["/images/palestine-map-side.jpg", "/images/palestine-map-angle.jpg"],
+    images: [
+      "/images/palestine-map-pair.png",
+      "/images/palestine-map-deck-side.png",
+      "/images/palestine-map-deck-angle.png",
+    ],
     slug: "map-of-palestine-af1",
     sizes: allSizes,
     description:
-      "HHand-painted map of Palestine in traditional flag colors with intricate Kufiyyeh patterns. A powerful statement piece that honors Palestinian heritage and identity through detailed cartographic artistry.",
+      "Hand-painted map of Palestine in traditional flag colors with intricate Kufiyyeh patterns. A powerful statement piece that honors Palestinian heritage and identity through detailed cartographic artistry.",
     details: [
       "Hand-painted map of Palestine in red and green",
       "Traditional Kuffiyeh border patterns",
