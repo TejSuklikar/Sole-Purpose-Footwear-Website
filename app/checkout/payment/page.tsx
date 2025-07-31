@@ -318,7 +318,7 @@ export default function PaymentPage() {
                   <div className="space-y-3">
                     <div>
                       <p className="text-neutral-300 text-sm mb-1">
-                        <strong>Zelle (Preferred):</strong> +1 (415) 939-8270
+                        <strong>Zelle:</strong> +1 (415) 939-8270
                       </p>
                     </div>
                     <div>
