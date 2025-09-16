@@ -85,6 +85,25 @@ const allSizes = [
 ]
 
 const shoes = [
+  // New 360° Red Kuffiyeh AF1s as first shoe
+  {
+    id: 16,
+    name: "360° Red Kuffiyeh AF1s",
+    price: 300,
+    images: ["/images/360-red-kuffiyeh-af1-single.jpeg", "/images/360-red-kuffiyeh-af1-pair.jpeg"],
+    slug: "360-red-kuffiyeh-af1s",
+    sizes: allSizes,
+    description:
+      "Complete 360° coverage of traditional red Kuffiyeh patterns on premium white Air Force 1s. Every surface features intricate geometric designs that celebrate Palestinian heritage with unmatched artistry and attention to detail.",
+    details: [
+      "Hand-painted with premium acrylic paints",
+      "Full 360° Kuffiyeh pattern coverage on all surfaces",
+      "Sealed with protective coating for durability",
+      "Based on Nike Air Force 1 silhouette",
+      "Men's/Women's: $300 | Toddler: $200",
+      "Available in all colors",
+    ],
+  },
   // Featured shoes (first 3 from hero section)
   {
     id: 1,

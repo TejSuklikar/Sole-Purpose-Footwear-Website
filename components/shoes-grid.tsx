@@ -102,8 +102,29 @@ const allSizes = [
   "8Y",
 ]
 
-// Default shoes data with updated Map of Palestine AF1 images
+// Default shoes data with new 360° Red Kuffiyeh AF1s as first item
 const defaultShoes: Shoe[] = [
+  {
+    id: 16,
+    name: "360° Red Kuffiyeh AF1s",
+    price: 300,
+    image: "/images/360-red-kuffiyeh-af1-single.jpeg",
+    images: ["/images/360-red-kuffiyeh-af1-single.jpeg", "/images/360-red-kuffiyeh-af1-pair.jpeg"],
+    slug: "360-red-kuffiyeh-af1s",
+    sizes: allSizes,
+    inStockSizes: allSizes,
+    description:
+      "Complete 360° coverage of traditional red Kuffiyeh patterns on premium white Air Force 1s. Every surface features intricate geometric designs.",
+    details: [
+      "Hand-painted with premium acrylic paints",
+      "Full 360° Kuffiyeh pattern coverage",
+      "Sealed with protective coating",
+      "Based on Nike Air Force 1",
+      "Men's/Women's: $300 | Toddler: $200",
+      "Available in all colors",
+    ],
+    isFeatured: true,
+  },
   {
     id: 1,
     name: "Red Kuffiyeh AF1",
@@ -401,7 +422,9 @@ export function ShoesGrid() {
                 </div>
                 <div className="p-6">
                   <h3 className="font-semibold text-lg mb-2 text-neutral-900">{shoe.name}</h3>
-                  <p className="text-2xl font-bold text-neutral-900 mb-2">$120 - $210</p>
+                  <p className="text-2xl font-bold text-neutral-900 mb-2">
+                    {shoe.name === "360° Red Kuffiyeh AF1s" ? "$200 - $300" : "$120 - $210"}
+                  </p>
                   <p className="text-sm text-neutral-600 mb-4">Available in {shoe.inStockSizes?.length || 73} sizes</p>
                   <Button className="w-full bg-neutral-700 text-white">View Details</Button>
                 </div>

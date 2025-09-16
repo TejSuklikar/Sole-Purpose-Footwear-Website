@@ -1,5 +1,23 @@
 [
   {
+    "id": 16,
+    "name": "360° Red Kuffiyeh AF1s",
+    "price": 300,
+    "images": ["/images/360-red-kuffiyeh-af1-single.jpeg", "/images/360-red-kuffiyeh-af1-pair.jpeg"],
+    "description": "Complete 360° coverage of traditional red Kuffiyeh patterns on premium white Air Force 1s. Every surface features intricate geometric designs.",
+    "details": [
+      "Hand-painted with premium acrylic paints",
+      "Full 360° Kuffiyeh pattern coverage",
+      "Sealed with protective coating",
+      "Based on Nike Air Force 1",
+      "Men's/Women's: $300 | Toddler: $200",
+      "Available in all colors"
+    ],
+    "availableSizes": [],
+    "slug": "360-red-kuffiyeh-af1s",
+    "isFeatured": true
+  },
+  {
     "id": 1,
     "name": "Red Kuffiyeh AF1",
     "price": 160,
@@ -82,7 +100,7 @@
       "/images/checkered-drip-heel.png",
       "/images/checkered-drip-pair.png"
     ],
-    "description": "Clean checkered pattern in black and white.",
+    "description": "Clean geometric checkered pattern in black and white.",
     "details": [
       "Hand-painted checkered pattern",
       "Black & white minimalist design",
