@@ -19,7 +19,18 @@ interface Shoe {
 }
 
 // Base pricing function (before shipping) - UPDATED
-const getBasePriceForSize = (size: string): number => {
+const getBasePriceForSize = (size: string, shoeId?: number): number => {
+  // Custom pricing for 360° Red Kuffiyeh AF1s (id: 16)
+  if (shoeId === 16) {
+    // Kids and toddlers: $200
+    if (size.includes("C") || size.includes("Y")) {
+      return 200
+    }
+    // Adults: $300
+    return 300
+  }
+
+  // Standard pricing for all other shoes
   // Infant sizes (1C-7.5C): $120
   if (size.includes("C")) {
     const num = Number.parseFloat(size)
@@ -116,7 +127,7 @@ export function ProductDetail({ shoe: initialShoe }: { shoe: Shoe }) {
     if (!selectedSize) return
 
     // Store base price in cart (shipping calculated at checkout)
-    const basePrice = getBasePriceForSize(selectedSize)
+    const basePrice = getBasePriceForSize(selectedSize, shoe.id)
 
     const sizeCategory = getSizeCategory(selectedSize)
 
@@ -187,7 +198,7 @@ export function ProductDetail({ shoe: initialShoe }: { shoe: Shoe }) {
           {categorySizes.map((size) => {
             const isInStock = inStockSizes.includes(size)
             const isSelected = selectedSize === size
-            const sizePrice = getBasePriceForSize(size)
+            const sizePrice = getBasePriceForSize(size, shoe.id)
 
             return (
               <button
@@ -219,8 +230,34 @@ export function ProductDetail({ shoe: initialShoe }: { shoe: Shoe }) {
   }
 
   const canAddToCart = selectedSize && inStockSizes.includes(selectedSize)
-  const selectedBasePrice = selectedSize ? getBasePriceForSize(selectedSize) : null
+  const selectedBasePrice = selectedSize ? getBasePriceForSize(selectedSize, shoe.id) : null
   const selectedShipping = selectedSize ? getShippingForSize(selectedSize) : null
+
+  // Get price ranges for this specific shoe
+  const getPriceRanges = (shoeId: number) => {
+    if (shoeId === 16) {
+      // 360° Red Kuffiyeh AF1s custom pricing
+      return {
+        mens: "$300",
+        womens: "$300",
+        bigKids: "$200",
+        youth: "$200",
+        toddler: "$200",
+        infant: "$200",
+      }
+    }
+    // Standard pricing
+    return {
+      mens: "$210",
+      womens: "$210",
+      bigKids: "$160",
+      youth: "$130",
+      toddler: "$130",
+      infant: "$120",
+    }
+  }
+
+  const priceRanges = getPriceRanges(shoe.id)
 
   return (
     <div className="py-20">
@@ -317,7 +354,7 @@ export function ProductDetail({ shoe: initialShoe }: { shoe: Shoe }) {
               <h1 className="font-playfair text-3xl md:text-4xl font-bold text-white mb-2">{shoe.name}</h1>
               <div className="space-y-2">
                 <p className="text-2xl font-bold text-white">
-                  Starting at $120
+                  {shoe.id === 16 ? "Starting at $200" : "Starting at $120"}
                   {selectedBasePrice && (
                     <span className="ml-2 text-lg text-neutral-300">(Selected: ${selectedBasePrice})</span>
                   )}
@@ -395,12 +432,12 @@ export function ProductDetail({ shoe: initialShoe }: { shoe: Shoe }) {
                 Prices shown before shipping • Sizes marked "Out" are currently unavailable
               </p>
 
-              {renderSizeCategory("Men's", mensSizes, "$210")}
-              {renderSizeCategory("Women's", womensSizes, "$210")}
-              {renderSizeCategory("Big Kids (6Y-8Y)", bigKidsSizes, "$160")}
-              {renderSizeCategory("Youth (1Y-5.5Y)", youthSizes, "$130")}
-              {renderSizeCategory("Toddler (8C-13.5C)", toddlerSizes, "$130")}
-              {renderSizeCategory("Infant (1C-7.5C)", infantSizes, "$120")}
+              {renderSizeCategory("Men's", mensSizes, priceRanges.mens)}
+              {renderSizeCategory("Women's", womensSizes, priceRanges.womens)}
+              {renderSizeCategory("Big Kids (6Y-8Y)", bigKidsSizes, priceRanges.bigKids)}
+              {renderSizeCategory("Youth (1Y-5.5Y)", youthSizes, priceRanges.youth)}
+              {renderSizeCategory("Toddler (8C-13.5C)", toddlerSizes, priceRanges.toddler)}
+              {renderSizeCategory("Infant (1C-7.5C)", infantSizes, priceRanges.infant)}
             </div>
 
             {/* Add to Cart */}

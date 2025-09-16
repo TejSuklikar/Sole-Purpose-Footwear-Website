@@ -423,7 +423,7 @@ export function ShoesGrid() {
                 <div className="p-6">
                   <h3 className="font-semibold text-lg mb-2 text-neutral-900">{shoe.name}</h3>
                   <p className="text-2xl font-bold text-neutral-900 mb-2">
-                    {shoe.name === "360° Red Kuffiyeh AF1s" ? "$200 - $300" : "$120 - $210"}
+                    {shoe.id === 16 ? "$200 - $300" : "$120 - $210"}
                   </p>
                   <p className="text-sm text-neutral-600 mb-4">Available in {shoe.inStockSizes?.length || 73} sizes</p>
                   <Button className="w-full bg-neutral-700 text-white">View Details</Button>
