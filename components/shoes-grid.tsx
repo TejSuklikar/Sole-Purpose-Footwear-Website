@@ -102,8 +102,32 @@ const allSizes = [
   "8Y",
 ]
 
-// Default shoes data with new 360° Red Kuffiyeh AF1s as first item
+// Default shoes data with new Olive Tree AF1s as first item
 const defaultShoes: Shoe[] = [
+  {
+    id: 17,
+    name: "Olive Tree AF1s",
+    price: 160,
+    image: "/images/olive-tree-af1-single.jpeg",
+    images: [
+      "/images/olive-tree-af1-single.jpeg",
+      "/images/olive-tree-af1-pair.jpeg",
+      "/images/olive-tree-af1-stacked.jpeg",
+    ],
+    slug: "olive-tree-af1s",
+    sizes: allSizes,
+    inStockSizes: allSizes,
+    description:
+      "Hand-painted olive tree design on premium white Air Force 1s featuring detailed brown trunk and vibrant green foliage.",
+    details: [
+      "Hand-painted with premium acrylic paints",
+      "Detailed olive tree artwork",
+      "Sealed with protective coating",
+      "Based on Nike Air Force 1",
+      "Palestinian heritage symbolism",
+    ],
+    isFeatured: true,
+  },
   {
     id: 16,
     name: "360° Red Kuffiyeh AF1s",
