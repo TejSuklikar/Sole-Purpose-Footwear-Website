@@ -15,9 +15,9 @@ import { Palette } from "lucide-react"
 const sizeCategories = [
   {
     category: "Men's/Women's",
-    display: "Men's/Women's - $210",
+    display: "Men's/Women's - $220",
     sizes: ["7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11", "11.5", "12", "12.5", "13", "14", "15"],
-    price: 210,
+    price: 220,
   },
   {
     category: "Big Kids",

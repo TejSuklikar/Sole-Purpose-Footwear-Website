@@ -960,7 +960,7 @@ export function AdminPanel() {
             </div>
             <div className="bg-neutral-800 p-3 rounded">
               <h4 className="text-white font-semibold mb-2">Women's & Men's</h4>
-              <p className="text-neutral-300">$210 + $20 shipping = $230 total</p>
+              <p className="text-neutral-300">$220 + $20 shipping = $240 total</p>
             </div>
             <div className="bg-green-800 p-3 rounded">
               <h4 className="text-white font-semibold mb-2">Bay Area Special</h4>

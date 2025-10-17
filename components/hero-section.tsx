@@ -72,7 +72,7 @@ export function HeroSection() {
                       <p className="text-neutral-800 mb-4 line-clamp-2">{shoe.description}</p>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-2xl font-bold text-black">$120 - $210</span>
+                      <span className="text-2xl font-bold text-black">$120 - $220</span>
                     </div>
                   </div>
                 </div>

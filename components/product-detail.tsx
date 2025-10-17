@@ -56,8 +56,8 @@ const getBasePriceForSize = (size: string, shoeId?: number): number => {
     }
   }
 
-  // Women's and Men's: $210
-  return 210
+  // Women's and Men's: $220
+  return 220
 }
 
 const getShippingForSize = (size: string): number => {
@@ -156,13 +156,29 @@ export function ProductDetail({ shoe: initialShoe }: { shoe: Shoe }) {
 
   const inStockSizes = shoe.inStockSizes || shoe.sizes
 
-  // Group sizes by category for better display - UPDATED WITH 7.5C
   const mensSizes = shoe.sizes.filter((size) => !size.includes("W") && !size.includes("C") && !size.includes("Y"))
   const womensSizes = shoe.sizes.filter((size) => size.includes("W"))
+
+  // Create size pairs: M 6 / W 7.5, M 6.5 / W 8, etc.
+  const combinedAdultSizes = mensSizes.map((mensSize) => {
+    const mensNum = Number.parseFloat(mensSize)
+    const womensNum = mensNum + 1.5
+    const womensSize = `${womensNum}W`
+
+    return {
+      display: `M ${mensSize} / W ${womensNum}`,
+      mensSize,
+      womensSize,
+      mensInStock: inStockSizes.includes(mensSize),
+      womensInStock: inStockSizes.includes(womensSize),
+    }
+  })
+
+  // Keep kids sizes separate
   const infantSizes = shoe.sizes.filter((size) => {
     if (!size.includes("C")) return false
     const num = Number.parseFloat(size)
-    return num >= 1 && num <= 7.5 // INCLUDES 7.5C
+    return num >= 1 && num <= 7.5
   })
   const toddlerSizes = shoe.sizes.filter((size) => {
     if (size.includes("C")) {
@@ -185,6 +201,71 @@ export function ProductDetail({ shoe: initialShoe }: { shoe: Shoe }) {
     }
     return false
   })
+
+  const renderCombinedAdultSizes = (categoryName: string, sizePairs: typeof combinedAdultSizes, priceRange: string) => {
+    if (sizePairs.length === 0) return null
+
+    return (
+      <div className="mb-4">
+        <h4 className="text-sm font-medium text-neutral-300 mb-2">
+          {categoryName} - {priceRange}
+        </h4>
+        <div className="grid grid-cols-2 gap-2">
+          {sizePairs.map((pair) => {
+            const isMensSelected = selectedSize === pair.mensSize
+            const isWomensSelected = selectedSize === pair.womensSize
+            const isSelected = isMensSelected || isWomensSelected
+            const mensPrice = getBasePriceForSize(pair.mensSize, shoe.id)
+
+            return (
+              <div key={pair.display} className="relative">
+                <button
+                  onClick={() => {
+                    // Toggle between men's and women's size, or select men's by default
+                    if (isMensSelected && pair.womensInStock) {
+                      setSelectedSize(pair.womensSize)
+                    } else if (isWomensSelected && pair.mensInStock) {
+                      setSelectedSize(pair.mensSize)
+                    } else if (pair.mensInStock) {
+                      setSelectedSize(pair.mensSize)
+                    } else if (pair.womensInStock) {
+                      setSelectedSize(pair.womensSize)
+                    }
+                  }}
+                  disabled={!pair.mensInStock && !pair.womensInStock}
+                  className={`w-full p-3 border rounded-lg text-center transition-colors ${
+                    isSelected
+                      ? "border-white bg-white text-neutral-900"
+                      : pair.mensInStock || pair.womensInStock
+                        ? "border-neutral-600 text-white hover:border-neutral-400"
+                        : "border-neutral-700 text-neutral-500 cursor-not-allowed"
+                  }`}
+                  title={
+                    pair.mensInStock || pair.womensInStock
+                      ? `${pair.display} - $${mensPrice} + shipping`
+                      : "Out of stock"
+                  }
+                >
+                  <div className="text-sm font-medium">{pair.display}</div>
+                  {(pair.mensInStock || pair.womensInStock) && <div className="text-xs opacity-75">${mensPrice}</div>}
+                  {!pair.mensInStock && !pair.womensInStock && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-neutral-800/80 rounded-lg">
+                      <span className="text-xs text-red-400">Out</span>
+                    </div>
+                  )}
+                </button>
+                {isSelected && (
+                  <div className="text-xs text-center mt-1 text-neutral-400">
+                    Selected: {isMensSelected ? `Men's ${pair.mensSize}` : `Women's ${pair.womensSize}`}
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      </div>
+    )
+  }
 
   const renderSizeCategory = (categoryName: string, categorySizes: string[], priceRange: string) => {
     if (categorySizes.length === 0) return null
@@ -240,16 +321,16 @@ export function ProductDetail({ shoe: initialShoe }: { shoe: Shoe }) {
       return {
         mens: "$300",
         womens: "$300",
-        bigKids: "$200",
-        youth: "$200",
-        toddler: "$200",
-        infant: "$200",
+        bigKids: "$160",
+        youth: "$130",
+        toddler: "$130",
+        infant: "$120",
       }
     }
     // Standard pricing
     return {
-      mens: "$210",
-      womens: "$210",
+      mens: "$220",
+      womens: "$220",
       bigKids: "$160",
       youth: "$130",
       toddler: "$130",
@@ -278,7 +359,7 @@ export function ProductDetail({ shoe: initialShoe }: { shoe: Shoe }) {
                 src={shoe.images[currentImageIndex] || "/placeholder.svg?height=400&width=400&text=Product+Image"}
                 alt={`${shoe.name} view ${currentImageIndex + 1}`}
                 fill
-                className="object-contain object-center p-4"
+                className="object-cover object-center"
                 crossOrigin="anonymous"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement
@@ -335,7 +416,7 @@ export function ProductDetail({ shoe: initialShoe }: { shoe: Shoe }) {
                       src={image || "/placeholder.svg?height=100&width=100&text=Thumbnail"}
                       alt={`${shoe.name} thumbnail ${index + 1}`}
                       fill
-                      className="object-contain object-center p-2"
+                      className="object-cover object-center"
                       crossOrigin="anonymous"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement
@@ -432,8 +513,7 @@ export function ProductDetail({ shoe: initialShoe }: { shoe: Shoe }) {
                 Prices shown before shipping • Sizes marked "Out" are currently unavailable
               </p>
 
-              {renderSizeCategory("Men's", mensSizes, priceRanges.mens)}
-              {renderSizeCategory("Women's", womensSizes, priceRanges.womens)}
+              {renderCombinedAdultSizes("Men's / Women's", combinedAdultSizes, priceRanges.mens)}
               {renderSizeCategory("Big Kids (6Y-8Y)", bigKidsSizes, priceRanges.bigKids)}
               {renderSizeCategory("Youth (1Y-5.5Y)", youthSizes, priceRanges.youth)}
               {renderSizeCategory("Toddler (8C-13.5C)", toddlerSizes, priceRanges.toddler)}
