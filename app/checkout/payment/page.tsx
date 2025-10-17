@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-
+import { formatSizeDisplay } from "@/lib/format-size"
 import { useState } from "react"
 import { useCart } from "@/components/cart-provider"
 import { Button } from "@/components/ui/button"
@@ -143,9 +143,7 @@ export default function PaymentPage() {
                 <div key={index} className="flex justify-between items-start">
                   <div className="flex-1">
                     <h3 className="font-medium text-white">{item.name}</h3>
-                    <p className="text-sm text-neutral-400">
-                      Size: {item.size} ({item.sizeCategory})
-                    </p>
+                    <p className="text-sm text-neutral-400">Size: {formatSizeDisplay(item.size, item.sizeCategory)}</p>
                     {item.customization && <p className="text-sm text-neutral-400">Custom: {item.customization}</p>}
                   </div>
                   <span className="font-medium text-white">${item.price}</span>

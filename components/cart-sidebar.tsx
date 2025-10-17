@@ -6,6 +6,7 @@ import { Minus, Plus, Trash2, ShoppingBag, Palette, X } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { formatSizeDisplay } from "@/lib/format-size"
 
 function CartSidebar({ onClose }: { onClose?: () => void }) {
   const { items, total, updateQuantity, removeItem, clearCart } = useCart()
@@ -75,7 +76,9 @@ function CartSidebar({ onClose }: { onClose?: () => void }) {
                     />
                     <div className="flex-1 min-w-0">
                       <h5 className="text-sm font-medium text-neutral-900 truncate">{item.name}</h5>
-                      <p className="text-sm text-neutral-600">Size: {item.size}</p>
+                      <p className="text-sm text-neutral-600">
+                        Size: {formatSizeDisplay(item.size, item.sizeCategory)}
+                      </p>
                       <p className="text-sm font-medium text-neutral-900">${item.price}</p>
                     </div>
                     <div className="flex items-center space-x-2">
@@ -128,7 +131,7 @@ function CartSidebar({ onClose }: { onClose?: () => void }) {
                       </div>
                       <div className="flex-1 min-w-0">
                         <h5 className="text-sm font-medium text-blue-900">{item.name}</h5>
-                        <p className="text-sm text-blue-700">Size: {item.size}</p>
+                        <p className="text-sm text-blue-700">Size: {formatSizeDisplay(item.size, item.sizeCategory)}</p>
                         <p className="text-sm font-medium text-blue-900">${item.price}</p>
                         {item.customDetails && (
                           <p className="text-xs text-blue-600 mt-1">
